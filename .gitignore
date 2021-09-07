@@ -4,3 +4,4 @@
 arbitrum-oracle-txs/
 config.py
 config.ini
+*.ini
