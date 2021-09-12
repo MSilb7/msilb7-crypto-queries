@@ -2,7 +2,9 @@
 .DS_Store
 .ipynb_checkpoints/
 arbitrum-oracle-txs/
+arbitrum-txs/
 optimism-oracle-txs/
+optimism-txs/
 config.py
 config.ini
 *.ini
