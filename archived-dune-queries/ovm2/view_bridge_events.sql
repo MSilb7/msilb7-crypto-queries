@@ -1,6 +1,5 @@
 --drop view if exists dune_user_generated.view_bridge_events;
-CREATE OR REPLACE view dune_user_generated.view_bridge_events AS
-
+--CREATE OR REPLACE view dune_user_generated.view_bridge_events AS
 
 WITH unified_bridges AS (
 
@@ -347,7 +346,7 @@ FROM (
 WHERE rn = 1 --just to ensure no duplicates across bridges
     
 )
-/*
+
 -- We keep Optimism in hourly throughout because we don't have prices in dex.trades
 , dex_trades AS ( --only Uniswap now, should have SNX and others later
 SELECT --pulled from eth dex_trades abstraction: https://github.com/duneanalytics/abstractions/blob/master/ethereum/dex/trades/insert_uniswap.sql
@@ -394,9 +393,22 @@ FROM dune_user_generated.hourly_bridge_token_price_ratios --https://dune.xyz/que
 INNER JOIN gs
 ON f.dt <= gs.dt
 AND gs.dt < f.next_dt
-
-
 )
+/*
+,synth_token_price AS (
+SELECT
+gs.dt,
+'\x8c6f28f2f1a3c87f0f938b96d27520d9751ec8d9'::bytea AS erc20_token, "token", "symbol", "median_price", "decimals"
+FROM (
+    SELECT *,
+    lead(hour, 1, now() ) OVER (PARTITION BY "token"
+                                ORDER BY hour asc) AS next_dt
+    FROM dune_user_generated."hourly_synth_prices"
+    ) f
+INNER JOIN gs
+ON f.hour <= gs.dt
+AND gs.dt < f.next_dt
+)*/
 
 , dex_price AS(
 --for tokens where dune doesn't have the price, calculate the avg price in it's last hour of swaps (6 hr if no swaps in the last hour)
@@ -560,7 +572,25 @@ WITH token_prices AS (
         ON h.erc20_token = p.token
         AND h.dt = p.dt
         ) h
-)*/
+    
+    /*UNION ALL
+    
+    SELECT --synth prices
+    dt,
+    token, symbol, decimals,
+    median_price * price_ratio AS median_price,
+    DENSE_RANK() OVER (PARTITION BY token ORDER BY dt DESC) AS hrank
+    FROM (
+        SELECT 
+        h.dt,
+        erc20_token, h.token, h.symbol, h.median_price AS price_ratio,
+        h.decimals, p.median_price
+        FROM synth_token_price h
+        INNER JOIN token_prices p
+        ON h.erc20_token = p.token
+        AND h.dt = p.dt
+        ) h*/
+)
 
 SELECT
 gb.dt, evt_tx_hash,
@@ -579,7 +609,8 @@ gb.token,
     AS symbol,
 bridge_type,
 amount/(10^COALESCE(e.decimals,dp.decimals)) AS num_tokens,
-dp.median_price*amount/(10^COALESCE(e.decimals,dp.decimals)) AS amount_usd,
+dp.median_price*amount/(10^COALESCE(e.decimals,dp.decimals)) 
+AS amount_usd,
 sender, receiver,
 is_standard_bridge
 
@@ -588,7 +619,7 @@ FROM unified_bridges gb
 LEFT JOIN erc20."tokens" e
     ON e."contract_address" = gb.token
 
-LEFT JOIN dune_user_generated."new_hourly_dex_prices" dp
+LEFT JOIN dune_user_generated."hourly_dex_prices" dp--dune_user_generated."hourly_dex_prices" dp
     ON DATE_TRUNC('hour',gb.dt) = dp.hour
     AND gb.token = dp.token
 --WHERE chain != 10 OR chain IS NULL--weird.... not sure why some are internal optimism transfers
