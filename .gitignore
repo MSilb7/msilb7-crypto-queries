@@ -8,3 +8,4 @@ optimism-txs/
 config.py
 config.ini
 *.ini
+labels/etherscan-export.xlsx
