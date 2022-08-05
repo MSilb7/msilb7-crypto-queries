@@ -9,3 +9,5 @@ config.py
 config.ini
 *.ini
 labels/etherscan-export.xlsx
+folder_ignore/
+Covalent API Testing.ipynb
