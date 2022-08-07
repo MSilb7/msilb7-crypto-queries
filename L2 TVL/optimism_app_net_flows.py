@@ -178,8 +178,8 @@ fig.update_layout(
     legend_title="App Name"
 )
 fig.update_layout(yaxis_tickprefix = '$')
-fig.write_image("/img_outputs/svg/daily_ndf.svg")
-fig.write_image("/img_outputs/png/daily_ndf.png")
+fig.write_image("img_outputs/svg/daily_ndf.svg")
+fig.write_image("img_outputs/png/daily_ndf.png")
 
 # cumul_fig = px.area(netdf_df, x="date", y="cumul_net_dollar_flow", color="protocol", \
 #              title="Cumulative Dollar Flow since Program Announcement",\
@@ -206,8 +206,8 @@ cumul_fig.update_layout(
     legend_title="App Name",
 #     color_discrete_map=px.colors.qualitative.G10
 )
-cumul_fig.write_image("/img_outputs/svg/cumul_ndf.svg")
-cumul_fig.write_image("/img_outputs/png/cumul_ndf.png")
+cumul_fig.write_image("img_outputs/svg/cumul_ndf.svg")
+cumul_fig.write_image("img_outputs/png/cumul_ndf.png")
 
 
 # In[39]:
@@ -218,7 +218,7 @@ cumul_fig.write_image("/img_outputs/png/cumul_ndf.png")
 print("yay")
 
 
-# In[40]:
+# In[41]:
 
 
 get_ipython().system(' jupyter nbconvert --to python optimism_app_net_flows.ipynb')
