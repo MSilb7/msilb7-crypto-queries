@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[12]:
+# In[27]:
 
 
 # ! pip install pandas
@@ -12,7 +12,7 @@
 # ! pip freeze = requirements.txt
 
 
-# In[13]:
+# In[28]:
 
 
 import pandas as pd
@@ -20,13 +20,13 @@ import requests as r
 import plotly.express as px
 import plotly.graph_objects as go
 from datetime import datetime, timedelta
-import os
+# import os
 
 
-# In[14]:
+# In[29]:
 
 
-pwd = os.getcwd()
+# pwd = os.getcwd()
 api_str = 'https://api.llama.fi/protocol/'
 
 protocols = [
@@ -58,13 +58,13 @@ df_df = pd.concat(prod)
 df_df
 
 
-# In[15]:
+# In[30]:
 
 
 # df_df[df_df['protocol']=='perpetual-protocol']
 
 
-# In[16]:
+# In[31]:
 
 
 #defillama api feedback - only token symbols come through, makes it hard to map w/o doing it manually
@@ -104,13 +104,13 @@ coingecko_token_map = [
 ]
 
 
-# In[17]:
+# In[32]:
 
 
 cg_token_list = [i[0] for i in coingecko_token_map]
 
 
-# In[18]:
+# In[33]:
 
 
 # DISTINCT TOKENS
@@ -120,7 +120,7 @@ missing_token_list = token_list[~token_list['token'].isin(cg_token_list)]
 missing_token_list
 
 
-# In[19]:
+# In[34]:
 
 
 
@@ -138,7 +138,7 @@ cg_df = pd.concat(cg_pds)
 # cg_df
 
 
-# In[20]:
+# In[35]:
 
 
 data_df = df_df.merge(cg_df, on=['date','token'],how='inner')
@@ -149,13 +149,13 @@ data_df['net_dollar_flow'] = data_df['net_token_flow'] * data_df['price_usd']
 data_df
 
 
-# In[21]:
+# In[36]:
 
 
 data_df[data_df['protocol']=='perpetual-protocol'].sort_values(by='date')
 
 
-# In[22]:
+# In[37]:
 
 
 netdf_df = data_df[data_df['date']>= data_df['start_date']][['date','protocol','net_dollar_flow']]
@@ -166,7 +166,7 @@ netdf_df.reset_index(inplace=True)
 netdf_df
 
 
-# In[23]:
+# In[38]:
 
 
 fig = px.line(netdf_df, x="date", y="net_dollar_flow", color="protocol",              title="Daily Net Dollar Flow since Program Announcement",            labels={
@@ -178,8 +178,8 @@ fig.update_layout(
     legend_title="App Name"
 )
 fig.update_layout(yaxis_tickprefix = '$')
-fig.write_image(pwd + "/img_outputs/svg/daily_ndf.svg")
-fig.write_image(pwd + "/img_outputs/png/daily_ndf.png")
+fig.write_image("/img_outputs/svg/daily_ndf.svg")
+fig.write_image("/img_outputs/png/daily_ndf.png")
 
 # cumul_fig = px.area(netdf_df, x="date", y="cumul_net_dollar_flow", color="protocol", \
 #              title="Cumulative Dollar Flow since Program Announcement",\
@@ -206,11 +206,11 @@ cumul_fig.update_layout(
     legend_title="App Name",
 #     color_discrete_map=px.colors.qualitative.G10
 )
-cumul_fig.write_image(pwd + "/img_outputs/svg/cumul_ndf.svg")
-cumul_fig.write_image(pwd + "/img_outputs/png/cumul_ndf.png")
+cumul_fig.write_image("/img_outputs/svg/cumul_ndf.svg")
+cumul_fig.write_image("/img_outputs/png/cumul_ndf.png")
 
 
-# In[24]:
+# In[39]:
 
 
 # fig.show()
@@ -218,7 +218,7 @@ cumul_fig.write_image(pwd + "/img_outputs/png/cumul_ndf.png")
 print("yay")
 
 
-# In[25]:
+# In[40]:
 
 
 get_ipython().system(' jupyter nbconvert --to python optimism_app_net_flows.ipynb')
