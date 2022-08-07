@@ -253,8 +253,8 @@ cumul_fig.write_html(prepend + "img_outputs/cumul_ndf.html", include_plotlyjs='c
 print("yay")
 
 
-# In[ ]:
+# In[137]:
 
 
-get_ipython().system(' jupyter nbconvert --to python optimism_app_net_flows.ipynb')
+# ! jupyter nbconvert --to python optimism_app_net_flows.ipynb
 
