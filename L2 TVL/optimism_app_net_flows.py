@@ -213,7 +213,7 @@ fig.update_layout(
 fig.update_layout(yaxis_tickprefix = '$')
 fig.write_image(prepend + "img_outputs/svg/daily_ndf.svg")
 fig.write_image(prepend + "img_outputs/png/daily_ndf.png")
-fig.write_html(prepend + "img_outputs/daily_ndf.html")
+fig.write_html(prepend + "img_outputs/daily_ndf.html", include_plotlyjs='cdn')
 
 # cumul_fig = px.area(netdf_df, x="date", y="cumul_net_dollar_flow", color="protocol", \
 #              title="Cumulative Dollar Flow since Program Announcement",\
@@ -242,7 +242,7 @@ cumul_fig.update_layout(
 )
 cumul_fig.write_image(prepend + "img_outputs/svg/cumul_ndf.svg") #prepend + 
 cumul_fig.write_image(prepend + "img_outputs/png/cumul_ndf.png") #prepend + 
-cumul_fig.write_html(prepend + "img_outputs/cumul_ndf.html")
+cumul_fig.write_html(prepend + "img_outputs/cumul_ndf.html", include_plotlyjs='cdn')
 
 
 # In[132]:
@@ -253,8 +253,8 @@ cumul_fig.write_html(prepend + "img_outputs/cumul_ndf.html")
 print("yay")
 
 
-# In[135]:
+# In[ ]:
 
 
-# ! jupyter nbconvert --to python optimism_app_net_flows.ipynb
+get_ipython().system(' jupyter nbconvert --to python optimism_app_net_flows.ipynb')
 
