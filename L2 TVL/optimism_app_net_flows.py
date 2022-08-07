@@ -251,7 +251,7 @@ cumul_fig.write_image(prepend + "img_outputs/png/cumul_ndf.png") #prepend +
 print("yay")
 
 
-# In[117]:
+# In[118]:
 
 
 # ! jupyter nbconvert --to python optimism_app_net_flows.ipynb
