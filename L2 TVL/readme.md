@@ -1,3 +1,3 @@
 # OP Summer TVL Change Tracking
-![](cumul_ndf.png)
-![](daily_ndf.png)
+![](cumul_ndf.svg)
+![](daily_ndf.svg)
