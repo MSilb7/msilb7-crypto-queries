@@ -1,0 +1,59 @@
+# This is a basic workflow to help you get started with Actions
+
+name: Run L2 TVL
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the "main" branch
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  # Run on a schedule
+  schedule:
+      - cron: '20 15 * * *'
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v3
+      
+      - name: Generate Requirements
+        run: |
+          pip install pipreqs
+          python -m  pipreqs.pipreqs
+      
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+          cache: 'pip' # caching pip dependencies
+      - run: pip install -r requirements.txt
+      
+#       - name: Install Python dependencies
+#         run: |
+#           python -m pip install --upgrade pip pandas
+#           python -m pip install --upgrade pip requests
+#           python -m pip install --upgrade pip plotly
+#           python -m pip install --upgrade pip datetime
+#           python -m pip install --upgrade pip sklearn
+
+      # Runs a single command using the runners shell
+      # - name: Run a one-line script
+      #  run: echo Hello, world!
+      - name: Update OP Summer TVL Charts
+        run: python L2\ \TVL/optimism_app_net_flows.py
+
+      # Runs a set of commands using the runners shell
+      # - name: Run a multi-line script
+      #  run: |
+      #    echo Add other actions to build,
+      #    echo test, and deploy your project.
