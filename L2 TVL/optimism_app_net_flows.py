@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[91]:
+# In[119]:
 
 
 # ! pip install pandas
@@ -12,7 +12,7 @@
 # ! pip freeze = requirements.txt
 
 
-# In[101]:
+# In[120]:
 
 
 import pandas as pd
@@ -24,7 +24,7 @@ import numpy as np
 import os
 
 
-# In[93]:
+# In[121]:
 
 
 pwd = os.getcwd()
@@ -34,7 +34,7 @@ else:
     prepend = 'L2 TVL/'
 
 
-# In[94]:
+# In[122]:
 
 
 
@@ -77,13 +77,13 @@ df_df = pd.concat(prod)
 df_df
 
 
-# In[95]:
+# In[123]:
 
 
 # df_df[df_df['protocol']=='perpetual-protocol']
 
 
-# In[96]:
+# In[124]:
 
 
 # #defillama api feedback - only token symbols come through, makes it hard to map w/o doing it manually
@@ -123,14 +123,14 @@ df_df
 # ]
 
 
-# In[97]:
+# In[125]:
 
 
 # cg_token_list = [i[0] for i in coingecko_token_map]
 # # print(cg_token_list)
 
 
-# In[98]:
+# In[126]:
 
 
 # # DISTINCT TOKENS
@@ -140,7 +140,7 @@ df_df
 # missing_token_list
 
 
-# In[99]:
+# In[127]:
 
 
 
@@ -161,7 +161,7 @@ df_df
 # # cg_df
 
 
-# In[107]:
+# In[128]:
 
 
 data_df = df_df.copy()#merge(cg_df, on=['date','token'],how='inner')
@@ -182,13 +182,13 @@ data_df['net_dollar_flow'] = data_df['net_token_flow'] * data_df['price_usd']
 # display(data_df)
 
 
-# In[108]:
+# In[129]:
 
 
 data_df[data_df['protocol']=='perpetual-protocol'].sort_values(by='date')
 
 
-# In[109]:
+# In[130]:
 
 
 netdf_df = data_df[data_df['date']>= data_df['start_date']][['date','protocol','net_dollar_flow']]
@@ -199,7 +199,7 @@ netdf_df.reset_index(inplace=True)
 netdf_df
 
 
-# In[112]:
+# In[131]:
 
 
 fig = px.line(netdf_df, x="date", y="net_dollar_flow", color="protocol",              title="Daily Net Dollar Flow since Program Announcement",            labels={
@@ -213,6 +213,7 @@ fig.update_layout(
 fig.update_layout(yaxis_tickprefix = '$')
 fig.write_image(prepend + "img_outputs/svg/daily_ndf.svg")
 fig.write_image(prepend + "img_outputs/png/daily_ndf.png")
+fig.write_html(prepend + "img_outputs/daily_ndf.html")
 
 # cumul_fig = px.area(netdf_df, x="date", y="cumul_net_dollar_flow", color="protocol", \
 #              title="Cumulative Dollar Flow since Program Announcement",\
@@ -241,9 +242,10 @@ cumul_fig.update_layout(
 )
 cumul_fig.write_image(prepend + "img_outputs/svg/cumul_ndf.svg") #prepend + 
 cumul_fig.write_image(prepend + "img_outputs/png/cumul_ndf.png") #prepend + 
+cumul_fig.write_html(prepend + "img_outputs/cumul_ndf.html")
 
 
-# In[113]:
+# In[132]:
 
 
 # fig.show()
@@ -251,7 +253,7 @@ cumul_fig.write_image(prepend + "img_outputs/png/cumul_ndf.png") #prepend +
 print("yay")
 
 
-# In[118]:
+# In[135]:
 
 
 # ! jupyter nbconvert --to python optimism_app_net_flows.ipynb
