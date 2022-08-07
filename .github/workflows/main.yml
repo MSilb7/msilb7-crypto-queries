@@ -11,7 +11,7 @@ on:
 #     branches: [ "main" ]
   # Run on a schedule
   schedule:
-      - cron: '20 15 * * *'
+      - cron: '0 */6 * * *'
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
