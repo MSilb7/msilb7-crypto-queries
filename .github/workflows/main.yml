@@ -31,6 +31,15 @@ jobs:
           python-version: '3.9'
           cache: 'pip' # caching pip dependencies
       - run: pip install -r requirements.txt
+      
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip pandas
+          python -m pip install --upgrade pip requests
+          python -m pip install --upgrade pip plotly
+          python -m pip install --upgrade pip datetime
+          python -m pip install --upgrade pip os
+          python -m pip install --upgrade pip sklearn
 
       # Runs a single command using the runners shell
       # - name: Run a one-line script
