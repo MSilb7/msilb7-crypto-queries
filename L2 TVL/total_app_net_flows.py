@@ -11,6 +11,7 @@ import plotly.graph_objects as go
 from datetime import datetime, timedelta, date
 import numpy as np
 import time
+import os
 header = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:71.0) Gecko/20100101 Firefox/71.0'}
 
 
@@ -30,6 +31,12 @@ s = requests.Session()
 retries = Retry(total=5, backoff_factor=1, status_forcelist=[ 502, 503, 504 ])
 s.mount('http://', HTTPAdapter(max_retries=retries))
 
+pwd = os.getcwd()
+if 'L2 TVL' in pwd:
+    prepend = ''
+else:
+    prepend = 'L2 TVL/'
+
 
 # In[52]:
 
@@ -43,7 +50,7 @@ trailing_num_days = 7
 #get all apps > 10 m tvl
 all_api = 'https://api.llama.fi/protocols'
 res = pd.DataFrame( r.get(all_api, headers=header).json() )
-res = res[res['tvl'] > 10_000_000] ##greater than 10mil
+res = res[res['tvl'] > 100_000_000] ##greater than 10mil
 print(len(res))
 # print(res.columns)
 
@@ -255,10 +262,10 @@ fig.update_traces(root_color="lightgrey")
 fig.update_layout(margin = dict(t=50, l=25, r=25, b=25))
 # fig.update_layout(tickprefix = '$')
 
-fig.show()
-fig.write_image("img_outputs/svg/net_app_flows.svg") #prepend + 
-fig.write_image("img_outputs/png/net_app_flows.png") #prepend + 
-fig.write_html("img_outputs/net_app_flows.html", include_plotlyjs='cdn')
+# fig.show()
+fig.write_image(prepend + "img_outputs/svg/net_app_flows.svg") #prepend + 
+fig.write_image(prepend + "img_outputs/png/net_app_flows.png") #prepend + 
+fig.write_html(prepend + "img_outputs/net_app_flows.html", include_plotlyjs='cdn')
 
 
 # In[67]:
@@ -310,7 +317,7 @@ fig.write_html("img_outputs/net_app_flows.html", include_plotlyjs='cdn')
 # cumul_fig.show()
 
 
-# In[72]:
+# In[74]:
 
 
 # ! jupyter nbconvert --to python total_app_net_flows.ipynb
