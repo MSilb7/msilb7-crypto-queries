@@ -50,7 +50,7 @@ trailing_num_days = 7
 #get all apps > 10 m tvl
 all_api = 'https://api.llama.fi/protocols'
 res = pd.DataFrame( r.get(all_api, headers=header).json() )
-res = res[res['tvl'] > 100_000_000] ##greater than 10mil
+res = res[res['tvl'] > 10_000_000] ##greater than 10mil
 print(len(res))
 # print(res.columns)
 
@@ -245,7 +245,9 @@ netdf_df['rank_desc'] = netdf_df.groupby(['protocol', 'chain'])['date'].        
 # In[71]:
 
 
-summary_df = netdf_df[( netdf_df['rank_desc'] == 1 ) &                        (~netdf_df['chain'].str.contains('borrowed')) &                        (~netdf_df['chain'].str.contains('staking'))  
+summary_df = netdf_df[  ( netdf_df['rank_desc'] == 1 ) &                        (~netdf_df['chain'].str.contains('-borrowed')) &                        (~netdf_df['chain'].str.contains('-staking'))  
+                        (~netdf_df['chain'].str.contains('-pool2')) 
+                        (~netdf_df['chain'] == 'treasury')
                         ]
 summary_df = summary_df.sort_values(by='cumul_net_dollar_flow',ascending=False)
 summary_df['pct_of_tvl'] = 100* summary_df['net_dollar_flow'] / summary_df['usd_value']
@@ -317,7 +319,7 @@ fig.write_html(prepend + "img_outputs/net_app_flows.html", include_plotlyjs='cdn
 # cumul_fig.show()
 
 
-# In[74]:
+# In[75]:
 
 
 # ! jupyter nbconvert --to python total_app_net_flows.ipynb
