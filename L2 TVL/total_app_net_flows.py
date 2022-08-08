@@ -92,7 +92,7 @@ for index,proto in protocols.iterrows():
 #     time.sleep(0.1)
     try:
         prot_req = s.get(apic, headers=header).json()['chainTvls']
-        print(apic)
+#         print(apic)
         for ch in chains:
             ad = pd.json_normalize( prot_req[ch]['tokens'] )
             ad_usd = pd.json_normalize( prot_req[ch]['tokensInUsd'] )
@@ -119,7 +119,8 @@ for index,proto in protocols.iterrows():
 
 
 df_df_all = pd.concat(prod)
-df_df_all
+# df_df_all
+print("done api")
 
 
 # In[59]:
@@ -133,8 +134,8 @@ df_df = df_df_all[df_df_all['date'].dt.date >= date.today()-timedelta(days=trail
 df_df['last_token_value'] = df_df.groupby(['token','protocol','chain'])['token_value'].shift(1)
 #now actually filter
 df_df = df_df[df_df['date'].dt.date >= date.today()-timedelta(days=trailing_num_days +1) ]
-display(df_df['date'].drop_duplicates())
-df_df[(df_df['protocol'] == 'uniswap') & (df_df['token'] != 'USDT') & (df_df['token_value'] > 0)]
+# display(df_df['date'].drop_duplicates())
+# df_df[(df_df['protocol'] == 'uniswap') & (df_df['token'] != 'USDT') & (df_df['token_value'] > 0)]
 
 
 # In[ ]:
@@ -186,13 +187,13 @@ data_df = data_df[~data_df['net_dollar_flow'].isna()] #50 bil error bar
 #         ].sort_values('net_dollar_flow'))
 
 
-data_df.sort_values('net_dollar_flow')
+# data_df.sort_values('net_dollar_flow')
 
 
 # In[62]:
 
 
-data_df[['date']].drop_duplicates().sort_values('date')
+# data_df[['date']].drop_duplicates().sort_values('date')
 # data_df[data_df['date'].dt.date != data_df['date']].sort_values('date')
 
 
@@ -309,7 +310,7 @@ fig.write_html("img_outputs/net_app_flows.html", include_plotlyjs='cdn')
 # cumul_fig.show()
 
 
-# In[ ]:
+# In[72]:
 
 
 # ! jupyter nbconvert --to python total_app_net_flows.ipynb
