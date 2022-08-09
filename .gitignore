@@ -11,3 +11,4 @@ config.ini
 labels/etherscan-export.xlsx
 folder_ignore/
 Covalent API Testing.ipynb
+L2 TVL/img_outputs/net_app_flows.html
