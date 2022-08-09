@@ -51,7 +51,7 @@ trailing_num_days = 7
 
 start_date = date.today()-timedelta(days=trailing_num_days +1)
 
-start_date = datetime.strptime('2022-07-13', '%Y-%m-%d').date()
+# start_date = datetime.strptime('2022-07-13', '%Y-%m-%d').date()
 
 
 # In[4]:
@@ -333,8 +333,8 @@ fig.write_html(prepend + "img_outputs/net_app_flows.html", include_plotlyjs='cdn
 # cumul_fig.show()
 
 
-# In[ ]:
+# In[45]:
 
 
-get_ipython().system(' jupyter nbconvert --to python total_app_net_flows.ipynb')
+# ! jupyter nbconvert --to python total_app_net_flows.ipynb
 
