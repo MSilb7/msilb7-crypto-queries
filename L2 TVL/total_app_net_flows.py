@@ -252,10 +252,11 @@ netdf_df['rank_desc'] = netdf_df.groupby(['protocol', 'chain'])['date'].        
 
 
 
-# In[36]:
+# In[41]:
 
 
 summary_df = netdf_df[  ( netdf_df['rank_desc'] == 1 ) &                        (~netdf_df['chain'].str.contains('-borrowed')) &                        (~netdf_df['chain'].str.contains('-staking')) &                        (~netdf_df['chain'].str.contains('-pool2')) &                        (~( netdf_df['chain'] == 'treasury') ) &                        (~( netdf_df['chain'] == 'borrowed') )
+#                         & (~( netdf_df['chain'] == 'Ethereum') )
                         ]
 summary_df = summary_df.sort_values(by='cumul_net_dollar_flow',ascending=False)
 summary_df['pct_of_tvl'] = 100* summary_df['net_dollar_flow'] / summary_df['usd_value']
@@ -275,7 +276,7 @@ fig.update_layout(margin = dict(t=50, l=25, r=25, b=25))
 # fig.show()
 
 
-# In[37]:
+# In[42]:
 
 
 fig.write_image(prepend + "img_outputs/svg/net_app_flows.svg") #prepend + 
@@ -283,7 +284,7 @@ fig.write_image(prepend + "img_outputs/png/net_app_flows.png") #prepend +
 fig.write_html(prepend + "img_outputs/net_app_flows.html", include_plotlyjs='cdn')
 
 
-# In[38]:
+# In[43]:
 
 
 # netdf_df_plot = netdf_df[netdf_df['chain']=='Ethereum']
@@ -332,7 +333,7 @@ fig.write_html(prepend + "img_outputs/net_app_flows.html", include_plotlyjs='cdn
 # cumul_fig.show()
 
 
-# In[39]:
+# In[ ]:
 
 
 get_ipython().system(' jupyter nbconvert --to python total_app_net_flows.ipynb')
