@@ -1,7 +1,13 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[77]:
+# In[ ]:
+
+
+
+
+
+# In[1]:
 
 
 import pandas as pd
@@ -15,7 +21,7 @@ import os
 header = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:71.0) Gecko/20100101 Firefox/71.0'}
 
 
-# In[78]:
+# In[2]:
 
 
 #https://stackoverflow.com/questions/23267409/how-to-implement-retry-mechanism-into-python-requests-library
@@ -38,13 +44,17 @@ else:
     prepend = 'L2 TVL/'
 
 
-# In[79]:
+# In[22]:
 
 
 trailing_num_days = 7
 
+start_date = date.today()-timedelta(days=trailing_num_days +1)
 
-# In[80]:
+start_date = datetime.strptime('2022-07-13', '%Y-%m-%d').date()
+
+
+# In[4]:
 
 
 #get all apps > 10 m tvl
@@ -55,7 +65,7 @@ print(len(res))
 # print(res.columns)
 
 
-# In[81]:
+# In[5]:
 
 
 
@@ -66,7 +76,7 @@ protocols['chainTvls'] = protocols['chainTvls'].apply(lambda x: list(x.keys()) )
 protocols
 
 
-# In[82]:
+# In[6]:
 
 
 # protocols = protocols[ protocols['slug'] == 'uniswap-v3' ]
@@ -75,7 +85,7 @@ protocols
 # ad
 
 
-# In[83]:
+# In[7]:
 
 
 # api_str = 'https://api.llama.fi/protocol/uniswap'
@@ -84,7 +94,7 @@ protocols
 # prot_req
 
 
-# In[84]:
+# In[8]:
 
 
 #get by app
@@ -122,7 +132,7 @@ for index,proto in protocols.iterrows():
         print('err')
 
 
-# In[85]:
+# In[23]:
 
 
 df_df_all = pd.concat(prod)
@@ -130,17 +140,17 @@ df_df_all = pd.concat(prod)
 print("done api")
 
 
-# In[86]:
+# In[24]:
 
 
 # df_df[df_df['protocol']=='perpetual-protocol']
 #filter down a bit so we can do trailing comp w/o doing every row
-df_df = df_df_all[df_df_all['date'].dt.date >= date.today()-timedelta(days=trailing_num_days +2) ]
+df_df = df_df_all[df_df_all['date'].dt.date >= start_date-timedelta(days=1) ]
 # display(df_df['date'].drop_duplicates())
 #trailing comp
 df_df['last_token_value'] = df_df.groupby(['token','protocol','chain'])['token_value'].shift(1)
 #now actually filter
-df_df = df_df[df_df['date'].dt.date >= date.today()-timedelta(days=trailing_num_days +1) ]
+df_df = df_df[df_df['date'].dt.date >= start_date ]
 # display(df_df['date'].drop_duplicates())
 # df_df[(df_df['protocol'] == 'uniswap') & (df_df['token'] != 'USDT') & (df_df['token_value'] > 0)]
 
@@ -151,7 +161,7 @@ df_df = df_df[df_df['date'].dt.date >= date.today()-timedelta(days=trailing_num_
 
 
 
-# In[87]:
+# In[25]:
 
 
 # # DISTINCT TOKENS
@@ -165,7 +175,7 @@ df_df = df_df[df_df['date'].dt.date >= date.today()-timedelta(days=trailing_num_
 # missing_token_list
 
 
-# In[88]:
+# In[26]:
 
 
 # data_df = df_df.merge(cg_df, on=['date','token'],how='inner')
@@ -197,14 +207,14 @@ data_df = data_df[~data_df['net_dollar_flow'].isna()] #50 bil error bar
 # data_df.sort_values('net_dollar_flow')
 
 
-# In[89]:
+# In[27]:
 
 
 # data_df[['date']].drop_duplicates().sort_values('date')
 # data_df[data_df['date'].dt.date != data_df['date']].sort_values('date')
 
 
-# In[90]:
+# In[28]:
 
 
 # data_df[data_df['protocol']=='perpetual-protocol'].sort_values(by='date')
@@ -212,7 +222,7 @@ data_df = data_df[~data_df['net_dollar_flow'].isna()] #50 bil error bar
 # segment_cols = ['date','protocol','chain','token']
 
 
-# In[91]:
+# In[29]:
 
 
 netdf_df = data_df[['date','protocol','chain','net_dollar_flow','usd_value']]
@@ -228,7 +238,7 @@ netdf_df.reset_index(inplace=True)
 netdf_df.drop(columns=['index'],inplace=True)
 
 
-# In[92]:
+# In[30]:
 
 
 #get latest
@@ -242,10 +252,10 @@ netdf_df['rank_desc'] = netdf_df.groupby(['protocol', 'chain'])['date'].        
 
 
 
-# In[98]:
+# In[36]:
 
 
-summary_df = netdf_df[  ( netdf_df['rank_desc'] == 1 ) &                        (~netdf_df['chain'].str.contains('-borrowed')) &                        (~netdf_df['chain'].str.contains('-staking')) &                        (~netdf_df['chain'].str.contains('-pool2')) &                        (~( netdf_df['chain'] == 'treasury') )
+summary_df = netdf_df[  ( netdf_df['rank_desc'] == 1 ) &                        (~netdf_df['chain'].str.contains('-borrowed')) &                        (~netdf_df['chain'].str.contains('-staking')) &                        (~netdf_df['chain'].str.contains('-pool2')) &                        (~( netdf_df['chain'] == 'treasury') ) &                        (~( netdf_df['chain'] == 'borrowed') )
                         ]
 summary_df = summary_df.sort_values(by='cumul_net_dollar_flow',ascending=False)
 summary_df['pct_of_tvl'] = 100* summary_df['net_dollar_flow'] / summary_df['usd_value']
@@ -263,12 +273,17 @@ fig.update_layout(margin = dict(t=50, l=25, r=25, b=25))
 # fig.update_layout(tickprefix = '$')
 
 # fig.show()
+
+
+# In[37]:
+
+
 fig.write_image(prepend + "img_outputs/svg/net_app_flows.svg") #prepend + 
 fig.write_image(prepend + "img_outputs/png/net_app_flows.png") #prepend + 
 fig.write_html(prepend + "img_outputs/net_app_flows.html", include_plotlyjs='cdn')
 
 
-# In[99]:
+# In[38]:
 
 
 # netdf_df_plot = netdf_df[netdf_df['chain']=='Ethereum']
@@ -317,8 +332,8 @@ fig.write_html(prepend + "img_outputs/net_app_flows.html", include_plotlyjs='cdn
 # cumul_fig.show()
 
 
-# In[100]:
+# In[39]:
 
 
-# ! jupyter nbconvert --to python total_app_net_flows.ipynb
+get_ipython().system(' jupyter nbconvert --to python total_app_net_flows.ipynb')
 
