@@ -7,7 +7,7 @@
 
 
 
-# In[1]:
+# In[ ]:
 
 
 import pandas as pd
@@ -21,7 +21,7 @@ import os
 header = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:71.0) Gecko/20100101 Firefox/71.0'}
 
 
-# In[2]:
+# In[ ]:
 
 
 #https://stackoverflow.com/questions/23267409/how-to-implement-retry-mechanism-into-python-requests-library
@@ -44,7 +44,7 @@ else:
     prepend = 'L2 TVL/'
 
 
-# In[22]:
+# In[ ]:
 
 
 trailing_num_days = 7
@@ -54,7 +54,7 @@ start_date = date.today()-timedelta(days=trailing_num_days +1)
 # start_date = datetime.strptime('2022-07-13', '%Y-%m-%d').date()
 
 
-# In[4]:
+# In[ ]:
 
 
 #get all apps > 10 m tvl
@@ -65,7 +65,7 @@ print(len(res))
 # print(res.columns)
 
 
-# In[5]:
+# In[ ]:
 
 
 
@@ -76,7 +76,7 @@ protocols['chainTvls'] = protocols['chainTvls'].apply(lambda x: list(x.keys()) )
 protocols
 
 
-# In[6]:
+# In[ ]:
 
 
 # protocols = protocols[ protocols['slug'] == 'uniswap-v3' ]
@@ -85,7 +85,7 @@ protocols
 # ad
 
 
-# In[7]:
+# In[ ]:
 
 
 # api_str = 'https://api.llama.fi/protocol/uniswap'
@@ -94,7 +94,7 @@ protocols
 # prot_req
 
 
-# In[8]:
+# In[ ]:
 
 
 #get by app
@@ -132,7 +132,7 @@ for index,proto in protocols.iterrows():
         print('err')
 
 
-# In[23]:
+# In[ ]:
 
 
 df_df_all = pd.concat(prod)
@@ -140,7 +140,7 @@ df_df_all = pd.concat(prod)
 print("done api")
 
 
-# In[24]:
+# In[ ]:
 
 
 # df_df[df_df['protocol']=='perpetual-protocol']
@@ -161,7 +161,7 @@ df_df = df_df[df_df['date'].dt.date >= start_date ]
 
 
 
-# In[25]:
+# In[ ]:
 
 
 # # DISTINCT TOKENS
@@ -175,7 +175,7 @@ df_df = df_df[df_df['date'].dt.date >= start_date ]
 # missing_token_list
 
 
-# In[26]:
+# In[ ]:
 
 
 # data_df = df_df.merge(cg_df, on=['date','token'],how='inner')
@@ -207,14 +207,14 @@ data_df = data_df[~data_df['net_dollar_flow'].isna()] #50 bil error bar
 # data_df.sort_values('net_dollar_flow')
 
 
-# In[27]:
+# In[ ]:
 
 
 # data_df[['date']].drop_duplicates().sort_values('date')
 # data_df[data_df['date'].dt.date != data_df['date']].sort_values('date')
 
 
-# In[28]:
+# In[ ]:
 
 
 # data_df[data_df['protocol']=='perpetual-protocol'].sort_values(by='date')
@@ -222,7 +222,7 @@ data_df = data_df[~data_df['net_dollar_flow'].isna()] #50 bil error bar
 # segment_cols = ['date','protocol','chain','token']
 
 
-# In[29]:
+# In[ ]:
 
 
 netdf_df = data_df[['date','protocol','chain','net_dollar_flow','usd_value']]
@@ -238,7 +238,7 @@ netdf_df.reset_index(inplace=True)
 netdf_df.drop(columns=['index'],inplace=True)
 
 
-# In[30]:
+# In[ ]:
 
 
 #get latest
@@ -252,7 +252,7 @@ netdf_df['rank_desc'] = netdf_df.groupby(['protocol', 'chain'])['date'].        
 
 
 
-# In[41]:
+# In[ ]:
 
 
 summary_df = netdf_df[  ( netdf_df['rank_desc'] == 1 ) &                        (~netdf_df['chain'].str.contains('-borrowed')) &                        (~netdf_df['chain'].str.contains('-staking')) &                        (~netdf_df['chain'].str.contains('-pool2')) &                        (~( netdf_df['chain'] == 'treasury') ) &                        (~( netdf_df['chain'] == 'borrowed') ) &                        (~( netdf_df['chain'] == 'staking') )
@@ -276,7 +276,7 @@ fig.update_layout(margin = dict(t=50, l=25, r=25, b=25))
 # fig.show()
 
 
-# In[42]:
+# In[ ]:
 
 
 fig.write_image(prepend + "img_outputs/svg/net_app_flows.svg") #prepend + 
@@ -284,7 +284,7 @@ fig.write_image(prepend + "img_outputs/png/net_app_flows.png") #prepend +
 fig.write_html(prepend + "img_outputs/net_app_flows.html", include_plotlyjs='cdn')
 
 
-# In[6]:
+# In[ ]:
 
 
 # ! jupyter nbconvert --to python total_app_net_flows.ipynb
