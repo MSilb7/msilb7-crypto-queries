@@ -255,7 +255,7 @@ netdf_df['rank_desc'] = netdf_df.groupby(['protocol', 'chain'])['date'].        
 # In[41]:
 
 
-summary_df = netdf_df[  ( netdf_df['rank_desc'] == 1 ) &                        (~netdf_df['chain'].str.contains('-borrowed')) &                        (~netdf_df['chain'].str.contains('-staking')) &                        (~netdf_df['chain'].str.contains('-pool2')) &                        (~( netdf_df['chain'] == 'treasury') ) &                        (~( netdf_df['chain'] == 'borrowed') )
+summary_df = netdf_df[  ( netdf_df['rank_desc'] == 1 ) &                        (~netdf_df['chain'].str.contains('-borrowed')) &                        (~netdf_df['chain'].str.contains('-staking')) &                        (~netdf_df['chain'].str.contains('-pool2')) &                        (~( netdf_df['chain'] == 'treasury') ) &                        (~( netdf_df['chain'] == 'borrowed') ) &                        (~( netdf_df['chain'] == 'borrowed') )
 #                         & (~( netdf_df['chain'] == 'Ethereum') )
                         ]
 summary_df = summary_df.sort_values(by='cumul_net_dollar_flow',ascending=False)
@@ -333,7 +333,7 @@ fig.write_html(prepend + "img_outputs/net_app_flows.html", include_plotlyjs='cdn
 # cumul_fig.show()
 
 
-# In[45]:
+# In[6]:
 
 
 # ! jupyter nbconvert --to python total_app_net_flows.ipynb
