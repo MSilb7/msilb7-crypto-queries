@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[119]:
+# In[ ]:
 
 
 # ! pip install pandas
@@ -12,7 +12,7 @@
 # ! pip freeze = requirements.txt
 
 
-# In[120]:
+# In[ ]:
 
 
 import pandas as pd
@@ -24,7 +24,7 @@ import numpy as np
 import os
 
 
-# In[121]:
+# In[ ]:
 
 
 pwd = os.getcwd()
@@ -34,7 +34,7 @@ else:
     prepend = 'L2 TVL/'
 
 
-# In[122]:
+# In[ ]:
 
 
 
@@ -70,20 +70,20 @@ for prot in protocols:
         ad['token'] = ad['token'].str.replace('tokens.','', regex=False)
         ad['protocol'] = prot[0]
         ad['start_date'] = pd.to_datetime(prot[1])
-        ad['date'] = ad['date'] - timedelta(days=1) #change to eod vs sod
+        # ad['date'] = ad['date'] - timedelta(days=1) #change to eod vs sod
         prod.append(ad)
 
 df_df = pd.concat(prod)
 df_df
 
 
-# In[123]:
+# In[ ]:
 
 
 # df_df[df_df['protocol']=='perpetual-protocol']
 
 
-# In[124]:
+# In[ ]:
 
 
 # #defillama api feedback - only token symbols come through, makes it hard to map w/o doing it manually
@@ -123,14 +123,14 @@ df_df
 # ]
 
 
-# In[125]:
+# In[ ]:
 
 
 # cg_token_list = [i[0] for i in coingecko_token_map]
 # # print(cg_token_list)
 
 
-# In[126]:
+# In[ ]:
 
 
 # # DISTINCT TOKENS
@@ -140,7 +140,7 @@ df_df
 # missing_token_list
 
 
-# In[127]:
+# In[ ]:
 
 
 
@@ -161,7 +161,7 @@ df_df
 # # cg_df
 
 
-# In[128]:
+# In[ ]:
 
 
 data_df = df_df.copy()#merge(cg_df, on=['date','token'],how='inner')
@@ -182,13 +182,13 @@ data_df['net_dollar_flow'] = data_df['net_token_flow'] * data_df['price_usd']
 # display(data_df)
 
 
-# In[129]:
+# In[ ]:
 
 
 data_df[data_df['protocol']=='perpetual-protocol'].sort_values(by='date')
 
 
-# In[130]:
+# In[ ]:
 
 
 netdf_df = data_df[data_df['date']>= data_df['start_date']][['date','protocol','net_dollar_flow']]
@@ -199,7 +199,7 @@ netdf_df.reset_index(inplace=True)
 netdf_df
 
 
-# In[131]:
+# In[ ]:
 
 
 fig = px.line(netdf_df, x="date", y="net_dollar_flow", color="protocol",              title="Daily Net Dollar Flow since Program Announcement",            labels={
@@ -234,7 +234,7 @@ for p in proto_names:
 
 cumul_fig.update_layout(yaxis_tickprefix = '$')
 cumul_fig.update_layout(
-    title="Cumulative Dollar Flow since Program Announcement",
+    title="Cumulative Net Dollar Flow since Program Announcement",
     xaxis_title="Day",
     yaxis_title="Cumulative Net Dollar Flow (N$F)",
     legend_title="App Name",
@@ -245,15 +245,15 @@ cumul_fig.write_image(prepend + "img_outputs/png/cumul_ndf.png") #prepend +
 cumul_fig.write_html(prepend + "img_outputs/cumul_ndf.html", include_plotlyjs='cdn')
 
 
-# In[132]:
+# In[ ]:
 
 
 # fig.show()
-# cumul_fig.show()
+cumul_fig.show()
 print("yay")
 
 
-# In[137]:
+# In[ ]:
 
 
 # ! jupyter nbconvert --to python optimism_app_net_flows.ipynb

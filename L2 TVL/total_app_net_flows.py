@@ -126,7 +126,7 @@ for index,proto in protocols.iterrows():
                 ad['protocol'] = prot
                 ad['chain'] = ch
         #         ad['start_date'] = pd.to_datetime(prot[1])
-                ad['date'] = ad['date'] - timedelta(days=1) #change to eod vs sod
+                # ad['date'] = ad['date'] - timedelta(days=1) #change to eod vs sod
                 prod.append(ad)
     except:
         print('err')
