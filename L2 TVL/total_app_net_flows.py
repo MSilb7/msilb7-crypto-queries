@@ -255,7 +255,7 @@ netdf_df['rank_desc'] = netdf_df.groupby(['protocol', 'chain'])['date'].        
 # In[41]:
 
 
-summary_df = netdf_df[  ( netdf_df['rank_desc'] == 1 ) &                        (~netdf_df['chain'].str.contains('-borrowed')) &                        (~netdf_df['chain'].str.contains('-staking')) &                        (~netdf_df['chain'].str.contains('-pool2')) &                        (~( netdf_df['chain'] == 'treasury') ) &                        (~( netdf_df['chain'] == 'borrowed') ) &                        (~( netdf_df['chain'] == 'borrowed') )
+summary_df = netdf_df[  ( netdf_df['rank_desc'] == 1 ) &                        (~netdf_df['chain'].str.contains('-borrowed')) &                        (~netdf_df['chain'].str.contains('-staking')) &                        (~netdf_df['chain'].str.contains('-pool2')) &                        (~( netdf_df['chain'] == 'treasury') ) &                        (~( netdf_df['chain'] == 'borrowed') ) &                        (~( netdf_df['chain'] == 'staking') )
 #                         & (~( netdf_df['chain'] == 'Ethereum') )
                         ]
 summary_df = summary_df.sort_values(by='cumul_net_dollar_flow',ascending=False)
@@ -282,55 +282,6 @@ fig.update_layout(margin = dict(t=50, l=25, r=25, b=25))
 fig.write_image(prepend + "img_outputs/svg/net_app_flows.svg") #prepend + 
 fig.write_image(prepend + "img_outputs/png/net_app_flows.png") #prepend + 
 fig.write_html(prepend + "img_outputs/net_app_flows.html", include_plotlyjs='cdn')
-
-
-# In[43]:
-
-
-# netdf_df_plot = netdf_df[netdf_df['chain']=='Ethereum']
-
-# fig = px.line(netdf_df_plot, x="date", y="net_dollar_flow", color="protocol", \
-#              title="Daily Net Dollar Flow since Program Announcement",\
-#             labels={
-#                      "date": "Day",
-#                      "net_dollar_flow": "Net Dollar Flow (N$F)"
-#                  }
-#             )
-# fig.update_layout(
-#     legend_title="App Name"
-# )
-# fig.update_layout(yaxis_tickprefix = '$')
-# fig.show()
-
-# # cumul_fig = px.area(netdf_df, x="date", y="cumul_net_dollar_flow", color="protocol", \
-# #              title="Cumulative Dollar Flow since Program Announcement",\
-# #                    labels={
-# #                      "date": "Day",
-# #                      "cumul_net_dollar_flow": "Cumulative Net Dollar Flow (N$F)"
-# #                  }
-# #             ,areamode='group')
-# # cumul_fig.update_layout(yaxis_tickprefix = '$')
-# # cumul_fig.show()
-
-
-# cumul_fig = go.Figure()
-# proto_names = netdf_df_plot['protocol'].drop_duplicates()
-# print(proto_names)
-# for p in proto_names:
-#     cumul_fig.add_trace(go.Scatter(x=netdf_df_plot[netdf_df_plot['protocol'] == p]['date'] \
-#                                    , y=netdf_df_plot[netdf_df_plot['protocol'] == p]['cumul_net_dollar_flow'] \
-#                                     ,name = p\
-#                                   ,fill='tozeroy')) # fill down to xaxis
-
-# cumul_fig.update_layout(yaxis_tickprefix = '$')
-# cumul_fig.update_layout(
-#     title="Cumulative Dollar Flow since Program Announcement",
-#     xaxis_title="Day",
-#     yaxis_title="Cumulative Net Dollar Flow (N$F)",
-#     legend_title="App Name",
-# #     color_discrete_map=px.colors.qualitative.G10
-# )
-# cumul_fig.show()
 
 
 # In[6]:
