@@ -4,12 +4,6 @@
 # In[ ]:
 
 
-
-
-
-# In[ ]:
-
-
 import pandas as pd
 import requests as r
 import plotly.express as px
@@ -156,12 +150,6 @@ df_df = df_df[df_df['date'].dt.date >= start_date ]
 
 
 
-
-
-# In[ ]:
-
-
-
 data_df = df_df.copy()
 data_df['token_value'] = data_df['token_value'].replace(0, np.nan)
 # price = usd value / num tokens
@@ -205,12 +193,6 @@ netdf_df['rank_desc'] = netdf_df.groupby(['protocol', 'chain'])['date'].        
 # In[ ]:
 
 
-
-
-
-# In[ ]:
-
-
 summary_df = netdf_df[  ( netdf_df['rank_desc'] == 1 ) &                        (~netdf_df['chain'].str.contains('-borrowed')) &                        (~netdf_df['chain'].str.contains('-staking')) &                        (~netdf_df['chain'].str.contains('-pool2')) &                        (~( netdf_df['chain'] == 'treasury') ) &                        (~( netdf_df['chain'] == 'borrowed') ) &                        (~( netdf_df['chain'] == 'staking') )
 #                         & (~( netdf_df['chain'] == 'Ethereum') )
                         ]
@@ -240,7 +222,7 @@ fig.write_image(prepend + "img_outputs/png/net_app_flows.png") #prepend +
 fig.write_html(prepend + "img_outputs/net_app_flows.html", include_plotlyjs='cdn')
 
 
-# In[ ]:
+# In[2]:
 
 
 # ! jupyter nbconvert --to python total_app_net_flows.ipynb

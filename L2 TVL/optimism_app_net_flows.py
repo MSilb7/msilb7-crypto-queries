@@ -80,90 +80,6 @@ df_df
 # In[ ]:
 
 
-# df_df[df_df['protocol']=='perpetual-protocol']
-
-
-# In[ ]:
-
-
-# #defillama api feedback - only token symbols come through, makes it hard to map w/o doing it manually
-# coingecko_token_map = [
-#     ['LINK','chainlink']
-#     ,['USDT','tether']
-#     ,['USDC','usd-coin']
-#     ,['WETH','weth']
-#     ,['SUSD','nusd']
-#     ,['DAI','dai']
-#     ,['AAVE','aave']
-#     ,['WBTC','wrapped-bitcoin']
-#     ,['SNX','havven']
-#     ,['OP','optimism']
-#     ,['SETH','seth']
-#     ,['FXS','frax-share']
-#     ,['THALES','thales']
-#     ,['FRAX','frax']
-#     ,['ALUSD','alchemix-usd']
-#     ,['PERP','perpetual-protocol']
-#     ,['LUSD','liquity-usd']
-#     ,['LYRA','lyra-finance']
-#     ,['HND','hundred-finance']
-#     ,['BITANT','bitant']
-#     ,['UNI','uniswap']
-#     ,['SLINK','slink']
-#     ,['VELO','velodrome-finance']
-#     ,['DOLA','dola-usd']
-#     ,['CRV','curve-dao-token']
-#     ,['SBTC','sbtc']
-#     ,['KROM','kromatika']
-#     ,['DF','dforce-token']
-#     ,['STG','stargate-finance']
-#     ,['AELIN','aelin']
-#     ,['RAI','rai']
-#     ,['RETH','rocket-pool-eth']
-# ]
-
-
-# In[ ]:
-
-
-# cg_token_list = [i[0] for i in coingecko_token_map]
-# # print(cg_token_list)
-
-
-# In[ ]:
-
-
-# # DISTINCT TOKENS
-
-# token_list = df_df[['token']].drop_duplicates()
-# missing_token_list = token_list[~token_list['token'].isin(cg_token_list)]
-# missing_token_list
-
-
-# In[ ]:
-
-
-
-# cg_pds = []
-# for t in coingecko_token_map:
-#     time.sleep(0.1)
-#     cg_api = 'https://api.coingecko.com/api/v3/coins/'\
-#             + t[1] + '/market_chart?vs_currency=usd&days=max&interval=daily'
-#     print(cg_api)
-#     pr = pd.DataFrame( r.get(cg_api).json()['prices'] )
-#     pr['token'] = t[0]
-#     pr['cg_slug'] = t[1]
-#     pr = pr.rename(columns={0:'date',1:'price_usd'})
-#     pr['date'] = pd.to_datetime(pr['date'], unit ='ms') #convert to days
-#     cg_pds.append(pr)
-
-# cg_df = pd.concat(cg_pds)
-# # cg_df
-
-
-# In[ ]:
-
-
 data_df = df_df.copy()#merge(cg_df, on=['date','token'],how='inner')
 data_df.sort_values(by='date',inplace=True)
 data_df['token_value'] = data_df['token_value'].replace(0, np.nan)
@@ -249,7 +165,7 @@ cumul_fig.write_html(prepend + "img_outputs/cumul_ndf.html", include_plotlyjs='c
 
 
 # fig.show()
-cumul_fig.show()
+# cumul_fig.show()
 print("yay")
 
 
