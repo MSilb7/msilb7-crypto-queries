@@ -143,16 +143,13 @@ print("done api")
 # In[ ]:
 
 
-# df_df[df_df['protocol']=='perpetual-protocol']
 #filter down a bit so we can do trailing comp w/o doing every row
 df_df = df_df_all[df_df_all['date'].dt.date >= start_date-timedelta(days=1) ]
-# display(df_df['date'].drop_duplicates())
+
 #trailing comp
 df_df['last_token_value'] = df_df.groupby(['token','protocol','chain'])['token_value'].shift(1)
 #now actually filter
 df_df = df_df[df_df['date'].dt.date >= start_date ]
-# display(df_df['date'].drop_duplicates())
-# df_df[(df_df['protocol'] == 'uniswap') & (df_df['token'] != 'USDT') & (df_df['token_value'] > 0)]
 
 
 # In[ ]:
@@ -164,62 +161,22 @@ df_df = df_df[df_df['date'].dt.date >= start_date ]
 # In[ ]:
 
 
-# # DISTINCT TOKENS
 
-# token_list = df_df.groupby(['token']).count()
-# token_list = token_list[token_list['token_value']>=1000]
-# token_list.sort_values(by='token_value',inplace=True, ascending=False)
-# token_list.reset_index(inplace=True)
-# missing_token_list = token_list[~token_list['token'].isin(cg_token_list)]
-# missing_token_list
-# missing_token_list
-
-
-# In[ ]:
-
-
-# data_df = df_df.merge(cg_df, on=['date','token'],how='inner')
 data_df = df_df.copy()
 data_df['token_value'] = data_df['token_value'].replace(0, np.nan)
+# price = usd value / num tokens
 data_df['price_usd'] = data_df['usd_value']/data_df['token_value']
 
-# print(len(data_df))
 data_df.sort_values(by='date',inplace=True)
-# print(len(data_df))
-# data_df['net_token_flow'] = data_df.groupby(['token','protocol','chain'])['token_value'].apply(lambda x: x- x.shift(1))
-data_df['net_token_flow'] = data_df['token_value'] - data_df['last_token_value']
 
-# print(len(data_df))
+# net token change
+data_df['net_token_flow'] = data_df['token_value'] - data_df['last_token_value']
+# net token change * current price
 data_df['net_dollar_flow'] = data_df['net_token_flow'] * data_df['price_usd']
 
 
-# data_df = data_df[data_df['token'] != 'RVRS'] #Harmony error
-# data_df = data_df[data_df['token'] != 'usn'] #Harmony error
-# data_df = data_df[data_df['protocol'] != 'shibaswap'] #Harmony error
-data_df = data_df[abs(data_df['net_dollar_flow']) < 50_000_000_000] #50 bil error bar
-data_df = data_df[~data_df['net_dollar_flow'].isna()] #50 bil error bar
-# display(data_df[
-# #         (data_df['protocol'] == 'sushiswap') & (data_df['chain'] == 'Harmony')
-#         (data_df['net_dollar_flow'].notna()) & (data_df['net_dollar_flow'] != 0)
-#         ].sort_values('net_dollar_flow'))
-
-
-# data_df.sort_values('net_dollar_flow')
-
-
-# In[ ]:
-
-
-# data_df[['date']].drop_duplicates().sort_values('date')
-# data_df[data_df['date'].dt.date != data_df['date']].sort_values('date')
-
-
-# In[ ]:
-
-
-# data_df[data_df['protocol']=='perpetual-protocol'].sort_values(by='date')
-
-# segment_cols = ['date','protocol','chain','token']
+data_df = data_df[abs(data_df['net_dollar_flow']) < 50_000_000_000] #50 bil error bar for bad prices
+data_df = data_df[~data_df['net_dollar_flow'].isna()]
 
 
 # In[ ]:
@@ -228,11 +185,11 @@ data_df = data_df[~data_df['net_dollar_flow'].isna()] #50 bil error bar
 netdf_df = data_df[['date','protocol','chain','net_dollar_flow','usd_value']]
 netdf_df = netdf_df.fillna(0)
 netdf_df = netdf_df.groupby(['date','protocol','chain']).sum(['net_dollar_flow','usd_value']) ##agg by app
-# display(netdf_df)
+
 #usd_value is the TVL on a given day
 netdf_df = netdf_df.groupby(['date','protocol','chain','usd_value']).sum(['net_dollar_flow'])
 netdf_df.reset_index(inplace=True)
-# display(netdf_df)
+
 netdf_df['cumul_net_dollar_flow'] = netdf_df[['protocol','chain','net_dollar_flow']]                                    .groupby(['protocol','chain']).cumsum()
 netdf_df.reset_index(inplace=True)
 netdf_df.drop(columns=['index'],inplace=True)
@@ -243,7 +200,6 @@ netdf_df.drop(columns=['index'],inplace=True)
 
 #get latest
 netdf_df['rank_desc'] = netdf_df.groupby(['protocol', 'chain'])['date'].                            rank(method='dense',ascending=False).astype(int)
-# netdf_df[netdf_df['chain'] == 'Klaytn']
 
 
 # In[ ]:
