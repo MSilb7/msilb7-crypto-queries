@@ -74,7 +74,6 @@ for prot in protocols:
         prod.append(ad)
 
 df_df = pd.concat(prod)
-df_df
 
 
 # In[ ]:
@@ -101,7 +100,7 @@ data_df['net_dollar_flow'] = data_df['net_token_flow'] * data_df['price_usd']
 # In[ ]:
 
 
-data_df[data_df['protocol']=='perpetual-protocol'].sort_values(by='date')
+# data_df[data_df['protocol']=='perpetual-protocol'].sort_values(by='date')
 
 
 # In[ ]:
@@ -111,8 +110,6 @@ netdf_df = data_df[data_df['date']>= data_df['start_date']][['date','protocol','
 netdf_df = netdf_df.groupby(['date','protocol']).sum(['net_dollar_flow'])
 netdf_df['cumul_net_dollar_flow'] = netdf_df.groupby(['protocol']).cumsum()
 netdf_df.reset_index(inplace=True)
-
-netdf_df
 
 
 # In[ ]:
@@ -169,7 +166,7 @@ cumul_fig.write_html(prepend + "img_outputs/cumul_ndf.html", include_plotlyjs='c
 print("yay")
 
 
-# In[ ]:
+# In[17]:
 
 
 # ! jupyter nbconvert --to python optimism_app_net_flows.ipynb
