@@ -212,6 +212,16 @@ fig.update_layout(margin = dict(t=50, l=25, r=25, b=25))
 # fig.update_layout(tickprefix = '$')
 
 # fig.show()
+fig_app = px.treemap(summary_df[summary_df['abs_cumul_net_dollar_flow'] !=0],                 #  path=[px.Constant("all"), 'chain', 'protocol'], \
+#                  path=[px.Constant("all"), 'token', 'chain', 'protocol'], \
+                        path=[px.Constant("all"), 'protocol','chain'], \
+                 values='abs_cumul_net_dollar_flow', color='flow_direction'
+#                 ,color_discrete_map={'-1':'red', '1':'green'})
+                ,color_continuous_scale='Spectral'
+                )
+# fig.data[0].textinfo = 'label+text+value'
+fig_app.update_traces(root_color="lightgrey")
+fig_app.update_layout(margin = dict(t=50, l=25, r=25, b=25))
 
 
 # In[ ]:
@@ -221,8 +231,12 @@ fig.write_image(prepend + "img_outputs/svg/net_app_flows.svg") #prepend +
 fig.write_image(prepend + "img_outputs/png/net_app_flows.png") #prepend + 
 fig.write_html(prepend + "img_outputs/net_app_flows.html", include_plotlyjs='cdn')
 
+fig_app.write_image(prepend + "img_outputs/svg/net_app_flows_by_app.svg") #prepend + 
+fig_app.write_image(prepend + "img_outputs/png/net_app_flows_by_app.png") #prepend + 
+fig_app.write_html(prepend + "img_outputs/net_app_flows_by_app.html", include_plotlyjs='cdn')
 
-# In[3]:
+
+# In[4]:
 
 
 # ! jupyter nbconvert --to python total_app_net_flows.ipynb
