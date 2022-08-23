@@ -11,16 +11,8 @@ config.ini
 labels/etherscan-export.xlsx
 folder_ignore/
 Covalent API Testing.ipynb
-L2 TVL/img_outputs/net_app_flows.html
-L2 TVL/img_outputs/cumul_ndf.html
-L2 TVL/img_outputs/cumul_ndf.html
-L2 TVL/img_outputs/daily_ndf.html
-L2 TVL/img_outputs/cumul_ndf.html
-L2 TVL/img_outputs/net_app_flows.html
-L2 TVL/img_outputs/net_app_flows.html
 L2 TVL/img_outputs/png/net_app_flows.png
 L2 TVL/img_outputs/svg/net_app_flows.svg
-L2 TVL/img_outputs/net_app_flows.html
 *.html
 L2 TVL/Oracles/Get Oracle Data.ipynb
 L2 TVL/velo_app_net_flows.ipynb
