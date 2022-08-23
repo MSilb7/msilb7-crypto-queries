@@ -236,7 +236,7 @@ fig_app.write_image(prepend + "img_outputs/png/net_app_flows_by_app.png") #prepe
 fig_app.write_html(prepend + "img_outputs/net_app_flows_by_app.html", include_plotlyjs='cdn')
 
 
-# In[4]:
+# In[ ]:
 
 
 # ! jupyter nbconvert --to python total_app_net_flows.ipynb
