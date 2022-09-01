@@ -1,6 +1,6 @@
 # This is a basic workflow to help you get started with Actions
 
-name: Run L2 TVL
+name: Run Updated Pulls
 
 # Controls when the workflow will run
 on:
@@ -46,19 +46,22 @@ jobs:
           # python -m pip install --upgrade pip datetime
           # python -m pip install --upgrade pip sklearn
           pip install -U kaleido
+          pip install -U aiohttp
+          pip install -U nest_asyncio
+          pip install -U aiohttp_retry
 
       # Runs a single command using the runners shell
       # - name: Run a one-line script
       #  run: echo Hello, world!
+      - name: Update App Fee Charts
+        run: python L2_Fees/optimism_app_fees.py
+        
       - name: Update OP Summer TVL Charts
         run: python L2\ \TVL/optimism_app_net_flows.py
       
       - name: Update Total App Flow Charts
         run: python L2\ \TVL/total_app_net_flows.py
       
-      - name: Update App Fee Charts
-        run: python L2_fees/optimism_app_fees.py
-
       # Runs a set of commands using the runners shell
       # - name: Run a multi-line script
       #  run: |
