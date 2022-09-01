@@ -40,6 +40,8 @@ else:
 
 api_str = 'https://api.llama.fi/protocol/'
 
+# Protocol Incentive Start Dates
+# NOTE: This should be when the in-app incentives began, not any external incentives (i.e. DEX pools)
 protocols = [
     # name, incentive start date
          ['velodrome','2022-07-13']
@@ -51,6 +53,8 @@ protocols = [
         ,['aave-v3','2022-08-04']
         ,['wepiggy','2022-08-03']
         ,['stargate','2022-08-05']
+        ,['pika-protocol','2022-08-29']
+        # ,['synthetix','2022-08-25'] #This is when Curve incentives started, so not really 1:1
         ]
 # print(protocols[0])
 prod = []
@@ -166,7 +170,7 @@ cumul_fig.write_html(prepend + "img_outputs/cumul_ndf.html", include_plotlyjs='c
 print("yay")
 
 
-# In[17]:
+# In[ ]:
 
 
 # ! jupyter nbconvert --to python optimism_app_net_flows.ipynb
