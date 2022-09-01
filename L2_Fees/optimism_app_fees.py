@@ -176,7 +176,7 @@ fdf = get_range(date_rng)
 
 
 fdf['results.oneDayTotalFees'] = fdf['results.oneDayTotalFees'].fillna(0)
-display(fdf)
+# display(fdf)
 
 
 # In[ ]:
