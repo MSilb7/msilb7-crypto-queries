@@ -238,7 +238,7 @@ data_fdf_chain['fees_3q_cmgr_eth'] = (
                                 ) ** (1/(3*3)) - 1
 # #if focus on op
 
-display(data_fdf_chain)
+# display(data_fdf_chain)
 
 
 # In[ ]:
