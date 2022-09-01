@@ -46,9 +46,6 @@ jobs:
           # python -m pip install --upgrade pip datetime
           # python -m pip install --upgrade pip sklearn
           pip install -U kaleido
-          pip install -U aiohttp
-          pip install -U nest_asyncio
-          pip install -U aiohttp_retry
 
       # Runs a single command using the runners shell
       # - name: Run a one-line script
