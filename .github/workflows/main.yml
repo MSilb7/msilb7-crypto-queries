@@ -57,7 +57,7 @@ jobs:
         run: python L2\ \TVL/total_app_net_flows.py
       
       - name: Update App Fee Charts
-        run: python L2_fees/optimism_app_fees.py
+        run: python L2_Fees/optimism_app_fees.py
 
       # Runs a set of commands using the runners shell
       # - name: Run a multi-line script
