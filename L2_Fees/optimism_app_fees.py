@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[145]:
+# In[ ]:
 
 
 import pandas as pd
@@ -18,7 +18,7 @@ nest_asyncio.apply()
 header = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:71.0) Gecko/20100101 Firefox/71.0'}
 
 
-# In[146]:
+# In[ ]:
 
 
 #https://stackoverflow.com/questions/23267409/how-to-implement-retry-mechanism-into-python-requests-library
@@ -41,7 +41,7 @@ else:
     prepend = 'L2_Fees/'
 
 
-# In[147]:
+# In[ ]:
 
 
 trailing_num_days = 365#90
@@ -53,7 +53,7 @@ print(start_date)
 # start_date = datetime.strptime('2022-07-13', '%Y-%m-%d').date()
 
 
-# In[148]:
+# In[ ]:
 
 
 eth_prices = r.get(
@@ -68,7 +68,7 @@ ethp['date'] = ethp['date'].dt.strftime("%Y-%m-%d")
 ethp.drop_duplicates(subset=['date'],inplace=True,keep='first')
 
 
-# In[149]:
+# In[ ]:
 
 
 statuses = {x for x in range(100, 600)}
@@ -76,7 +76,7 @@ statuses.remove(200)
 statuses.remove(429)
 
 
-# In[150]:
+# In[ ]:
 
 
 async def get_cryptostats_api(api_core_string,dt_string ):
@@ -116,7 +116,7 @@ async def get_cryptostats_api(api_core_string,dt_string ):
         
 
 
-# In[151]:
+# In[ ]:
 
 
 # ALL Relevant API Strings
@@ -137,7 +137,7 @@ date_rng_str = ','.join(x.strftime("%Y-%m-%d") for x in date_rng)
 # print(date_rng[0].strftime("%Y-%m-%d"))
 
 
-# In[152]:
+# In[ ]:
 
 
 def get_range(date_range):
@@ -162,7 +162,7 @@ def get_range(date_range):
         return fee_df
 
 
-# In[153]:
+# In[ ]:
 
 
 
@@ -172,14 +172,14 @@ fdf = get_range(date_rng)
 # print(r)
 
 
-# In[154]:
+# In[ ]:
 
 
 fdf['results.oneDayTotalFees'] = fdf['results.oneDayTotalFees'].fillna(0)
 display(fdf)
 
 
-# In[155]:
+# In[ ]:
 
 
 data_fdf = fdf[['id','metadata.blockchain','results.oneDayTotalFees','metadata.name','metadata.category','date']]
@@ -194,7 +194,7 @@ data_fdf['oneDayTotalFees_ETH'] = data_fdf['results.oneDayTotalFees']/data_fdf['
 data_fdf
 
 
-# In[156]:
+# In[ ]:
 
 
 data_fdf_op = data_fdf[data_fdf['metadata.blockchain'] == 'Optimism']
@@ -241,7 +241,7 @@ data_fdf_chain['fees_3q_cmgr_eth'] = (
 display(data_fdf_chain)
 
 
-# In[157]:
+# In[ ]:
 
 
 fig = px.line(data_fdf_op, x="date", y="results.oneDayTotalFees", color='metadata.name', title = 'Fees Earned on Optimism (USD)')
@@ -253,7 +253,7 @@ fig.write_image(prepend + "img_outputs/png/app_fees_on_op.png") #prepend +
 fig.write_html(prepend + "img_outputs/app_fees_on_op.html", include_plotlyjs='cdn')
 
 
-# In[158]:
+# In[ ]:
 
 
 fig_chain = px.line(data_fdf_chain, x="date", y="results.oneDayTotalFees", color = "metadata.blockchain", title = 'Sum Fees Earned on apps by Chain (USD)')
@@ -265,7 +265,7 @@ fig_chain.write_image(prepend + "img_outputs/png/app_fees_by_chain.png") #prepen
 fig_chain.write_html(prepend + "img_outputs/app_fees_by_chain.html", include_plotlyjs='cdn')
 
 
-# In[159]:
+# In[ ]:
 
 
 fig_chain_30d = px.line(data_fdf_chain, x="date", y="results.oneDayTotalFees", color = "metadata.blockchain", title = 'Sum Fees Earned on apps by Chain (USD)')
@@ -273,7 +273,7 @@ fig_chain_30d.update_layout(yaxis_tickprefix = '$')
 fig_chain_30d.show()
 
 
-# In[160]:
+# In[ ]:
 
 
 # ! jupyter nbconvert --to python optimism_app_fees.ipynb
