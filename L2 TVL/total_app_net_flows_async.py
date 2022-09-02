@@ -12,6 +12,9 @@ from datetime import datetime, timedelta, date
 import numpy as np
 import time
 import os
+import asyncio, aiohttp, nest_asyncio
+from aiohttp_retry import RetryClient, ExponentialRetry
+nest_asyncio.apply()
 header = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:71.0) Gecko/20100101 Firefox/71.0'}
 
 
@@ -25,7 +28,7 @@ import requests
 
 from requests.adapters import HTTPAdapter, Retry
 
-logging.basicConfig(level=logging.DEBUG)
+# logging.basicConfig(level=logging.DEBUG)
 
 s = requests.Session()
 retries = Retry(total=5, backoff_factor=1, status_forcelist=[ 502, 503, 504 ])
@@ -91,46 +94,96 @@ protocols
 # In[ ]:
 
 
-#get by app
-api_str = 'https://api.llama.fi/protocol/'
-# print(protocols)
-prod = []
-for index,proto in protocols.iterrows():
-#     print(proto)
-    prot = proto['slug']
-    chains = proto['chainTvls']
-    apic = api_str + prot
-#     time.sleep(0.1)
-    try:
-        prot_req = s.get(apic, headers=header).json()['chainTvls']
-#         print(apic)
-        for ch in chains:
-            ad = pd.json_normalize( prot_req[ch]['tokens'] )
-            ad_usd = pd.json_normalize( prot_req[ch]['tokensInUsd'] )
-#             ad = ad.merge(how='left')
-            if not ad.empty:
-                ad = pd.melt(ad,id_vars = ['date'])
-                ad = ad.rename(columns={'variable':'token','value':'token_value'})
-                ad_usd = pd.melt(ad_usd,id_vars = ['date'])
-                ad_usd = ad_usd.rename(columns={'variable':'token','value':'usd_value'})
-                ad = ad.merge(ad_usd,on=['date','token'])
-                
-                ad['date'] = pd.to_datetime(ad['date'], unit ='s') #convert to days
-                ad['token'] = ad['token'].str.replace('tokens.','', regex=False)
-                ad['protocol'] = prot
-                ad['chain'] = ch
-        #         ad['start_date'] = pd.to_datetime(prot[1])
-                # ad['date'] = ad['date'] - timedelta(days=1) #change to eod vs sod
-                prod.append(ad)
-    except:
-        print('err')
+statuses = {x for x in range(100, 600)}
+statuses.remove(200)
+statuses.remove(429)
 
 
 # In[ ]:
 
 
-df_df_all = pd.concat(prod)
-# df_df_all
+async def get_tvl(apistring, header, statuses, chains, prot):
+        prod = []
+        retry_client = RetryClient()
+        async with retry_client.get(apistring, retry_options=ExponentialRetry(attempts=10), raise_for_status=statuses) as response:
+                try:
+                        prot_req = await response.json()
+                        prot_req = prot_req['chainTvls']
+                        for ch in chains:
+                                ad = pd.json_normalize( prot_req[ch]['tokens'] )
+                                ad_usd = pd.json_normalize( prot_req[ch]['tokensInUsd'] )
+                        #             ad = ad.merge(how='left')
+                                if not ad.empty:
+                                        ad = pd.melt(ad,id_vars = ['date'])
+                                        ad = ad.rename(columns={'variable':'token','value':'token_value'})
+                                        ad_usd = pd.melt(ad_usd,id_vars = ['date'])
+                                        ad_usd = ad_usd.rename(columns={'variable':'token','value':'usd_value'})
+                                        ad = ad.merge(ad_usd,on=['date','token'])
+                                        
+                                        ad['date'] = pd.to_datetime(ad['date'], unit ='s') #convert to days
+                                        ad['token'] = ad['token'].str.replace('tokens.','', regex=False)
+                                        ad['protocol'] = prot
+                                        ad['chain'] = ch
+                                #         ad['start_date'] = pd.to_datetime(prot[1])
+                                        # ad['date'] = ad['date'] - timedelta(days=1) #change to eod vs sod
+                                        prod.append(ad)
+                except Exception as e:
+                        raise Exception("Could not convert json")
+        await retry_client.close()
+        
+        return prod
+
+
+# In[ ]:
+
+
+def get_range(protocols):
+        data_dfs = []
+        fee_df = []
+        # for dt in date_range:
+        #         await asyncio.gather()
+        #         data_dfs.append(res_df)
+        #         # res.columns
+        # try:
+        #         loop.close()
+        # except:
+        #         #nothing
+        loop = asyncio.get_event_loop()
+        #get by app
+        api_str = 'https://api.llama.fi/protocol/'
+        # print(protocols)
+        prod = []
+        tasks = []
+        for index,proto in protocols.iterrows():
+                #     print(proto)
+                prot = proto['slug']
+                chains = proto['chainTvls']
+                apic = api_str + prot
+                #     time.sleep(0.1)
+                tasks.append( get_tvl(apic, header, statuses, chains, prot) )
+        # print(tasks)
+        data_dfs = loop.run_until_complete(asyncio.gather(*tasks, return_exceptions=True))
+        # print(date_range)
+        # loop.close()
+        # print(data_dfs)
+        # fee_df = pd.concat(data_dfs)
+        # return fee_df
+        return data_dfs
+
+
+# In[ ]:
+
+
+df_df_all = get_range(protocols)
+print (typeof(df_df_all) )
+
+
+# In[ ]:
+
+
+
+df_df_all = pd.concat(df_df_all)
+# print(df_df_all[2])
 print("done api")
 
 
@@ -236,7 +289,7 @@ fig_app.write_image(prepend + "img_outputs/png/net_app_flows_by_app.png") #prepe
 fig_app.write_html(prepend + "img_outputs/net_app_flows_by_app.html", include_plotlyjs='cdn')
 
 
-# In[19]:
+# In[28]:
 
 
 # ! jupyter nbconvert --to python total_app_net_flows.ipynb
