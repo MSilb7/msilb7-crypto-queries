@@ -175,7 +175,7 @@ def get_range(protocols):
 
 
 df_df_all = get_range(protocols)
-print (typeof(df_df_all) )
+# print (typeof(df_df_all) )
 
 
 # In[ ]:
@@ -289,8 +289,8 @@ fig_app.write_image(prepend + "img_outputs/png/net_app_flows_by_app.png") #prepe
 fig_app.write_html(prepend + "img_outputs/net_app_flows_by_app.html", include_plotlyjs='cdn')
 
 
-# In[28]:
+# In[ ]:
 
 
-# ! jupyter nbconvert --to python total_app_net_flows.ipynb
+# ! jupyter nbconvert --to python total_app_net_flows_async.ipynb
 
