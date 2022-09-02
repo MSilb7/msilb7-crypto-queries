@@ -6,8 +6,13 @@
 
 import pandas as pd
 import requests as r
+
+#handle weird kaleido error
 import plotly.express as px
 import plotly.graph_objects as go
+import plotly.io as pio
+pio.kaleido.scope.chromium_args = tuple([arg for arg in pio.kaleido.scope.chromium_args if arg != "--disable-dev-shm-usage"])
+
 from datetime import datetime, timedelta, date
 import numpy as np
 import time
@@ -155,6 +160,9 @@ def get_range(date_range):
         tasks = [get_cryptostats_api(api_core,dt) for dt in date_range]
         # print(tasks)
         data_dfs = loop.run_until_complete(asyncio.gather(*tasks, return_exceptions=True))
+        print(len(data_dfs))
+        data_dfs = [value for value in data_dfs if type(value) == pd.DataFrame]
+        print(len(data_dfs))
         # print(date_range)
         # loop.close()
         # print(data_dfs)
@@ -273,7 +281,7 @@ fig_chain_30d.update_layout(yaxis_tickprefix = '$')
 fig_chain_30d.show()
 
 
-# In[ ]:
+# In[17]:
 
 
 # ! jupyter nbconvert --to python optimism_app_fees.ipynb
