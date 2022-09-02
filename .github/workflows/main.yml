@@ -72,6 +72,7 @@ jobs:
       - name: Update Total App Flow Charts
         run: python L2\ \TVL/total_app_net_flows_async.py
   commit_results:
+    if: ${{ always() }} #Always runs even if prior jobs fail - so that one bad job doesn't f everything up.
     needs: [build, app_fees, op_summer, total_tvl_flow]
     runs-on: ubuntu-latest
     steps:
