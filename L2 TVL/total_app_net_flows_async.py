@@ -174,8 +174,32 @@ def get_range(protocols):
 # In[ ]:
 
 
-df_df_all = get_range(protocols)
+df_df = get_range(protocols)
 # print (typeof(df_df_all) )
+
+
+# In[ ]:
+
+
+df_list = []
+for dat in df_df_all:
+        if isinstance(dat,list):
+                # print(dat)
+                try:
+                        tempdf = pd.DataFrame(dat[0])
+                        if not tempdf.empty:
+                                # print(tempdf)
+                                df_list.append(tempdf)
+                except:
+                        continue
+# df_df_all = pd.DataFrame()
+df_df_all = pd.concat(df_list)
+
+
+# In[ ]:
+
+
+# df_df_all
 
 
 # In[ ]:
