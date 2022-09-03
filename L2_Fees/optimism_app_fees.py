@@ -199,6 +199,8 @@ data_fdf.reset_index(inplace=True)
 data_fdf = data_fdf[data_fdf['metadata.blockchain'] != data_fdf['metadata.name']]
 
 data_fdf['oneDayTotalFees_ETH'] = data_fdf['results.oneDayTotalFees']/data_fdf['eth_price']
+
+
 data_fdf
 
 
@@ -206,8 +208,25 @@ data_fdf
 
 
 data_fdf_op = data_fdf[data_fdf['metadata.blockchain'] == 'Optimism']
+data_fdf_op['chain_app_id'] = data_fdf_op['metadata.blockchain'] + '_' + data_fdf_op['metadata.name']
+
+data_fdf_op.sort_values(by =['date','results.oneDayTotalFees','metadata.blockchain'], ascending = [True,False,False],inplace = True)
+data_fdf_op.reset_index(inplace=True,drop=True)
+
+data_fdf_op['fees_7_day_avg'] = data_fdf_op.groupby('chain_app_id')['results.oneDayTotalFees'].rolling(7,min_periods=1).mean().reset_index(0,drop=True)
+data_fdf_op['fees_30_day_avg'] = data_fdf_op.groupby('chain_app_id')['results.oneDayTotalFees'].rolling(30,min_periods=1).mean().reset_index(0,drop=True)
+data_fdf_op['fees_90_day_avg'] = data_fdf_op.groupby('chain_app_id')['results.oneDayTotalFees'].rolling(90,min_periods=1).mean().reset_index(0,drop=True)
+
+data_fdf_op['fees_7_day_avg_eth'] = data_fdf_op.groupby('chain_app_id')['oneDayTotalFees_ETH'].rolling(7,min_periods=1).mean().reset_index(0,drop=True)
+data_fdf_op['fees_30_day_avg_eth'] = data_fdf_op.groupby('chain_app_id')['oneDayTotalFees_ETH'].rolling(30,min_periods=1).mean().reset_index(0,drop=True)
+data_fdf_op['fees_90_day_avg_eth'] = data_fdf_op.groupby('chain_app_id')['oneDayTotalFees_ETH'].rolling(90,min_periods=1).mean().reset_index(0,drop=True)
+
 
 # display(data_fdf_op)
+
+
+# In[ ]:
+
 
 data_fdf_chain = data_fdf.groupby(['date','metadata.blockchain']).sum()
 data_fdf_chain.reset_index(inplace=True)
@@ -259,6 +278,26 @@ fig.update_layout(yaxis_tickprefix = '$')
 fig.write_image(prepend + "img_outputs/svg/app_fees_on_op.svg") #prepend + 
 fig.write_image(prepend + "img_outputs/png/app_fees_on_op.png") #prepend + 
 fig.write_html(prepend + "img_outputs/app_fees_on_op.html", include_plotlyjs='cdn')
+
+
+# In[ ]:
+
+
+fig_7d = px.line(data_fdf_op, x="date", y="fees_7_day_avg", color='metadata.name', title = 'Fees Earned on Optimism (USD) - 7 Day Moving Average')
+fig_7d.update_layout(yaxis_tickprefix = '$')
+# fig_7d.show()
+
+fig_7d.write_image(prepend + "img_outputs/svg/app_fees_on_op_7dma.svg") #prepend + 
+fig_7d.write_image(prepend + "img_outputs/png/app_fees_on_op_7dma.png") #prepend + 
+fig_7d.write_html(prepend + "img_outputs/app_fees_on_op_7dma.html", include_plotlyjs='cdn')
+
+fig_30d = px.line(data_fdf_op, x="date", y="fees_30_day_avg", color='metadata.name', title = 'Fees Earned on Optimism (USD) - 30 Day Moving Average')
+fig_30d.update_layout(yaxis_tickprefix = '$')
+# fig_30d.show()
+
+fig_30d.write_image(prepend + "img_outputs/svg/app_fees_on_op_30dma.svg") #prepend + 
+fig_30d.write_image(prepend + "img_outputs/png/app_fees_on_op_30dma.png") #prepend + 
+fig_30d.write_html(prepend + "img_outputs/app_fees_on_op_30dma.html", include_plotlyjs='cdn')
 
 
 # In[ ]:
