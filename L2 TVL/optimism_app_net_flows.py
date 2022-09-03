@@ -54,7 +54,7 @@ protocols = [
         ,['wepiggy','2022-08-03']
         ,['stargate','2022-08-05']
         ,['pika-protocol','2022-08-29']
-        # ,['synthetix','2022-08-25'] #This is when Curve incentives started, so not really 1:1
+        ,['synthetix','2022-08-25'] #This is when Curve incentives started, so not really 1:1
         ]
 # print(protocols[0])
 prod = []
