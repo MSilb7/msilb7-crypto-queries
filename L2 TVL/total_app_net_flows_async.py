@@ -182,7 +182,7 @@ df_df = get_range(protocols)
 
 
 df_list = []
-for dat in df_df_all:
+for dat in df_df:
         if isinstance(dat,list):
                 # print(dat)
                 try:
