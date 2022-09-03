@@ -316,5 +316,5 @@ fig_app.write_html(prepend + "img_outputs/net_app_flows_by_app.html", include_pl
 # In[ ]:
 
 
-get_ipython().system(' jupyter nbconvert --to python total_app_net_flows_async.ipynb')
+# ! jupyter nbconvert --to python total_app_net_flows_async.ipynb
 
