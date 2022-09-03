@@ -58,7 +58,7 @@ start_date = date.today()-timedelta(days=trailing_num_days +1)
 all_api = 'https://api.llama.fi/protocols'
 res = pd.DataFrame( r.get(all_api, headers=header).json() )
 res = res[res['tvl'] > 10_000_000] ##greater than 10mil
-print(len(res))
+# print(len(res))
 # print(res.columns)
 
 
@@ -316,5 +316,5 @@ fig_app.write_html(prepend + "img_outputs/net_app_flows_by_app.html", include_pl
 # In[ ]:
 
 
-# ! jupyter nbconvert --to python total_app_net_flows_async.ipynb
+get_ipython().system(' jupyter nbconvert --to python total_app_net_flows_async.ipynb')
 

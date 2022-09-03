@@ -160,9 +160,9 @@ def get_range(date_range):
         tasks = [get_cryptostats_api(api_core,dt) for dt in date_range]
         # print(tasks)
         data_dfs = loop.run_until_complete(asyncio.gather(*tasks, return_exceptions=True))
-        print(len(data_dfs))
+        # print(len(data_dfs))
         data_dfs = [value for value in data_dfs if type(value) == pd.DataFrame]
-        print(len(data_dfs))
+        # print(len(data_dfs))
         # print(date_range)
         # loop.close()
         # print(data_dfs)
@@ -281,7 +281,7 @@ fig_chain_30d.update_layout(yaxis_tickprefix = '$')
 fig_chain_30d.show()
 
 
-# In[17]:
+# In[ ]:
 
 
 # ! jupyter nbconvert --to python optimism_app_fees.ipynb

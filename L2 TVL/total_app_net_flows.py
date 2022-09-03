@@ -13,6 +13,7 @@ import numpy as np
 import time
 import os
 header = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:71.0) Gecko/20100101 Firefox/71.0'}
+pd.options.mode.chained_assignment = None  # default='warn'
 
 
 # In[ ]:
@@ -66,7 +67,7 @@ print(len(res))
 protocols = res[['slug','chainTvls']]
 re = res['chainTvls']
 # r[1].keys()
-protocols['chainTvls'] = protocols['chainTvls'].apply(lambda x: list(x.keys()) )
+protocols['chainTvls',:] = protocols['chainTvls'].apply(lambda x: list(x.keys()) )
 protocols
 
 
@@ -236,8 +237,8 @@ fig_app.write_image(prepend + "img_outputs/png/net_app_flows_by_app.png") #prepe
 fig_app.write_html(prepend + "img_outputs/net_app_flows_by_app.html", include_plotlyjs='cdn')
 
 
-# In[19]:
+# In[ ]:
 
 
-# ! jupyter nbconvert --to python total_app_net_flows.ipynb
+get_ipython().system(' jupyter nbconvert --to python total_app_net_flows.ipynb')
 
