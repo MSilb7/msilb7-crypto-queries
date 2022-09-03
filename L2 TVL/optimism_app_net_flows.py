@@ -44,17 +44,17 @@ api_str = 'https://api.llama.fi/protocol/'
 # NOTE: This should be when the in-app incentives began, not any external incentives (i.e. DEX pools)
 protocols = [
     # name, incentive start date
-         ['velodrome','2022-07-13']
-        ,['pooltogether','2022-07-14']
-        ,['lyra','2022-08-02']
-        ,['rubicon','2022-07-15']
-        ,['perpetual-protocol','2022-07-14']
-        ,['thales','2022-07-14'] #TVL not relevant
-        ,['aave-v3','2022-08-04']
-        ,['wepiggy','2022-08-03']
-        ,['stargate','2022-08-05']
-        ,['pika-protocol','2022-08-29']
-        ,['synthetix','2022-08-25'] #This is when Curve incentives started, so not really 1:1
+         ['velodrome',          '2022-07-13']
+        ,['pooltogether',       '2022-07-14']
+        ,['lyra',               '2022-08-02']
+        ,['rubicon',            '2022-07-15']
+        ,['perpetual-protocol', '2022-07-14']
+        ,['thales',             '2022-07-14'] #TVL not relevant
+        ,['aave-v3',            '2022-08-04']
+        ,['wepiggy',            '2022-08-03']
+        ,['stargate',           '2022-08-05']
+        ,['pika-protocol',      '2022-08-29']
+        ,['synthetix',          '2022-08-25'] #This is when Curve incentives started, so not really 1:1
         ]
 # print(protocols[0])
 prod = []
@@ -160,6 +160,7 @@ cumul_fig.update_layout(
 cumul_fig.write_image(prepend + "img_outputs/svg/cumul_ndf.svg") #prepend + 
 cumul_fig.write_image(prepend + "img_outputs/png/cumul_ndf.png") #prepend + 
 cumul_fig.write_html(prepend + "img_outputs/cumul_ndf.html", include_plotlyjs='cdn')
+# cumul_fig.show()
 
 
 # In[ ]:
