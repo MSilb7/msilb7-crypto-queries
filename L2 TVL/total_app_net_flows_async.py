@@ -31,7 +31,7 @@ from requests.adapters import HTTPAdapter, Retry
 # logging.basicConfig(level=logging.DEBUG)
 
 s = requests.Session()
-retries = Retry(total=5, backoff_factor=1, status_forcelist=[ 502, 503, 504 ])
+retries = Retry(total=10, backoff_factor=1, status_forcelist=[ 502, 503, 504 ])
 s.mount('http://', HTTPAdapter(max_retries=retries))
 
 pwd = os.getcwd()
@@ -60,6 +60,7 @@ res = pd.DataFrame( r.get(all_api, headers=header).json() )
 res = res[res['tvl'] > 10_000_000] ##greater than 10mil
 # print(len(res))
 # print(res.columns)
+display(res)
 
 
 # In[ ]:
@@ -67,10 +68,11 @@ res = res[res['tvl'] > 10_000_000] ##greater than 10mil
 
 
 protocols = res[['slug','chainTvls']]
+# print(protocols)
 re = res['chainTvls']
 # r[1].keys()
 protocols['chainTvls'] = protocols['chainTvls'].apply(lambda x: list(x.keys()) )
-protocols
+protocols[protocols['chainTvls'].map(set(['Arbitrum']).issubset)]
 
 
 # In[ ]:
@@ -185,13 +187,14 @@ df_list = []
 for dat in df_df:
         if isinstance(dat,list):
                 # print(dat)
-                try:
-                        tempdf = pd.DataFrame(dat[0])
-                        if not tempdf.empty:
-                                # print(tempdf)
-                                df_list.append(tempdf)
-                except:
-                        continue
+                for pt in dat: #each list within the list (i.e. multiple chains)
+                        try:
+                                tempdf = pd.DataFrame(pt)
+                                if not tempdf.empty:
+                                        # print(tempdf)
+                                        df_list.append(tempdf)
+                        except:
+                                continue
 # df_df_all = pd.DataFrame()
 df_df_all = pd.concat(df_list)
 
@@ -277,6 +280,9 @@ summary_df = summary_df.sort_values(by='cumul_net_dollar_flow',ascending=False)
 summary_df['pct_of_tvl'] = 100* summary_df['net_dollar_flow'] / summary_df['usd_value']
 summary_df['flow_direction'] = np.where(summary_df['cumul_net_dollar_flow']>=0,1,-1)
 summary_df['abs_cumul_net_dollar_flow'] = abs(summary_df['cumul_net_dollar_flow'])
+
+print(summary_df[summary_df['chain']=='Arbitrum'])
+print(summary_df[summary_df['chain']=='Optimism'])
 # display(summary_df)
 fig = px.treemap(summary_df[summary_df['abs_cumul_net_dollar_flow'] !=0],                  path=[px.Constant("all"), 'chain', 'protocol'], #                  path=[px.Constant("all"), 'token', 'chain', 'protocol'], \
                  values='abs_cumul_net_dollar_flow', color='flow_direction'
@@ -288,7 +294,7 @@ fig.update_traces(root_color="lightgrey")
 fig.update_layout(margin = dict(t=50, l=25, r=25, b=25))
 # fig.update_layout(tickprefix = '$')
 
-# fig.show()
+fig.show()
 fig_app = px.treemap(summary_df[summary_df['abs_cumul_net_dollar_flow'] !=0],                 #  path=[px.Constant("all"), 'chain', 'protocol'], \
 #                  path=[px.Constant("all"), 'token', 'chain', 'protocol'], \
                         path=[px.Constant("all"), 'protocol','chain'], \

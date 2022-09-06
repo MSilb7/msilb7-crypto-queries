@@ -36,7 +36,7 @@ from requests.adapters import HTTPAdapter, Retry
 # logging.basicConfig(level=logging.DEBUG)
 
 s = requests.Session()
-retries = Retry(total=5, backoff_factor=1, status_forcelist=[ 404, 502, 503, 504 ])
+retries = Retry(total=10, backoff_factor=1, status_forcelist=[ 404, 502, 503, 504 ])
 s.mount('http://', HTTPAdapter(max_retries=retries))
 
 pwd = os.getcwd()
@@ -320,7 +320,7 @@ fig_chain_30d.update_layout(yaxis_tickprefix = '$')
 fig_chain_30d.show()
 
 
-# In[ ]:
+# In[112]:
 
 
 # ! jupyter nbconvert --to python optimism_app_fees.ipynb
