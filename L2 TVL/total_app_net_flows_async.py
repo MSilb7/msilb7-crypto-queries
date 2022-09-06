@@ -60,7 +60,7 @@ res = pd.DataFrame( r.get(all_api, headers=header).json() )
 res = res[res['tvl'] > 10_000_000] ##greater than 10mil
 # print(len(res))
 # print(res.columns)
-display(res)
+# display(res)
 
 
 # In[ ]:
