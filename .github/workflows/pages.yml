@@ -5,9 +5,9 @@ on:
   # Runs on pushes targeting the default branch
   push:
     branches: ["main"]
-  # trigger when the "Run L2 TVL" workflow succeeded
+  # trigger when the "Run L2 TVL & App Fees Pulls" workflow succeeded
   workflow_run:
-    workflows: ["Run L2 TVL"]
+    workflows: ["Run L2 TVL & App Fees Pulls"]
     types:
       - completed
 
