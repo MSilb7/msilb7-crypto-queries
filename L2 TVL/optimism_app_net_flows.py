@@ -55,6 +55,9 @@ protocols = [
         ,['stargate',           '2022-08-05']
         ,['pika-protocol',      '2022-08-29']
         ,['synthetix',          '2022-08-25'] #This is when Curve incentives started, so not really 1:1
+        ,['pickle',             '2022-09-09']
+        ,['aelin',              '2022-09-12']
+        ,['polynomial-protocol','2022-09-14']
         ]
 # print(protocols[0])
 prod = []
