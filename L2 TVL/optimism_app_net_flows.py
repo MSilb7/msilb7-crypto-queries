@@ -86,6 +86,12 @@ df_df = pd.concat(prod)
 # In[ ]:
 
 
+df_df
+
+
+# In[ ]:
+
+
 data_df = df_df.copy()#merge(cg_df, on=['date','token'],how='inner')
 data_df.sort_values(by='date',inplace=True)
 data_df['token_value'] = data_df['token_value'].replace(0, np.nan)
@@ -94,11 +100,15 @@ data_df['price_usd'] = data_df['usd_value']/data_df['token_value']
 data_df.sort_values(by='date',inplace=True)
 
 data_df['last_token_value'] = data_df.groupby(['token','protocol'])['token_value'].shift(1)
+data_df['last_price_usd'] = data_df.groupby(['token','protocol'])['price_usd'].shift(1)
 data_df['last_token_value'] = data_df['last_token_value'].fillna(0)
 
 data_df['net_token_flow'] = data_df['token_value'] - data_df['last_token_value']
+data_df['net_price_change'] = data_df['price_usd'] - data_df['last_price_usd']
 
 data_df['net_dollar_flow'] = data_df['net_token_flow'] * data_df['price_usd']
+
+data_df['net_price_stock_change'] = data_df['last_token_value'] * data_df['net_price_change']
 
 
 # display(data_df)
@@ -108,15 +118,30 @@ data_df['net_dollar_flow'] = data_df['net_token_flow'] * data_df['price_usd']
 
 
 # data_df[data_df['protocol']=='perpetual-protocol'].sort_values(by='date')
+data_df.head()
 
 
 # In[ ]:
 
 
-netdf_df = data_df[data_df['date']>= data_df['start_date']][['date','protocol','net_dollar_flow']]
-netdf_df = netdf_df.groupby(['date','protocol']).sum(['net_dollar_flow'])
-netdf_df['cumul_net_dollar_flow'] = netdf_df.groupby(['protocol']).cumsum()
+netdf_df = data_df[data_df['date']>= data_df['start_date']][['date','protocol','net_dollar_flow','net_price_stock_change','usd_value']]
+
+
+netdf_df = netdf_df.groupby(['date','protocol']).sum(['net_dollar_flow','net_price_stock_change','usd_value'])
+
+
+netdf_df['tvl_change'] = netdf_df['usd_value'] - netdf_df.groupby(['protocol'])['usd_value'].shift(1)
+netdf_df['error'] = netdf_df['tvl_change'] - (netdf_df['net_dollar_flow'] + netdf_df['net_price_stock_change'])
+
+netdf_df['cumul_net_dollar_flow'] = netdf_df['net_dollar_flow'].groupby(['protocol']).cumsum()
+netdf_df['cumul_net_price_stock_change'] = netdf_df['net_price_stock_change'].groupby(['protocol']).cumsum()
 netdf_df.reset_index(inplace=True)
+
+
+# In[ ]:
+
+
+netdf_df[netdf_df['protocol'] == 'velodrome'].head()
 
 
 # In[ ]:
