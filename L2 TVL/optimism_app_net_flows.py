@@ -58,6 +58,7 @@ protocols = [
         ,['pickle',             '2022-09-09']
         ,['aelin',              '2022-09-12']
         ,['polynomial-protocol','2022-09-14']
+        ,['xtoken',             '2022-09-19']
         ]
 # print(protocols[0])
 prod = []
@@ -86,7 +87,7 @@ df_df = pd.concat(prod)
 # In[ ]:
 
 
-df_df
+# df_df
 
 
 # In[ ]:
