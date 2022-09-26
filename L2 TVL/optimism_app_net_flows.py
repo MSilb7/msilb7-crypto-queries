@@ -59,6 +59,7 @@ protocols = [
         ,['aelin',              '2022-09-12']
         ,['polynomial-protocol','2022-09-14']
         ,['xtoken',             '2022-09-19']
+        ,['hop-protocol',       '2022-09-22']
         ]
 # print(protocols[0])
 prod = []
