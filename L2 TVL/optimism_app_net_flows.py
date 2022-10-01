@@ -60,6 +60,7 @@ protocols = [
         ,['polynomial-protocol','2022-09-14']
         ,['xtoken',             '2022-09-19']
         ,['hop-protocol',       '2022-09-22']
+        ,['beethoven-x',        '2022-09-29']
         ]
 # print(protocols[0])
 prod = []
@@ -201,7 +202,7 @@ cumul_fig.write_html(prepend + "img_outputs/cumul_ndf.html", include_plotlyjs='c
 print("yay")
 
 
-# In[ ]:
+# In[89]:
 
 
 # ! jupyter nbconvert --to python optimism_app_net_flows.ipynb
