@@ -15,29 +15,49 @@ async def get_tvl(apistring, header, statuses, chains, prot):
         async with retry_client.get(apistring, retry_options=ExponentialRetry(attempts=10), raise_for_status=statuses) as response:
                 try:
                         prot_req = await response.json()
+                        cats = prot_req['category']
                         prot_req = prot_req['chainTvls']
                         for ch in chains:
+                                
                                 ad = pd.json_normalize( prot_req[ch]['tokens'] )
                                 ad_usd = pd.json_normalize( prot_req[ch]['tokensInUsd'] )
+                                try: #if there's generic tvl
+                                        ad_tvl = pd.json_normalize( prot_req[ch]['tvl'] )
+                                        ad_tvl = ad_tvl[['date','totalLiquidityUSD']]
+                                        ad_tvl = ad_tvl.rename(columns={'totalLiquidityUSD':'total_app_tvl'})
+                                        # print(ad_tvl)
+                                except:
+                                        continue
                         #             ad = ad.merge(how='left')
                                 if not ad.empty:
                                         ad = pd.melt(ad,id_vars = ['date'])
                                         ad = ad.rename(columns={'variable':'token','value':'token_value'})
-                                        ad_usd = pd.melt(ad_usd,id_vars = ['date'])
-                                        ad_usd = ad_usd.rename(columns={'variable':'token','value':'usd_value'})
-                                        ad = ad.merge(ad_usd,on=['date','token'])
+                                        if not ad_usd.empty:
+                                                ad_usd = pd.melt(ad_usd,id_vars = ['date'])
+                                                ad_usd = ad_usd.rename(columns={'variable':'token','value':'usd_value'})
+                                                ad = ad.merge(ad_usd,on=['date','token'])
+                                        else:
+                                                ad['usd_value'] = ''
+                                        if not ad_tvl.empty:
+                                                ad = ad.merge(ad_tvl,on=['date'],how = 'outer')
+                                        else:
+                                                ad['total_app_tvl'] = ''
                                         
                                         ad['date'] = pd.to_datetime(ad['date'], unit ='s') #convert to days
-                                        ad['token'] = ad['token'].str.replace('tokens.','', regex=False)
+                                        try:
+                                                ad['token'] = ad['token'].str.replace('tokens.','', regex=False)
+                                        except:
+                                                continue
                                         ad['protocol'] = prot
                                         ad['chain'] = ch
+                                        ad['category'] = cats
                                 #         ad['start_date'] = pd.to_datetime(prot[1])
                                         # ad['date'] = ad['date'] - timedelta(days=1) #change to eod vs sod
                                         prod.append(ad)
                 except Exception as e:
                         raise Exception("Could not convert json")
         await retry_client.close()
-        
+        # print(prod)
         return prod
 
 def get_range(protocols, header = header, statuses = statuses):
@@ -92,12 +112,19 @@ def remove_bad_cats(netdf):
                         (~netdf['chain'].str.contains('-borrowed')) &\
                         (~netdf['chain'].str.contains('-staking')) &\
                         (~netdf['chain'].str.contains('-pool2')) &\
+                        (~netdf['chain'].str.contains('-treasury')) &\
+                        (~netdf['chain'].str.contains('-vesting')) &\
+                        (~netdf['chain'].str.contains('-Vesting')) &\
                         (~( netdf['chain'] == 'treasury') ) &\
                         (~( netdf['chain'] == 'borrowed') ) &\
                         (~( netdf['chain'] == 'staking') ) &\
+                        (~( netdf['chain'] == 'vesting') ) &\
+                        (~( netdf['chain'] == 'Vesting') ) &\
                         (~( netdf['chain'] == 'pool2') )       
 #                         & (~( netdf_df['chain'] == 'Ethereum') )
                         ]
+        return summary_df
+
 def get_chain_tvls(chain_list):
         # get chain tvls
         chain_api = 'https://api.llama.fi/charts/'
