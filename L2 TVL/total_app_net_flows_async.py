@@ -44,7 +44,7 @@ else:
 # In[ ]:
 
 
-trailing_num_days = 7
+trailing_num_days = 90
 
 start_date = date.today()-timedelta(days=trailing_num_days +1)
 
@@ -55,9 +55,10 @@ start_date = date.today()-timedelta(days=trailing_num_days +1)
 
 
 #get all apps > 10 m tvl
+min_tvl = 10_000_000
 all_api = 'https://api.llama.fi/protocols'
 res = pd.DataFrame( r.get(all_api, headers=header).json() )
-res = res[res['tvl'] > 10_000_000] ##greater than 10mil
+res = res[res['tvl'] > min_tvl] ##greater than 10mil
 # print(len(res))
 # print(res.columns)
 # display(res)
@@ -72,7 +73,7 @@ protocols = res[['slug','chainTvls']]
 re = res['chainTvls']
 # r[1].keys()
 protocols['chainTvls'] = protocols['chainTvls'].apply(lambda x: list(x.keys()) )
-protocols[protocols['chainTvls'].map(set(['Arbitrum']).issubset)]
+# protocols[protocols['chainTvls'].map(set(['Arbitrum']).issubset)]
 
 
 # In[ ]:
@@ -273,7 +274,7 @@ netdf_df['rank_desc'] = netdf_df.groupby(['protocol', 'chain'])['date'].        
 # In[ ]:
 
 
-summary_df = netdf_df[  ( netdf_df['rank_desc'] == 1 ) &                        (~netdf_df['chain'].str.contains('-borrowed')) &                        (~netdf_df['chain'].str.contains('-staking')) &                        (~netdf_df['chain'].str.contains('-pool2')) &                        (~( netdf_df['chain'] == 'treasury') ) &                        (~( netdf_df['chain'] == 'borrowed') ) &                        (~( netdf_df['chain'] == 'staking') ) &                        (~( netdf_df['chain'] == 'pool2') )       
+summary_df = netdf_df[  ( netdf_df['rank_desc'] == 1 ) &                        (~netdf_df['chain'].str.contains('-borrowed')) &                        (~netdf_df['chain'].str.contains('-staking')) &                        (~netdf_df['chain'].str.contains('-pool2')) &                            (~netdf_df['chain'].str.contains('-treasury')) &                        (~( netdf_df['chain'] == 'treasury') ) &                        (~( netdf_df['chain'] == 'borrowed') ) &                        (~( netdf_df['chain'] == 'staking') ) &                            (~( netdf_df['chain'] == 'treasury') ) &                        (~( netdf_df['chain'] == 'pool2') ) &                        (~( netdf_df['protocol'] == 'polygon-bridge-&-staking') ) 
 #                         & (~( netdf_df['chain'] == 'Ethereum') )
                         ]
 summary_df = summary_df.sort_values(by='cumul_net_dollar_flow',ascending=False)
@@ -288,6 +289,8 @@ fig = px.treemap(summary_df[summary_df['abs_cumul_net_dollar_flow'] !=0],       
                  values='abs_cumul_net_dollar_flow', color='flow_direction'
 #                 ,color_discrete_map={'-1':'red', '1':'green'})
                 ,color_continuous_scale='Spectral'
+                     , title = "App Net Flows Change by App -> Chain - Last " + str(trailing_num_days) + \
+                            " Days - (Apps with > $" + str(min_tvl/1e6) + "M TVL Shown)"
                 )
 # fig.data[0].textinfo = 'label+text+value'
 fig.update_traces(root_color="lightgrey")
@@ -301,10 +304,13 @@ fig_app = px.treemap(summary_df[summary_df['abs_cumul_net_dollar_flow'] !=0],   
                  values='abs_cumul_net_dollar_flow', color='flow_direction'
 #                 ,color_discrete_map={'-1':'red', '1':'green'})
                 ,color_continuous_scale='Spectral'
+                , title = "App Net Flows Change by Chain -> App - Last " + str(trailing_num_days) + \
+                            " Days - (Apps with > $" + str(min_tvl/1e6) + "M TVL Shown)"
                 )
 # fig.data[0].textinfo = 'label+text+value'
 fig_app.update_traces(root_color="lightgrey")
 fig_app.update_layout(margin = dict(t=50, l=25, r=25, b=25))
+fig.show()
 
 
 # In[ ]:
