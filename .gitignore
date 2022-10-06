@@ -17,22 +17,4 @@ L2 TVL/img_outputs/svg/net_app_flows.svg
 L2 TVL/Oracles/Get Oracle Data.ipynb
 L2 TVL/velo_app_net_flows.ipynb
 L2 TVL/ignore/
-L2 TVL/img_outputs/cumul_ndf.html
-L2 TVL/img_outputs/daily_ndf.html
-L2 TVL/img_outputs/net_app_flows_by_app.html
-L2 TVL/img_outputs/net_app_flows.html
-L2 TVL/img_outputs/png/cumul_ndf.png
-L2 TVL/img_outputs/png/daily_ndf.png
-L2 TVL/img_outputs/svg/cumul_ndf.svg
-L2 TVL/img_outputs/svg/daily_ndf.svg
-L2 TVL/img_outputs/svg/net_app_flows_by_app.svg
-L2 TVL/img_outputs/svg/net_app_flows.svg
-L2_Fees/img_outputs/app_fees_by_chain.html
-L2_Fees/img_outputs/png/app_fees_by_chain.png
-L2_Fees/img_outputs/png/app_fees_on_op_7dma.png
-L2_Fees/img_outputs/png/app_fees_on_op_30dma.png
-L2_Fees/img_outputs/png/app_fees_on_op.png
-L2_Fees/img_outputs/svg/app_fees_by_chain.svg
-L2_Fees/img_outputs/svg/app_fees_on_op_7dma.svg
-L2_Fees/img_outputs/svg/app_fees_on_op_30dma.svg
-L2_Fees/img_outputs/svg/app_fees_on_op.svg
+L2 TVL/img_outputs/
