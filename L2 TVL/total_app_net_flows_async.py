@@ -291,6 +291,7 @@ fig = px.treemap(summary_df[summary_df['abs_cumul_net_dollar_flow'] !=0],       
                 ,color_continuous_scale='Spectral'
                      , title = "App Net Flows Change by App -> Chain - Last " + str(trailing_num_days) + \
                             " Days - (Apps with > $" + str(min_tvl/1e6) + "M TVL Shown)"
+                ,hover_data=['cumul_net_dollar_flow']
                 )
 # fig.data[0].textinfo = 'label+text+value'
 fig.update_traces(root_color="lightgrey")
@@ -306,6 +307,7 @@ fig_app = px.treemap(summary_df[summary_df['abs_cumul_net_dollar_flow'] !=0],   
                 ,color_continuous_scale='Spectral'
                 , title = "App Net Flows Change by Chain -> App - Last " + str(trailing_num_days) + \
                             " Days - (Apps with > $" + str(min_tvl/1e6) + "M TVL Shown)"
+                ,hover_data=['cumul_net_dollar_flow']
                 )
 # fig.data[0].textinfo = 'label+text+value'
 fig_app.update_traces(root_color="lightgrey")
@@ -325,7 +327,7 @@ fig_app.write_image(prepend + "img_outputs/png/net_app_flows_by_app.png") #prepe
 fig_app.write_html(prepend + "img_outputs/net_app_flows_by_app.html", include_plotlyjs='cdn')
 
 
-# In[28]:
+# In[29]:
 
 
 # ! jupyter nbconvert --to python total_app_net_flows_async.ipynb
