@@ -263,7 +263,7 @@ netdf_df['cumul_net_dollar_flow'] = netdf_df[['protocol','chain','net_dollar_flo
 netdf_df['cumul_net_dollar_flow_7d'] = netdf_df[['protocol','chain','net_dollar_flow']]                                    .groupby(['protocol','chain'])['net_dollar_flow'].rolling(7, min_periods=1).sum()                                    .reset_index(drop=True)
 netdf_df.reset_index(inplace=True)
 netdf_df.drop(columns=['index'],inplace=True)
-display(netdf_df)
+# display(netdf_df)
 
 
 # In[ ]:
@@ -347,8 +347,8 @@ fig_app.write_image(prepend + "img_outputs/png/net_app_flows_by_app.png") #prepe
 fig_app.write_html(prepend + "img_outputs/net_app_flows_by_app.html", include_plotlyjs='cdn')
 
 
-# In[ ]:
+# In[84]:
 
 
-get_ipython().system(' jupyter nbconvert --to python total_app_net_flows_async.ipynb')
+# ! jupyter nbconvert --to python total_app_net_flows_async.ipynb
 
