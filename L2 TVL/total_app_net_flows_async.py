@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[ ]:
+# In[34]:
 
 
 import pandas as pd
@@ -18,7 +18,7 @@ nest_asyncio.apply()
 header = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:71.0) Gecko/20100101 Firefox/71.0'}
 
 
-# In[ ]:
+# In[35]:
 
 
 #https://stackoverflow.com/questions/23267409/how-to-implement-retry-mechanism-into-python-requests-library
@@ -41,7 +41,7 @@ else:
     prepend = 'L2 TVL/'
 
 
-# In[ ]:
+# In[36]:
 
 
 trailing_num_days = 90
@@ -51,7 +51,7 @@ start_date = date.today()-timedelta(days=trailing_num_days +1)
 # start_date = datetime.strptime('2022-07-13', '%Y-%m-%d').date()
 
 
-# In[ ]:
+# In[37]:
 
 
 #get all apps > 10 m tvl
@@ -64,7 +64,7 @@ res = res[res['tvl'] > min_tvl] ##greater than 10mil
 # display(res)
 
 
-# In[ ]:
+# In[38]:
 
 
 
@@ -76,7 +76,7 @@ protocols['chainTvls'] = protocols['chainTvls'].apply(lambda x: list(x.keys()) )
 # protocols[protocols['chainTvls'].map(set(['Arbitrum']).issubset)]
 
 
-# In[ ]:
+# In[39]:
 
 
 # protocols = protocols[ protocols['slug'] == 'uniswap-v3' ]
@@ -85,7 +85,7 @@ protocols['chainTvls'] = protocols['chainTvls'].apply(lambda x: list(x.keys()) )
 # ad
 
 
-# In[ ]:
+# In[40]:
 
 
 # api_str = 'https://api.llama.fi/protocol/uniswap'
@@ -94,7 +94,7 @@ protocols['chainTvls'] = protocols['chainTvls'].apply(lambda x: list(x.keys()) )
 # prot_req
 
 
-# In[ ]:
+# In[41]:
 
 
 statuses = {x for x in range(100, 600)}
@@ -102,7 +102,7 @@ statuses.remove(200)
 statuses.remove(429)
 
 
-# In[ ]:
+# In[42]:
 
 
 async def get_tvl(apistring, header, statuses, chains, prot):
@@ -137,7 +137,7 @@ async def get_tvl(apistring, header, statuses, chains, prot):
         return prod
 
 
-# In[ ]:
+# In[43]:
 
 
 def get_range(protocols):
@@ -174,14 +174,14 @@ def get_range(protocols):
         return data_dfs
 
 
-# In[ ]:
+# In[44]:
 
 
 df_df = get_range(protocols)
 # print (typeof(df_df_all) )
 
 
-# In[ ]:
+# In[45]:
 
 
 df_list = []
@@ -200,13 +200,13 @@ for dat in df_df:
 df_df_all = pd.concat(df_list)
 
 
-# In[ ]:
+# In[46]:
 
 
 # df_df_all
 
 
-# In[ ]:
+# In[47]:
 
 
 
@@ -215,7 +215,7 @@ df_df_all = pd.concat(df_list)
 print("done api")
 
 
-# In[ ]:
+# In[48]:
 
 
 #filter down a bit so we can do trailing comp w/o doing every row
@@ -227,7 +227,7 @@ df_df['last_token_value'] = df_df.groupby(['token','protocol','chain'])['token_v
 df_df = df_df[df_df['date'].dt.date >= start_date ]
 
 
-# In[ ]:
+# In[53]:
 
 
 
@@ -248,7 +248,7 @@ data_df = data_df[abs(data_df['net_dollar_flow']) < 50_000_000_000] #50 bil erro
 data_df = data_df[~data_df['net_dollar_flow'].isna()]
 
 
-# In[ ]:
+# In[54]:
 
 
 netdf_df = data_df[['date','protocol','chain','net_dollar_flow','usd_value']]
@@ -260,8 +260,10 @@ netdf_df = netdf_df.groupby(['date','protocol','chain','usd_value']).sum(['net_d
 netdf_df.reset_index(inplace=True)
 
 netdf_df['cumul_net_dollar_flow'] = netdf_df[['protocol','chain','net_dollar_flow']]                                    .groupby(['protocol','chain']).cumsum()
+netdf_df['cumul_net_dollar_flow_7d'] = netdf_df[['protocol','chain','net_dollar_flow']]                                    .groupby(['protocol','chain'])['net_dollar_flow'].rolling(7).sum()                                    .reset_index(drop=True)
 netdf_df.reset_index(inplace=True)
 netdf_df.drop(columns=['index'],inplace=True)
+display(netdf_df)
 
 
 # In[ ]:
@@ -281,9 +283,10 @@ summary_df = summary_df.sort_values(by='cumul_net_dollar_flow',ascending=False)
 summary_df['pct_of_tvl'] = 100* summary_df['net_dollar_flow'] / summary_df['usd_value']
 summary_df['flow_direction'] = np.where(summary_df['cumul_net_dollar_flow']>=0,1,-1)
 summary_df['abs_cumul_net_dollar_flow'] = abs(summary_df['cumul_net_dollar_flow'])
+summary_df['abs_cumul_net_dollar_flow_7d'] = abs(summary_df['cumul_net_dollar_flow_7d'])
 
-print(summary_df[summary_df['chain']=='Arbitrum'])
-print(summary_df[summary_df['chain']=='Optimism'])
+# print(summary_df[summary_df['chain']=='Arbitrum'])
+# print(summary_df[summary_df['chain']=='Optimism'])
 # display(summary_df)
 fig = px.treemap(summary_df[summary_df['abs_cumul_net_dollar_flow'] !=0],                  path=[px.Constant("all"), 'chain', 'protocol'], #                  path=[px.Constant("all"), 'token', 'chain', 'protocol'], \
                  values='abs_cumul_net_dollar_flow', color='flow_direction'
@@ -291,12 +294,25 @@ fig = px.treemap(summary_df[summary_df['abs_cumul_net_dollar_flow'] !=0],       
                 ,color_continuous_scale='Spectral'
                      , title = "App Net Flows Change by App -> Chain - Last " + str(trailing_num_days) + \
                             " Days - (Apps with > $" + str(min_tvl/1e6) + "M TVL Shown)"
+                
                 ,hover_data=['cumul_net_dollar_flow']
                 )
 # fig.data[0].textinfo = 'label+text+value'
 fig.update_traces(root_color="lightgrey")
 fig.update_layout(margin = dict(t=50, l=25, r=25, b=25))
 # fig.update_layout(tickprefix = '$')
+
+fig_7d = px.treemap(summary_df[summary_df['abs_cumul_net_dollar_flow_7d'] !=0],                  path=[px.Constant("all"), 'chain', 'protocol'], #                  path=[px.Constant("all"), 'token', 'chain', 'protocol'], \
+                 values='abs_cumul_net_dollar_flow', color='flow_direction'
+#                 ,color_discrete_map={'-1':'red', '1':'green'})
+                ,color_continuous_scale='Spectral'
+                     , title = "App Net Flows Change by App -> Chain - Last " + "7"" + \
+                            " Days - (Apps with > $" + str(min_tvl/1e6) + "M TVL Shown)"
+                
+                hover_data("=['cumul_net_dollar_flow_7d']")
+                )
+fig_7d.update_traces(root_color="lightgrey")
+fig_7d.update_layout(margin = dict(t=50, l=25, r=25, b=25))
 
 fig.show()
 fig_app = px.treemap(summary_df[summary_df['abs_cumul_net_dollar_flow'] !=0],                 #  path=[px.Constant("all"), 'chain', 'protocol'], \
@@ -322,12 +338,16 @@ fig.write_image(prepend + "img_outputs/svg/net_app_flows.svg") #prepend +
 fig.write_image(prepend + "img_outputs/png/net_app_flows.png") #prepend + 
 fig.write_html(prepend + "img_outputs/net_app_flows.html", include_plotlyjs='cdn')
 
+fig_7d.write_image(prepend + "img_outputs/svg/net_app_flows_7d.svg") #prepend + 
+fig_7d.write_image(prepend + "img_outputs/png/net_app_flows_7d.png") #prepend + 
+fig_7d.write_html(prepend + "img_outputs/net_app_flows_7d.html", include_plotlyjs='cdn')
+
 fig_app.write_image(prepend + "img_outputs/svg/net_app_flows_by_app.svg") #prepend + 
 fig_app.write_image(prepend + "img_outputs/png/net_app_flows_by_app.png") #prepend + 
 fig_app.write_html(prepend + "img_outputs/net_app_flows_by_app.html", include_plotlyjs='cdn')
 
 
-# In[29]:
+# In[ ]:
 
 
 # ! jupyter nbconvert --to python total_app_net_flows_async.ipynb
