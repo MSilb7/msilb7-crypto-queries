@@ -253,7 +253,7 @@ data_df = data_df[~data_df['net_dollar_flow'].isna()]
 
 netdf_df = data_df[['date','protocol','chain','net_dollar_flow','usd_value']]
 netdf_df = netdf_df.fillna(0)
-netdf_df = netdf_df.sort_values(order_by='date',ascending=True)
+netdf_df = netdf_df.sort_values(by='date',ascending=True)
 netdf_df = netdf_df.groupby(['date','protocol','chain']).sum(['net_dollar_flow','usd_value']) ##agg by app
 
 #usd_value is the TVL on a given day
@@ -348,7 +348,7 @@ fig_app.write_image(prepend + "img_outputs/png/net_app_flows_by_app.png") #prepe
 fig_app.write_html(prepend + "img_outputs/net_app_flows_by_app.html", include_plotlyjs='cdn')
 
 
-# In[ ]:
+# In[87]:
 
 
 # ! jupyter nbconvert --to python total_app_net_flows_async.ipynb
