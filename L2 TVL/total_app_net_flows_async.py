@@ -253,6 +253,7 @@ data_df = data_df[~data_df['net_dollar_flow'].isna()]
 
 netdf_df = data_df[['date','protocol','chain','net_dollar_flow','usd_value']]
 netdf_df = netdf_df.fillna(0)
+netdf_df = netdf_df.sort_values(order_by='date',ascending=True)
 netdf_df = netdf_df.groupby(['date','protocol','chain']).sum(['net_dollar_flow','usd_value']) ##agg by app
 
 #usd_value is the TVL on a given day
@@ -309,7 +310,7 @@ fig_7d = px.treemap(summary_df[summary_df['abs_cumul_net_dollar_flow_7d'] !=0], 
                      , title = "App Net Flows Change by App -> Chain - Last " + str(7) + \
                             " Days - (Apps with > $" + str(min_tvl/1e6) + "M TVL Shown)"
                 
-                ,hover_data=['cumul_net_dollar_flow_7d']
+                # ,hover_data=['cumul_net_dollar_flow_7d']
                 )
 fig_7d.update_traces(root_color="lightgrey")
 fig_7d.update_layout(margin = dict(t=50, l=25, r=25, b=25))
@@ -347,7 +348,7 @@ fig_app.write_image(prepend + "img_outputs/png/net_app_flows_by_app.png") #prepe
 fig_app.write_html(prepend + "img_outputs/net_app_flows_by_app.html", include_plotlyjs='cdn')
 
 
-# In[85]:
+# In[ ]:
 
 
 # ! jupyter nbconvert --to python total_app_net_flows_async.ipynb
