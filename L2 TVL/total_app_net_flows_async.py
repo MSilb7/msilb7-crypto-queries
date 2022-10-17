@@ -264,6 +264,11 @@ netdf_df['cumul_net_dollar_flow'] = netdf_df[['protocol','chain','net_dollar_flo
 netdf_df['cumul_net_dollar_flow_7d'] = netdf_df[['protocol','chain','net_dollar_flow']]                                    .groupby(['protocol','chain'])['net_dollar_flow'].rolling(7, min_periods=1).sum()                                    .reset_index(drop=True)
 netdf_df.reset_index(inplace=True)
 netdf_df.drop(columns=['index'],inplace=True)
+
+
+# In[ ]:
+
+
 # display(netdf_df)
 
 
@@ -272,6 +277,7 @@ netdf_df.drop(columns=['index'],inplace=True)
 
 #get latest
 netdf_df['rank_desc'] = netdf_df.groupby(['protocol', 'chain'])['date'].                            rank(method='dense',ascending=False).astype(int)
+display(netdf_df[netdf_df['protocol'] == 'lyra'])
 
 
 # In[ ]:
@@ -283,8 +289,10 @@ summary_df = netdf_df[  ( netdf_df['rank_desc'] == 1 ) &                        
 summary_df = summary_df.sort_values(by='cumul_net_dollar_flow',ascending=False)
 summary_df['pct_of_tvl'] = 100* summary_df['net_dollar_flow'] / summary_df['usd_value']
 summary_df['flow_direction'] = np.where(summary_df['cumul_net_dollar_flow']>=0,1,-1)
+summary_df['flow_direction_7d'] = np.where(summary_df['cumul_net_dollar_flow_7d']>=0,1,-1)
 summary_df['abs_cumul_net_dollar_flow'] = abs(summary_df['cumul_net_dollar_flow'])
 summary_df['abs_cumul_net_dollar_flow_7d'] = abs(summary_df['cumul_net_dollar_flow_7d'])
+
 # display(summary_df)
 # print(summary_df[summary_df['chain']=='Arbitrum'])
 # print(summary_df[summary_df['chain']=='Optimism'])
@@ -304,7 +312,7 @@ fig.update_layout(margin = dict(t=50, l=25, r=25, b=25))
 # fig.update_layout(tickprefix = '$')
 
 fig_7d = px.treemap(summary_df[summary_df['abs_cumul_net_dollar_flow_7d'] !=0],                  path=[px.Constant("all"), 'chain', 'protocol'], #                  path=[px.Constant("all"), 'token', 'chain', 'protocol'], \
-                 values='abs_cumul_net_dollar_flow_7d', color='flow_direction'
+                 values='abs_cumul_net_dollar_flow_7d', color='flow_direction_7d'
 #                 ,color_discrete_map={'-1':'red', '1':'green'})
                 ,color_continuous_scale='Spectral'
                      , title = "App Net Flows Change by App -> Chain - Last " + str(7) + \
@@ -316,6 +324,7 @@ fig_7d.update_traces(root_color="lightgrey")
 fig_7d.update_layout(margin = dict(t=50, l=25, r=25, b=25))
 
 fig_7d.show()
+
 fig_app = px.treemap(summary_df[summary_df['abs_cumul_net_dollar_flow'] !=0],                 #  path=[px.Constant("all"), 'chain', 'protocol'], \
 #                  path=[px.Constant("all"), 'token', 'chain', 'protocol'], \
                         path=[px.Constant("all"), 'protocol','chain'], \
@@ -348,7 +357,7 @@ fig_app.write_image(prepend + "img_outputs/png/net_app_flows_by_app.png") #prepe
 fig_app.write_html(prepend + "img_outputs/net_app_flows_by_app.html", include_plotlyjs='cdn')
 
 
-# In[87]:
+# In[ ]:
 
 
 # ! jupyter nbconvert --to python total_app_net_flows_async.ipynb
