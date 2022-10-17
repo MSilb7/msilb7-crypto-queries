@@ -277,7 +277,7 @@ netdf_df.drop(columns=['index'],inplace=True)
 
 #get latest
 netdf_df['rank_desc'] = netdf_df.groupby(['protocol', 'chain'])['date'].                            rank(method='dense',ascending=False).astype(int)
-display(netdf_df[netdf_df['protocol'] == 'lyra'])
+# display(netdf_df[netdf_df['protocol'] == 'lyra'])
 
 
 # In[ ]:
@@ -357,7 +357,7 @@ fig_app.write_image(prepend + "img_outputs/png/net_app_flows_by_app.png") #prepe
 fig_app.write_html(prepend + "img_outputs/net_app_flows_by_app.html", include_plotlyjs='cdn')
 
 
-# In[ ]:
+# In[35]:
 
 
 # ! jupyter nbconvert --to python total_app_net_flows_async.ipynb
