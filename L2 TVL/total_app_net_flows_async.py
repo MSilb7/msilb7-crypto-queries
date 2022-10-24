@@ -230,10 +230,10 @@ df_df = df_df[df_df['date'].dt.date >= start_date ]
 # In[ ]:
 
 
-sample = df_df[(df_df['protocol'] == 'uniswap') & (df_df['chain'] == 'Optimism')]
-sample = sample.sort_values(by='date',ascending=False)
-display(sample)
-sample.to_csv('check_uni_error.csv')
+# sample = df_df[(df_df['protocol'] == 'uniswap') & (df_df['chain'] == 'Optimism')]
+# sample = sample.sort_values(by='date',ascending=False)
+# # display(sample)
+# sample.to_csv('check_uni_error.csv')
 
 
 # In[ ]:
