@@ -313,7 +313,7 @@ netdf_df = netdf_df[  #( netdf_df['rank_desc'] == 1 ) &\
 
 
 summary_df = netdf_df.copy()
-drange = [0, 1, 7, 30]
+drange = [0, 1, 7, 30, 90, 180, 365]
 summary_df = summary_df.sort_values(by='date',ascending=True)
 # summary_df = summary_df[(summary_df['chain'] == 'Solana') & (summary_df['protocol'] == 'uxd')]
 for i in drange:
