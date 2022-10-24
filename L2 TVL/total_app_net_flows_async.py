@@ -324,13 +324,15 @@ for i in drange:
         else:
                 col_str = 'cumul_net_dollar_flow_' + str(i) + 'd'
                 # print(col_str)
-                summary_df[col_str] = summary_df[['protocol','chain','net_dollar_flow']]                                    .groupby(['protocol','chain'])['net_dollar_flow'].rolling(i, min_periods=1).sum()                                    .reset_index(drop=True).values
+                summary_df[col_str] = summary_df[['protocol','chain','net_dollar_flow']]                                    .groupby(['protocol','chain'])['net_dollar_flow'].transform(lambda x: x.rolling(i, min_periods=1).sum() )
+                                #         .rolling(i, min_periods=1).sum()\ #This caused errors and mismatches
+                                #     .reset_index(level=0,drop=True)#.values
                 summary_df['flow_direction_' + str(i) + 'd'] = np.where(summary_df[col_str]>=0,1,-1)
                 summary_df['abs_cumul_net_dollar_flow_' + str(i) + 'd'] = abs(summary_df[col_str])
                 # display(summary_df)
                 # display(summary_df[(summary_df['chain'] == 'Optimism') & (summary_df['protocol'] == 'yearn-finance')] )
 
-
+display(summary_df[(summary_df['chain'] == 'Optimism') & (summary_df['protocol'] == 'qidao')].iloc[-7: , :15] )
 summary_df['pct_of_tvl'] = 100* summary_df['net_dollar_flow'] / summary_df['usd_value']
 summary_df = summary_df[summary_df['rank_desc'] == 1 ]
 # display(summary_df)
