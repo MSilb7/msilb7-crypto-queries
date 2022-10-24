@@ -279,7 +279,7 @@ netdf_df.reset_index(inplace=True)
 #                                     .reset_index(drop=True)
 netdf_df.reset_index(inplace=True)
 netdf_df.drop(columns=['index'],inplace=True)
-display(netdf_df)
+# display(netdf_df)
 
 
 # In[ ]:
