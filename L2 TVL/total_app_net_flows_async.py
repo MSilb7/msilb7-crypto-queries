@@ -269,11 +269,17 @@ netdf_df = netdf_df.groupby(['date','protocol','chain']).sum(['net_dollar_flow',
 netdf_df = netdf_df.groupby(['date','protocol','chain','usd_value']).sum(['net_dollar_flow'])
 netdf_df.reset_index(inplace=True)
 
-netdf_df['cumul_net_dollar_flow'] = netdf_df[['protocol','chain','net_dollar_flow']]                                    .groupby(['protocol','chain']).cumsum()
-netdf_df['cumul_net_dollar_flow_7d'] = netdf_df[['protocol','chain','net_dollar_flow']]                                    .groupby(['protocol','chain'])['net_dollar_flow'].rolling(7, min_periods=1).sum()                                    .reset_index(drop=True)
-netdf_df['cumul_net_dollar_flow_30d'] = netdf_df[['protocol','chain','net_dollar_flow']]                                    .groupby(['protocol','chain'])['net_dollar_flow'].rolling(30, min_periods=1).sum()                                    .reset_index(drop=True)
+# netdf_df['cumul_net_dollar_flow'] = netdf_df[['protocol','chain','net_dollar_flow']]\
+#                                     .groupby(['protocol','chain']).cumsum()
+# netdf_df['cumul_net_dollar_flow_7d'] = netdf_df[['protocol','chain','net_dollar_flow']]\
+#                                     .groupby(['protocol','chain'])['net_dollar_flow'].rolling(7, min_periods=1).sum()\
+#                                     .reset_index(drop=True)
+# netdf_df['cumul_net_dollar_flow_30d'] = netdf_df[['protocol','chain','net_dollar_flow']]\
+#                                     .groupby(['protocol','chain'])['net_dollar_flow'].rolling(30, min_periods=1).sum()\
+#                                     .reset_index(drop=True)
 netdf_df.reset_index(inplace=True)
 netdf_df.drop(columns=['index'],inplace=True)
+display(netdf_df)
 
 
 # In[ ]:
@@ -288,7 +294,7 @@ netdf_df.drop(columns=['index'],inplace=True)
 #get latest
 netdf_df['rank_desc'] = netdf_df.groupby(['protocol', 'chain'])['date'].                            rank(method='dense',ascending=False).astype(int)
 # display(netdf_df[netdf_df['protocol'] == 'lyra'])
-summary_df = netdf_df[  #( netdf_df['rank_desc'] == 1 ) &\
+netdf_df = netdf_df[  #( netdf_df['rank_desc'] == 1 ) &\
                         (~netdf_df['chain'].str.contains('-borrowed')) &\
                         (~netdf_df['chain'].str.contains('-staking')) &\
                         (~netdf_df['chain'].str.contains('-pool2')) &\
@@ -306,8 +312,10 @@ summary_df = netdf_df[  #( netdf_df['rank_desc'] == 1 ) &\
 # In[ ]:
 
 
+summary_df = netdf_df.copy()
 drange = [0, 1, 7, 30]
 summary_df = summary_df.sort_values(by='date',ascending=True)
+# summary_df = summary_df[(summary_df['chain'] == 'Solana') & (summary_df['protocol'] == 'uxd')]
 for i in drange:
         if i == 0:
                 summary_df['cumul_net_dollar_flow'] = summary_df[['protocol','chain','net_dollar_flow']]                                    .groupby(['protocol','chain']).cumsum()
@@ -315,15 +323,17 @@ for i in drange:
                 summary_df['abs_cumul_net_dollar_flow'] = abs(summary_df['cumul_net_dollar_flow'])
         else:
                 col_str = 'cumul_net_dollar_flow_' + str(i) + 'd'
-                summary_df[col_str] = summary_df[['protocol','chain','net_dollar_flow']]                                    .groupby(['protocol','chain'])['net_dollar_flow'].rolling(i, min_periods=1).sum()                                    .reset_index(drop=True)
+                # print(col_str)
+                summary_df[col_str] = summary_df[['protocol','chain','net_dollar_flow']]                                    .groupby(['protocol','chain'])['net_dollar_flow'].rolling(i, min_periods=1).sum()                                    .reset_index(drop=True).values
                 summary_df['flow_direction_' + str(i) + 'd'] = np.where(summary_df[col_str]>=0,1,-1)
                 summary_df['abs_cumul_net_dollar_flow_' + str(i) + 'd'] = abs(summary_df[col_str])
+                # display(summary_df)
                 # display(summary_df[(summary_df['chain'] == 'Optimism') & (summary_df['protocol'] == 'yearn-finance')] )
 
 
 summary_df['pct_of_tvl'] = 100* summary_df['net_dollar_flow'] / summary_df['usd_value']
 summary_df = summary_df[summary_df['rank_desc'] == 1 ]
-
+# display(summary_df)
 for i in drange:
         fig = ''
         if i == 0:
@@ -338,14 +348,17 @@ for i in drange:
                 cval = 'flow_direction_' + str(i) +'d'
                 saveval = 'net_app_flows_' + str(i) +'d'
                 titleval = "App Net Flows Change by App -> Chain - Last " + str(i) +                             " Days - (Apps with > $" + str(min_tvl/1e6) + "M TVL Shown)"
-
+        print(yval)
+        print(cval)
+        print(titleval)
+        print(hval)
         fig = px.treemap(summary_df[summary_df[yval] !=0],                  path=[px.Constant("all"), 'chain', 'protocol'], #                  path=[px.Constant("all"), 'token', 'chain', 'protocol'], \
                  values=yval, color=cval
 #                 ,color_discrete_map={'-1':'red', '1':'green'})
                 ,color_continuous_scale='Spectral'
                      , title = titleval
                 
-                ,hover_data = hval
+                , hover_data = [hval]
                 )
         
         fig.update_traces(root_color="lightgrey")
