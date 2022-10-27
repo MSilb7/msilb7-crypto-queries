@@ -335,6 +335,7 @@ for i in drange:
 # display(summary_df[(summary_df['chain'] == 'Optimism') & (summary_df['protocol'] == 'qidao')].iloc[-7: , :15] )
 summary_df['pct_of_tvl'] = 100* summary_df['net_dollar_flow'] / summary_df['usd_value']
 summary_df = summary_df[summary_df['rank_desc'] == 1 ]
+summary_df.to_csv('latest_tvl_app_trends.csv')
 # display(summary_df)
 for i in drange:
         fig = ''
@@ -451,7 +452,7 @@ fig_app.write_image(prepend + "img_outputs/png/net_app_flows_by_app.png") #prepe
 fig_app.write_html(prepend + "img_outputs/net_app_flows_by_app.html", include_plotlyjs='cdn')
 
 
-# In[122]:
+# In[ ]:
 
 
 # ! jupyter nbconvert --to python total_app_net_flows_async.ipynb
