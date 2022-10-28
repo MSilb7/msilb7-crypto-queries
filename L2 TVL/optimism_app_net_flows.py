@@ -63,7 +63,6 @@ protocols = [
         ,['beethoven-x',        '2022-09-29']
         ,['uniswap-v3',         '2022-10-26']
         ,['arrakis-finance',    '2022-10-26']
-        ,
         ]
 # print(protocols[0])
 prod = []
@@ -99,6 +98,8 @@ df_df = pd.concat(prod)
 
 
 data_df = df_df.copy()#merge(cg_df, on=['date','token'],how='inner')
+data_df = data_df[data_df['token_value'] > 0]
+
 data_df.sort_values(by='date',inplace=True)
 data_df['token_value'] = data_df['token_value'].replace(0, np.nan)
 data_df['price_usd'] = data_df['usd_value']/data_df['token_value']
@@ -124,7 +125,6 @@ data_df['net_price_stock_change'] = data_df['last_token_value'] * data_df['net_p
 
 
 # data_df[data_df['protocol']=='perpetual-protocol'].sort_values(by='date')
-data_df = data_df[data_df['token_value'] > 0]
 data_df.head()
 # data_df[(data_df['protocol'] == 'pooltogether') & (data_df['date'] >= '2022-10-06') & (data_df['date'] <= '2022-10-12')].tail(10)
 
