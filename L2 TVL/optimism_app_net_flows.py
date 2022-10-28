@@ -63,6 +63,7 @@ protocols = [
         ,['beethoven-x',        '2022-09-29']
         ,['uniswap-v3',         '2022-10-26']
         ,['arrakis-finance',    '2022-10-26']
+        ,['gamma',              '2022-10-26']
         ]
 # print(protocols[0])
 prod = []
