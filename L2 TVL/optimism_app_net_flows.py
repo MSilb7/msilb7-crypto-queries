@@ -61,6 +61,9 @@ protocols = [
         ,['xtoken',             '2022-09-19']
         ,['hop-protocol',       '2022-09-22']
         ,['beethoven-x',        '2022-09-29']
+        ,['uniswap-v3',         '2022-10-26']
+        ,['arrakis-finance',    '2022-10-26']
+        ,
         ]
 # print(protocols[0])
 prod = []
@@ -121,7 +124,9 @@ data_df['net_price_stock_change'] = data_df['last_token_value'] * data_df['net_p
 
 
 # data_df[data_df['protocol']=='perpetual-protocol'].sort_values(by='date')
+data_df = data_df[data_df['token_value'] > 0]
 data_df.head()
+# data_df[(data_df['protocol'] == 'pooltogether') & (data_df['date'] >= '2022-10-06') & (data_df['date'] <= '2022-10-12')].tail(10)
 
 
 # In[ ]:
@@ -144,7 +149,7 @@ netdf_df.reset_index(inplace=True)
 # In[ ]:
 
 
-netdf_df[netdf_df['protocol'] == 'velodrome'].head()
+netdf_df[(netdf_df['protocol'] == 'pooltogether') & (netdf_df['date'] >= '2022-10-06') & (netdf_df['date'] <= '2022-10-12')].tail(10)
 
 
 # In[ ]:
@@ -202,7 +207,7 @@ cumul_fig.write_html(prepend + "img_outputs/cumul_ndf.html", include_plotlyjs='c
 print("yay")
 
 
-# In[89]:
+# In[ ]:
 
 
 # ! jupyter nbconvert --to python optimism_app_net_flows.ipynb
