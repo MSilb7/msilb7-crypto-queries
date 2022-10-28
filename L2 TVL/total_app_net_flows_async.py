@@ -230,6 +230,15 @@ df_df = df_df[df_df['date'].dt.date >= start_date ]
 # In[ ]:
 
 
+# sample = df_df[(df_df['protocol'] == 'uniswap') & (df_df['chain'] == 'Optimism')]
+# sample = sample.sort_values(by='date',ascending=False)
+# # display(sample)
+# sample.to_csv('check_uni_error.csv')
+
+
+# In[ ]:
+
+
 
 data_df = df_df.copy()
 data_df['token_value'] = data_df['token_value'].replace(0, np.nan)
@@ -260,16 +269,23 @@ netdf_df = netdf_df.groupby(['date','protocol','chain']).sum(['net_dollar_flow',
 netdf_df = netdf_df.groupby(['date','protocol','chain','usd_value']).sum(['net_dollar_flow'])
 netdf_df.reset_index(inplace=True)
 
-netdf_df['cumul_net_dollar_flow'] = netdf_df[['protocol','chain','net_dollar_flow']]                                    .groupby(['protocol','chain']).cumsum()
-netdf_df['cumul_net_dollar_flow_7d'] = netdf_df[['protocol','chain','net_dollar_flow']]                                    .groupby(['protocol','chain'])['net_dollar_flow'].rolling(7, min_periods=1).sum()                                    .reset_index(drop=True)
+# netdf_df['cumul_net_dollar_flow'] = netdf_df[['protocol','chain','net_dollar_flow']]\
+#                                     .groupby(['protocol','chain']).cumsum()
+# netdf_df['cumul_net_dollar_flow_7d'] = netdf_df[['protocol','chain','net_dollar_flow']]\
+#                                     .groupby(['protocol','chain'])['net_dollar_flow'].rolling(7, min_periods=1).sum()\
+#                                     .reset_index(drop=True)
+# netdf_df['cumul_net_dollar_flow_30d'] = netdf_df[['protocol','chain','net_dollar_flow']]\
+#                                     .groupby(['protocol','chain'])['net_dollar_flow'].rolling(30, min_periods=1).sum()\
+#                                     .reset_index(drop=True)
 netdf_df.reset_index(inplace=True)
 netdf_df.drop(columns=['index'],inplace=True)
+# display(netdf_df)
 
 
 # In[ ]:
 
 
-# display(netdf_df)
+
 
 
 # In[ ]:
@@ -278,52 +294,131 @@ netdf_df.drop(columns=['index'],inplace=True)
 #get latest
 netdf_df['rank_desc'] = netdf_df.groupby(['protocol', 'chain'])['date'].                            rank(method='dense',ascending=False).astype(int)
 # display(netdf_df[netdf_df['protocol'] == 'lyra'])
+netdf_df = netdf_df[  #( netdf_df['rank_desc'] == 1 ) &\
+                        (~netdf_df['chain'].str.contains('-borrowed')) &\
+                        (~netdf_df['chain'].str.contains('-staking')) &\
+                        (~netdf_df['chain'].str.contains('-pool2')) &\
+                            (~netdf_df['chain'].str.contains('-treasury')) &\
+                        (~( netdf_df['chain'] == 'treasury') ) &\
+                        (~( netdf_df['chain'] == 'borrowed') ) &\
+                        (~( netdf_df['chain'] == 'staking') ) &\
+                            (~( netdf_df['chain'] == 'treasury') ) &\
+                        (~( netdf_df['chain'] == 'pool2') ) &\
+                        (~( netdf_df['protocol'] == 'polygon-bridge-&-staking') ) 
+#                         & (~( netdf_df['chain'] == 'Ethereum') )
+                        ]
 
 
 # In[ ]:
 
 
-summary_df = netdf_df[  ( netdf_df['rank_desc'] == 1 ) &                        (~netdf_df['chain'].str.contains('-borrowed')) &                        (~netdf_df['chain'].str.contains('-staking')) &                        (~netdf_df['chain'].str.contains('-pool2')) &                            (~netdf_df['chain'].str.contains('-treasury')) &                        (~( netdf_df['chain'] == 'treasury') ) &                        (~( netdf_df['chain'] == 'borrowed') ) &                        (~( netdf_df['chain'] == 'staking') ) &                            (~( netdf_df['chain'] == 'treasury') ) &                        (~( netdf_df['chain'] == 'pool2') ) &                        (~( netdf_df['protocol'] == 'polygon-bridge-&-staking') ) 
-#                         & (~( netdf_df['chain'] == 'Ethereum') )
-                        ]
-summary_df = summary_df.sort_values(by='cumul_net_dollar_flow',ascending=False)
+summary_df = netdf_df.copy()
+drange = [0, 1, 7, 30, 90, 180, 365]
+summary_df = summary_df.sort_values(by='date',ascending=True)
+# summary_df = summary_df[(summary_df['chain'] == 'Solana') & (summary_df['protocol'] == 'uxd')]
+for i in drange:
+        if i == 0:
+                summary_df['cumul_net_dollar_flow'] = summary_df[['protocol','chain','net_dollar_flow']]                                    .groupby(['protocol','chain']).cumsum()
+                summary_df['flow_direction'] = np.where(summary_df['cumul_net_dollar_flow']>=0,1,-1)
+                summary_df['abs_cumul_net_dollar_flow'] = abs(summary_df['cumul_net_dollar_flow'])
+        else:
+                col_str = 'cumul_net_dollar_flow_' + str(i) + 'd'
+                # print(col_str)
+                summary_df[col_str] = summary_df[['protocol','chain','net_dollar_flow']]                                    .groupby(['protocol','chain'])['net_dollar_flow'].transform(lambda x: x.rolling(i, min_periods=1).sum() )
+                                #         .rolling(i, min_periods=1).sum()\ #This caused errors and mismatches
+                                #     .reset_index(level=0,drop=True)#.values
+                summary_df['flow_direction_' + str(i) + 'd'] = np.where(summary_df[col_str]>=0,1,-1)
+                summary_df['abs_cumul_net_dollar_flow_' + str(i) + 'd'] = abs(summary_df[col_str])
+                # display(summary_df)
+                # display(summary_df[(summary_df['chain'] == 'Optimism') & (summary_df['protocol'] == 'yearn-finance')] )
+
+# display(summary_df[(summary_df['chain'] == 'Optimism') & (summary_df['protocol'] == 'qidao')].iloc[-7: , :15] )
 summary_df['pct_of_tvl'] = 100* summary_df['net_dollar_flow'] / summary_df['usd_value']
-summary_df['flow_direction'] = np.where(summary_df['cumul_net_dollar_flow']>=0,1,-1)
-summary_df['flow_direction_7d'] = np.where(summary_df['cumul_net_dollar_flow_7d']>=0,1,-1)
-summary_df['abs_cumul_net_dollar_flow'] = abs(summary_df['cumul_net_dollar_flow'])
-summary_df['abs_cumul_net_dollar_flow_7d'] = abs(summary_df['cumul_net_dollar_flow_7d'])
+summary_df = summary_df[summary_df['rank_desc'] == 1 ]
+summary_df.to_csv('latest_tvl_app_trends.csv')
+# display(summary_df)
+for i in drange:
+        fig = ''
+        if i == 0:
+                yval = 'abs_cumul_net_dollar_flow'
+                hval = 'cumul_net_dollar_flow'
+                cval = 'flow_direction'
+                saveval = 'net_app_flows'
+                titleval = "App Net Flows Change by App -> Chain - Last " + str(trailing_num_days) +                             " Days - (Apps with > $" + str(min_tvl/1e6) + "M TVL Shown)"
+        else:
+                yval = 'abs_cumul_net_dollar_flow_' + str(i) +'d'
+                hval = 'cumul_net_dollar_flow_' + str(i) +'d'
+                cval = 'flow_direction_' + str(i) +'d'
+                saveval = 'net_app_flows_' + str(i) +'d'
+                titleval = "App Net Flows Change by App -> Chain - Last " + str(i) +                             " Days - (Apps with > $" + str(min_tvl/1e6) + "M TVL Shown)"
+        print(yval)
+        print(cval)
+        print(titleval)
+        print(hval)
+        fig = px.treemap(summary_df[summary_df[yval] !=0],                  path=[px.Constant("all"), 'chain', 'protocol'], #                  path=[px.Constant("all"), 'token', 'chain', 'protocol'], \
+                 values=yval, color=cval
+#                 ,color_discrete_map={'-1':'red', '1':'green'})
+                ,color_continuous_scale='Spectral'
+                     , title = titleval
+                
+                , hover_data = [hval]
+                )
+        
+        fig.update_traces(root_color="lightgrey")
+        fig.update_layout(margin = dict(t=50, l=25, r=25, b=25))
+
+        fig.write_image(prepend + "img_outputs/svg/" + saveval + ".svg") #prepend + 
+        fig.write_image(prepend + "img_outputs/png/" + saveval + ".png") #prepend + 
+        fig.write_html(prepend + "img_outputs/" + saveval + ".html", include_plotlyjs='cdn')
+# fig.data[0].textinfo = 'label+text+value'
+
+# fig.update_layout(tickprefix = '$')
+
+
+# In[ ]:
+
+
+
+# summary_df['flow_direction'] = np.where(summary_df['cumul_net_dollar_flow']>=0,1,-1)
+# summary_df['flow_direction_7d'] = np.where(summary_df['cumul_net_dollar_flow_7d']>=0,1,-1)
+# summary_df['abs_cumul_net_dollar_flow'] = abs(summary_df['cumul_net_dollar_flow'])
+# summary_df['abs_cumul_net_dollar_flow_7d'] = abs(summary_df['cumul_net_dollar_flow_7d'])
 
 # display(summary_df)
 # print(summary_df[summary_df['chain']=='Arbitrum'])
 # print(summary_df[summary_df['chain']=='Optimism'])
 # display(summary_df)
-fig = px.treemap(summary_df[summary_df['abs_cumul_net_dollar_flow'] !=0],                  path=[px.Constant("all"), 'chain', 'protocol'], #                  path=[px.Constant("all"), 'token', 'chain', 'protocol'], \
-                 values='abs_cumul_net_dollar_flow', color='flow_direction'
-#                 ,color_discrete_map={'-1':'red', '1':'green'})
-                ,color_continuous_scale='Spectral'
-                     , title = "App Net Flows Change by App -> Chain - Last " + str(trailing_num_days) + \
-                            " Days - (Apps with > $" + str(min_tvl/1e6) + "M TVL Shown)"
+# fig = px.treemap(summary_df[summary_df['abs_cumul_net_dollar_flow'] !=0], \
+#                  path=[px.Constant("all"), 'chain', 'protocol'], \
+# #                  path=[px.Constant("all"), 'token', 'chain', 'protocol'], \
+#                  values='abs_cumul_net_dollar_flow', color='flow_direction'
+# #                 ,color_discrete_map={'-1':'red', '1':'green'})
+#                 ,color_continuous_scale='Spectral'
+#                      , title = "App Net Flows Change by App -> Chain - Last " + str(trailing_num_days) + \
+#                             " Days - (Apps with > $" + str(min_tvl/1e6) + "M TVL Shown)"
                 
-                ,hover_data=['cumul_net_dollar_flow']
-                )
-# fig.data[0].textinfo = 'label+text+value'
-fig.update_traces(root_color="lightgrey")
-fig.update_layout(margin = dict(t=50, l=25, r=25, b=25))
-# fig.update_layout(tickprefix = '$')
+#                 ,hover_data=['cumul_net_dollar_flow']
+#                 )
+# # fig.data[0].textinfo = 'label+text+value'
+# fig.update_traces(root_color="lightgrey")
+# fig.update_layout(margin = dict(t=50, l=25, r=25, b=25))
+# # fig.update_layout(tickprefix = '$')
 
-fig_7d = px.treemap(summary_df[summary_df['abs_cumul_net_dollar_flow_7d'] !=0],                  path=[px.Constant("all"), 'chain', 'protocol'], #                  path=[px.Constant("all"), 'token', 'chain', 'protocol'], \
-                 values='abs_cumul_net_dollar_flow_7d', color='flow_direction_7d'
-#                 ,color_discrete_map={'-1':'red', '1':'green'})
-                ,color_continuous_scale='Spectral'
-                     , title = "App Net Flows Change by App -> Chain - Last " + str(7) + \
-                            " Days - (Apps with > $" + str(min_tvl/1e6) + "M TVL Shown)"
+# fig_7d = px.treemap(summary_df[summary_df['abs_cumul_net_dollar_flow_7d'] !=0], \
+#                  path=[px.Constant("all"), 'chain', 'protocol'], \
+# #                  path=[px.Constant("all"), 'token', 'chain', 'protocol'], \
+#                  values='abs_cumul_net_dollar_flow_7d', color='flow_direction_7d'
+# #                 ,color_discrete_map={'-1':'red', '1':'green'})
+#                 ,color_continuous_scale='Spectral'
+#                      , title = "App Net Flows Change by App -> Chain - Last " + str(7) + \
+#                             " Days - (Apps with > $" + str(min_tvl/1e6) + "M TVL Shown)"
                 
-                # ,hover_data=['cumul_net_dollar_flow_7d']
-                )
-fig_7d.update_traces(root_color="lightgrey")
-fig_7d.update_layout(margin = dict(t=50, l=25, r=25, b=25))
+#                 # ,hover_data=['cumul_net_dollar_flow_7d']
+#                 )
+# fig_7d.update_traces(root_color="lightgrey")
+# fig_7d.update_layout(margin = dict(t=50, l=25, r=25, b=25))
 
-fig_7d.show()
+# fig_7d.show()
 
 fig_app = px.treemap(summary_df[summary_df['abs_cumul_net_dollar_flow'] !=0],                 #  path=[px.Constant("all"), 'chain', 'protocol'], \
 #                  path=[px.Constant("all"), 'token', 'chain', 'protocol'], \
@@ -344,20 +439,20 @@ fig.show()
 # In[ ]:
 
 
-fig.write_image(prepend + "img_outputs/svg/net_app_flows.svg") #prepend + 
-fig.write_image(prepend + "img_outputs/png/net_app_flows.png") #prepend + 
-fig.write_html(prepend + "img_outputs/net_app_flows.html", include_plotlyjs='cdn')
+# fig.write_image(prepend + "img_outputs/svg/net_app_flows.svg") #prepend + 
+# fig.write_image(prepend + "img_outputs/png/net_app_flows.png") #prepend + 
+# fig.write_html(prepend + "img_outputs/net_app_flows.html", include_plotlyjs='cdn')
 
-fig_7d.write_image(prepend + "img_outputs/svg/net_app_flows_7d.svg") #prepend + 
-fig_7d.write_image(prepend + "img_outputs/png/net_app_flows_7d.png") #prepend + 
-fig_7d.write_html(prepend + "img_outputs/net_app_flows_7d.html", include_plotlyjs='cdn')
+# fig_7d.write_image(prepend + "img_outputs/svg/net_app_flows_7d.svg") #prepend + 
+# fig_7d.write_image(prepend + "img_outputs/png/net_app_flows_7d.png") #prepend + 
+# fig_7d.write_html(prepend + "img_outputs/net_app_flows_7d.html", include_plotlyjs='cdn')
 
 fig_app.write_image(prepend + "img_outputs/svg/net_app_flows_by_app.svg") #prepend + 
 fig_app.write_image(prepend + "img_outputs/png/net_app_flows_by_app.png") #prepend + 
 fig_app.write_html(prepend + "img_outputs/net_app_flows_by_app.html", include_plotlyjs='cdn')
 
 
-# In[35]:
+# In[ ]:
 
 
 # ! jupyter nbconvert --to python total_app_net_flows_async.ipynb
