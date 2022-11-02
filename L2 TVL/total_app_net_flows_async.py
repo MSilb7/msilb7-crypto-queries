@@ -279,7 +279,7 @@ netdf_df.reset_index(inplace=True)
 #                                     .reset_index(drop=True)
 netdf_df.reset_index(inplace=True)
 netdf_df.drop(columns=['index'],inplace=True)
-# display(netdf_df)
+# display(netdf_df[netdf_df['protocol']=='makerdao'])
 
 
 # In[ ]:
@@ -307,6 +307,7 @@ netdf_df = netdf_df[  #( netdf_df['rank_desc'] == 1 ) &\
                         (~( netdf_df['protocol'] == 'polygon-bridge-&-staking') ) 
 #                         & (~( netdf_df['chain'] == 'Ethereum') )
                         ]
+# display(netdf_df[netdf_df['protocol']=='makerdao'])
 
 
 # In[ ]:
@@ -331,7 +332,7 @@ for i in drange:
                 summary_df['abs_cumul_net_dollar_flow_' + str(i) + 'd'] = abs(summary_df[col_str])
                 # display(summary_df)
                 # display(summary_df[(summary_df['chain'] == 'Optimism') & (summary_df['protocol'] == 'yearn-finance')] )
-
+# display(summary_df[netdf_df['protocol']=='makerdao'])
 # display(summary_df[(summary_df['chain'] == 'Optimism') & (summary_df['protocol'] == 'qidao')].iloc[-7: , :15] )
 summary_df['pct_of_tvl'] = 100* summary_df['net_dollar_flow'] / summary_df['usd_value']
 summary_df = summary_df[summary_df['rank_desc'] == 1 ]
@@ -351,10 +352,10 @@ for i in drange:
                 cval = 'flow_direction_' + str(i) +'d'
                 saveval = 'net_app_flows_' + str(i) +'d'
                 titleval = "App Net Flows Change by App -> Chain - Last " + str(i) +                             " Days - (Apps with > $" + str(min_tvl/1e6) + "M TVL Shown)"
-        print(yval)
-        print(cval)
-        print(titleval)
-        print(hval)
+        # print(yval)
+        # print(cval)
+        # print(titleval)
+        # print(hval)
         fig = px.treemap(summary_df[summary_df[yval] !=0],                  path=[px.Constant("all"), 'chain', 'protocol'], #                  path=[px.Constant("all"), 'token', 'chain', 'protocol'], \
                  values=yval, color=cval
 #                 ,color_discrete_map={'-1':'red', '1':'green'})
@@ -373,6 +374,12 @@ for i in drange:
 # fig.data[0].textinfo = 'label+text+value'
 
 # fig.update_layout(tickprefix = '$')
+
+
+# In[ ]:
+
+
+# display(summary_df[summary_df['protocol']=='makerdao'].iloc[: , :15])
 
 
 # In[ ]:
