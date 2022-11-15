@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[ ]:
+# In[1]:
 
 
 # ! pip install pandas
@@ -12,7 +12,7 @@
 # ! pip freeze = requirements.txt
 
 
-# In[ ]:
+# In[2]:
 
 
 import pandas as pd
@@ -22,9 +22,10 @@ import plotly.graph_objects as go
 from datetime import datetime, timedelta
 import numpy as np
 import os
+import time
 
 
-# In[ ]:
+# In[3]:
 
 
 pwd = os.getcwd()
@@ -34,7 +35,7 @@ else:
     prepend = 'L2 TVL/'
 
 
-# In[ ]:
+# In[4]:
 
 
 
@@ -67,8 +68,11 @@ protocols = [
         ]
 # print(protocols[0])
 prod = []
+s = r.Session()
+
 for prot in protocols:
-    tp = r.get(api_str + prot[0]).json()['chainTvls']['Optimism']
+    print(api_str + prot[0])
+    tp = s.get(api_str + prot[0]).json()['chainTvls']['Optimism']
     ad = pd.json_normalize( tp['tokens'] )
     ad_usd = pd.json_normalize( tp['tokensInUsd'] )
     if not ad.empty:
@@ -85,27 +89,46 @@ for prot in protocols:
         ad['start_date'] = pd.to_datetime(prot[1])
         # ad['date'] = ad['date'] - timedelta(days=1) #change to eod vs sod
         prod.append(ad)
+        time.sleep(0.5)
 
 df_df = pd.concat(prod)
 
 
-# In[ ]:
+# In[5]:
 
 
 # df_df
+df_df = df_df.fillna(0)
+# display(df_df)
+# for prot in protocols:
+#         print( prot[0] )
 
 
-# In[ ]:
+# In[6]:
 
 
 data_df = df_df.copy()#merge(cg_df, on=['date','token'],how='inner')
+
 data_df = data_df[data_df['token_value'] > 0]
 
 data_df.sort_values(by='date',inplace=True)
 data_df['token_value'] = data_df['token_value'].replace(0, np.nan)
 data_df['price_usd'] = data_df['usd_value']/data_df['token_value']
 
+data_df['rank_desc'] = data_df.groupby(['protocol', 'token'])['date'].                            rank(method='dense',ascending=False).astype(int)
+
 data_df.sort_values(by='date',inplace=True)
+
+last_df = data_df[data_df['rank_desc'] == 1]
+last_df = last_df.rename(columns={'price_usd':'last_price_usd'})
+last_df = last_df[['token','protocol','last_price_usd']]
+# display(last_df)
+
+
+# In[7]:
+
+
+data_df = data_df.merge(last_df, on=['token','protocol'], how='left')
 
 data_df['last_token_value'] = data_df.groupby(['token','protocol'])['token_value'].shift(1)
 data_df['last_price_usd'] = data_df.groupby(['token','protocol'])['price_usd'].shift(1)
@@ -115,6 +138,7 @@ data_df['net_token_flow'] = data_df['token_value'] - data_df['last_token_value']
 data_df['net_price_change'] = data_df['price_usd'] - data_df['last_price_usd']
 
 data_df['net_dollar_flow'] = data_df['net_token_flow'] * data_df['price_usd']
+data_df['last_price_flow'] = data_df['net_token_flow'] * data_df['last_price_usd']
 
 data_df['net_price_stock_change'] = data_df['last_token_value'] * data_df['net_price_change']
 
@@ -122,38 +146,40 @@ data_df['net_price_stock_change'] = data_df['last_token_value'] * data_df['net_p
 # display(data_df)
 
 
-# In[ ]:
+# In[8]:
 
 
 # data_df[data_df['protocol']=='perpetual-protocol'].sort_values(by='date')
-data_df.head()
+data_df.tail()
 # data_df[(data_df['protocol'] == 'pooltogether') & (data_df['date'] >= '2022-10-06') & (data_df['date'] <= '2022-10-12')].tail(10)
 
 
-# In[ ]:
+# In[9]:
 
 
-netdf_df = data_df[data_df['date']>= data_df['start_date']][['date','protocol','net_dollar_flow','net_price_stock_change','usd_value']]
+netdf_df = data_df[data_df['date']>= data_df['start_date']][['date','protocol','net_dollar_flow','net_price_stock_change','last_price_flow','usd_value']]
 
 
-netdf_df = netdf_df.groupby(['date','protocol']).sum(['net_dollar_flow','net_price_stock_change','usd_value'])
+netdf_df = netdf_df.groupby(['date','protocol']).sum(['net_dollar_flow','net_price_stock_change','last_price_flow','usd_value'])
 
 
 netdf_df['tvl_change'] = netdf_df['usd_value'] - netdf_df.groupby(['protocol'])['usd_value'].shift(1)
 netdf_df['error'] = netdf_df['tvl_change'] - (netdf_df['net_dollar_flow'] + netdf_df['net_price_stock_change'])
 
+
 netdf_df['cumul_net_dollar_flow'] = netdf_df['net_dollar_flow'].groupby(['protocol']).cumsum()
+netdf_df['cumul_last_price_net_dollar_flow'] = netdf_df['last_price_flow'].groupby(['protocol']).cumsum()
 netdf_df['cumul_net_price_stock_change'] = netdf_df['net_price_stock_change'].groupby(['protocol']).cumsum()
 netdf_df.reset_index(inplace=True)
 
 
-# In[ ]:
+# In[10]:
 
 
-netdf_df[(netdf_df['protocol'] == 'pooltogether') & (netdf_df['date'] >= '2022-10-06') & (netdf_df['date'] <= '2022-10-12')].tail(10)
+netdf_df[(netdf_df['date'] >= '2022-10-06') & (netdf_df['date'] <= '2022-10-12')].tail(10)
 
 
-# In[ ]:
+# In[11]:
 
 
 fig = px.line(netdf_df, x="date", y="net_dollar_flow", color="protocol",              title="Daily Net Dollar Flow since Program Announcement",            labels={
@@ -168,6 +194,19 @@ fig.update_layout(yaxis_tickprefix = '$')
 fig.write_image(prepend + "img_outputs/svg/daily_ndf.svg")
 fig.write_image(prepend + "img_outputs/png/daily_ndf.png")
 fig.write_html(prepend + "img_outputs/daily_ndf.html", include_plotlyjs='cdn')
+
+fig_last = px.line(netdf_df, x="date", y="cumul_last_price_net_dollar_flow", color="protocol",              title="Cumulative Net Dollar Flow since Program Announcement (At Most Recent Token Price)",            labels={
+                     "date": "Day",
+                     "net_dollar_flow": "Net Dollar Flow (N$F)"
+                 }
+            )
+fig_last.update_layout(
+    legend_title="App Name"
+)
+fig_last.update_layout(yaxis_tickprefix = '$')
+fig_last.write_image(prepend + "img_outputs/svg/cumul_ndf_last_price.svg")
+fig_last.write_image(prepend + "img_outputs/png/cumul_ndf_last_price.png")
+fig_last.write_html(prepend + "img_outputs/cumul_ndf_last_price.html", include_plotlyjs='cdn')
 
 # cumul_fig = px.area(netdf_df, x="date", y="cumul_net_dollar_flow", color="protocol", \
 #              title="Cumulative Dollar Flow since Program Announcement",\
@@ -200,7 +239,7 @@ cumul_fig.write_html(prepend + "img_outputs/cumul_ndf.html", include_plotlyjs='c
 # cumul_fig.show()
 
 
-# In[ ]:
+# In[12]:
 
 
 # fig.show()
@@ -208,7 +247,7 @@ cumul_fig.write_html(prepend + "img_outputs/cumul_ndf.html", include_plotlyjs='c
 print("yay")
 
 
-# In[ ]:
+# In[13]:
 
 
 # ! jupyter nbconvert --to python optimism_app_net_flows.ipynb
