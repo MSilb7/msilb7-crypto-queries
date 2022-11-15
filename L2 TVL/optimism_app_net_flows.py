@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[1]:
+# In[ ]:
 
 
 # ! pip install pandas
@@ -12,7 +12,7 @@
 # ! pip freeze = requirements.txt
 
 
-# In[2]:
+# In[ ]:
 
 
 import pandas as pd
@@ -25,7 +25,7 @@ import os
 import time
 
 
-# In[3]:
+# In[ ]:
 
 
 pwd = os.getcwd()
@@ -35,7 +35,7 @@ else:
     prepend = 'L2 TVL/'
 
 
-# In[4]:
+# In[ ]:
 
 
 
@@ -72,29 +72,32 @@ s = r.Session()
 
 for prot in protocols:
     print(api_str + prot[0])
-    tp = s.get(api_str + prot[0]).json()['chainTvls']['Optimism']
-    ad = pd.json_normalize( tp['tokens'] )
-    ad_usd = pd.json_normalize( tp['tokensInUsd'] )
-    if not ad.empty:
-        ad = pd.melt(ad,id_vars = ['date'])
-        ad = ad.rename(columns={'variable':'token','value':'token_value'})
-        ad_usd = pd.melt(ad_usd,id_vars = ['date'])
-        ad_usd = ad_usd.rename(columns={'variable':'token','value':'usd_value'})
-        ad = ad.merge(ad_usd,on=['date','token'])
-        
-        ad['date'] = pd.to_datetime(ad['date'], unit ='s') #convert to days
+    try:
+        tp = s.get(api_str + prot[0]).json()['chainTvls']['Optimism']
+        ad = pd.json_normalize( tp['tokens'] )
+        ad_usd = pd.json_normalize( tp['tokensInUsd'] )
+        if not ad.empty:
+            ad = pd.melt(ad,id_vars = ['date'])
+            ad = ad.rename(columns={'variable':'token','value':'token_value'})
+            ad_usd = pd.melt(ad_usd,id_vars = ['date'])
+            ad_usd = ad_usd.rename(columns={'variable':'token','value':'usd_value'})
+            ad = ad.merge(ad_usd,on=['date','token'])
+            
+            ad['date'] = pd.to_datetime(ad['date'], unit ='s') #convert to days
 
-        ad['token'] = ad['token'].str.replace('tokens.','', regex=False)
-        ad['protocol'] = prot[0]
-        ad['start_date'] = pd.to_datetime(prot[1])
-        # ad['date'] = ad['date'] - timedelta(days=1) #change to eod vs sod
-        prod.append(ad)
-        time.sleep(0.5)
+            ad['token'] = ad['token'].str.replace('tokens.','', regex=False)
+            ad['protocol'] = prot[0]
+            ad['start_date'] = pd.to_datetime(prot[1])
+            # ad['date'] = ad['date'] - timedelta(days=1) #change to eod vs sod
+            prod.append(ad)
+            time.sleep(0.5)
+    except:
+        continue
 
 df_df = pd.concat(prod)
 
 
-# In[5]:
+# In[ ]:
 
 
 # df_df
@@ -104,7 +107,7 @@ df_df = df_df.fillna(0)
 #         print( prot[0] )
 
 
-# In[6]:
+# In[ ]:
 
 
 data_df = df_df.copy()#merge(cg_df, on=['date','token'],how='inner')
@@ -125,7 +128,7 @@ last_df = last_df[['token','protocol','last_price_usd']]
 # display(last_df)
 
 
-# In[7]:
+# In[ ]:
 
 
 data_df = data_df.merge(last_df, on=['token','protocol'], how='left')
@@ -146,7 +149,7 @@ data_df['net_price_stock_change'] = data_df['last_token_value'] * data_df['net_p
 # display(data_df)
 
 
-# In[8]:
+# In[ ]:
 
 
 # data_df[data_df['protocol']=='perpetual-protocol'].sort_values(by='date')
@@ -154,7 +157,7 @@ data_df.tail()
 # data_df[(data_df['protocol'] == 'pooltogether') & (data_df['date'] >= '2022-10-06') & (data_df['date'] <= '2022-10-12')].tail(10)
 
 
-# In[9]:
+# In[ ]:
 
 
 netdf_df = data_df[data_df['date']>= data_df['start_date']][['date','protocol','net_dollar_flow','net_price_stock_change','last_price_flow','usd_value']]
@@ -173,13 +176,13 @@ netdf_df['cumul_net_price_stock_change'] = netdf_df['net_price_stock_change'].gr
 netdf_df.reset_index(inplace=True)
 
 
-# In[10]:
+# In[ ]:
 
 
 netdf_df[(netdf_df['date'] >= '2022-10-06') & (netdf_df['date'] <= '2022-10-12')].tail(10)
 
 
-# In[11]:
+# In[ ]:
 
 
 fig = px.line(netdf_df, x="date", y="net_dollar_flow", color="protocol",              title="Daily Net Dollar Flow since Program Announcement",            labels={
@@ -239,7 +242,7 @@ cumul_fig.write_html(prepend + "img_outputs/cumul_ndf.html", include_plotlyjs='c
 # cumul_fig.show()
 
 
-# In[12]:
+# In[ ]:
 
 
 # fig.show()
@@ -247,7 +250,7 @@ cumul_fig.write_html(prepend + "img_outputs/cumul_ndf.html", include_plotlyjs='c
 print("yay")
 
 
-# In[13]:
+# In[ ]:
 
 
 # ! jupyter nbconvert --to python optimism_app_net_flows.ipynb
