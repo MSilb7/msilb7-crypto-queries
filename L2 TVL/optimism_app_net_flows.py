@@ -198,19 +198,6 @@ fig.write_image(prepend + "img_outputs/svg/daily_ndf.svg")
 fig.write_image(prepend + "img_outputs/png/daily_ndf.png")
 fig.write_html(prepend + "img_outputs/daily_ndf.html", include_plotlyjs='cdn')
 
-fig_last = px.line(netdf_df, x="date", y="cumul_last_price_net_dollar_flow", color="protocol",              title="Cumulative Net Dollar Flow since Program Announcement (At Most Recent Token Price)",            labels={
-                     "date": "Day",
-                     "net_dollar_flow": "Net Dollar Flow (N$F)"
-                 }
-            )
-fig_last.update_layout(
-    legend_title="App Name"
-)
-fig_last.update_layout(yaxis_tickprefix = '$')
-fig_last.write_image(prepend + "img_outputs/svg/cumul_ndf_last_price.svg")
-fig_last.write_image(prepend + "img_outputs/png/cumul_ndf_last_price.png")
-fig_last.write_html(prepend + "img_outputs/cumul_ndf_last_price.html", include_plotlyjs='cdn')
-
 # cumul_fig = px.area(netdf_df, x="date", y="cumul_net_dollar_flow", color="protocol", \
 #              title="Cumulative Dollar Flow since Program Announcement",\
 #                    labels={
@@ -239,6 +226,25 @@ cumul_fig.update_layout(
 cumul_fig.write_image(prepend + "img_outputs/svg/cumul_ndf.svg") #prepend + 
 cumul_fig.write_image(prepend + "img_outputs/png/cumul_ndf.png") #prepend + 
 cumul_fig.write_html(prepend + "img_outputs/cumul_ndf.html", include_plotlyjs='cdn')
+
+
+fig_last = go.Figure()
+proto_names = netdf_df['protocol'].drop_duplicates()
+# print(proto_names)
+for p in proto_names:
+    fig_last.add_trace(go.Scatter(x=netdf_df[netdf_df['protocol'] == p]['date']                                    , y=netdf_df[netdf_df['protocol'] == p]['cumul_last_price_net_dollar_flow']                                     ,name = p                                  ,fill='tozeroy')) # fill down to xaxis
+
+fig_last.update_layout(yaxis_tickprefix = '$')
+fig_last.update_layout(
+    title="Cumulative Net Dollar Flow since Program Announcement (At Most Recent Token Price)",
+    xaxis_title="Day",
+    yaxis_title="Cumulative Net Dollar Flow (N$F) - At Most Recent Price",
+    legend_title="App Name",
+#     color_discrete_map=px.colors.qualitative.G10
+)
+fig_last.write_image(prepend + "img_outputs/svg/cumul_ndf_last_price.svg")
+fig_last.write_image(prepend + "img_outputs/png/cumul_ndf_last_price.png")
+fig_last.write_html(prepend + "img_outputs/cumul_ndf_last_price.html", include_plotlyjs='cdn')
 # cumul_fig.show()
 
 
