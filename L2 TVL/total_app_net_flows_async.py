@@ -59,8 +59,19 @@ min_tvl = 10_000_000
 all_api = 'https://api.llama.fi/protocols'
 res = pd.DataFrame( r.get(all_api, headers=header).json() )
 res = res[res['tvl'] > min_tvl] ##greater than 10mil
+res = res[res['category'] != 'CEX'] #centralized exchanges
+res = res[res['category'] != 'Chain'] #chain staking (i.e. polygon, stacks, xdai)
+
+# cats = res['category'].drop_duplicates()
+# display(cats)
 # print(len(res))
 # print(res.columns)
+# display(res)
+
+
+# In[ ]:
+
+
 # display(res)
 
 
@@ -260,6 +271,12 @@ data_df = data_df[~data_df['net_dollar_flow'].isna()]
 # In[ ]:
 
 
+data_df[(data_df['protocol']=='stargate') & (data_df['chain']=='Optimism') & (data_df['date']>='2022-10-31')]
+
+
+# In[ ]:
+
+
 netdf_df = data_df[['date','protocol','chain','net_dollar_flow','usd_value']]
 netdf_df = netdf_df.fillna(0)
 netdf_df = netdf_df.sort_values(by='date',ascending=True)
@@ -285,7 +302,7 @@ netdf_df.drop(columns=['index'],inplace=True)
 # In[ ]:
 
 
-
+# netdf_df[(netdf_df['protocol']=='stargate') & (netdf_df['chain']=='Optimism')]
 
 
 # In[ ]:
@@ -304,7 +321,8 @@ netdf_df = netdf_df[  #( netdf_df['rank_desc'] == 1 ) &\
                         (~( netdf_df['chain'] == 'staking') ) &\
                             (~( netdf_df['chain'] == 'treasury') ) &\
                         (~( netdf_df['chain'] == 'pool2') ) &\
-                        (~( netdf_df['protocol'] == 'polygon-bridge-&-staking') ) 
+                        (~( netdf_df['protocol'] == 'polygon-bridge-&-staking') )  &\
+                            (~(netdf_df['protocol'].str[-4:] == '-cex') )
 #                         & (~( netdf_df['chain'] == 'Ethereum') )
                         ]
 # display(netdf_df[netdf_df['protocol']=='makerdao'])
@@ -334,6 +352,7 @@ for i in drange:
                 # display(summary_df[(summary_df['chain'] == 'Optimism') & (summary_df['protocol'] == 'yearn-finance')] )
 # display(summary_df[netdf_df['protocol']=='makerdao'])
 # display(summary_df[(summary_df['chain'] == 'Optimism') & (summary_df['protocol'] == 'qidao')].iloc[-7: , :15] )
+display(summary_df[(summary_df['protocol']=='stargate') & (summary_df['chain']=='Optimism')])
 summary_df['pct_of_tvl'] = 100* summary_df['net_dollar_flow'] / summary_df['usd_value']
 summary_df = summary_df[summary_df['rank_desc'] == 1 ]
 summary_df.to_csv('latest_tvl_app_trends.csv')
