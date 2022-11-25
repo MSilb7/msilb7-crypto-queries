@@ -257,7 +257,7 @@ fig_last.write_html(prepend + "img_outputs/cumul_ndf_last_price.html", include_p
 print("yay")
 
 
-# In[ ]:
+# In[1]:
 
 
 # ! jupyter nbconvert --to python optimism_app_net_flows.ipynb
