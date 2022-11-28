@@ -45,27 +45,28 @@ api_str = 'https://api.llama.fi/protocol/'
 # NOTE: This should be when the in-app incentives began, not any external incentives (i.e. DEX pools)
 protocols = [
     # name, incentive start date
-         ['velodrome',          '2022-07-13']
-        ,['pooltogether',       '2022-07-14']
-        ,['lyra',               '2022-08-02']
-        ,['rubicon',            '2022-07-15']
-        ,['perpetual-protocol', '2022-07-14']
-        ,['thales',             '2022-07-14'] #TVL not relevant
-        ,['aave-v3',            '2022-08-04']
-        ,['wepiggy',            '2022-08-03']
-        ,['stargate',           '2022-08-05']
-        ,['pika-protocol',      '2022-08-29']
-        ,['synthetix',          '2022-08-25'] #This is when Curve incentives started, so not really 1:1
-        ,['pickle',             '2022-09-09']
-        ,['aelin',              '2022-09-12']
-        ,['polynomial-protocol','2022-09-14']
-        ,['xtoken',             '2022-09-19']
-        ,['hop-protocol',       '2022-09-22']
-        ,['beethoven-x',        '2022-09-29']
-        ,['uniswap-v3',         '2022-10-26']
-        ,['arrakis-finance',    '2022-10-26']
-        ,['gamma',              '2022-10-26']
-        ,['revert-compoundor',  '2022-11-03']
+         ['velodrome',          '2022-07-13',   'Velodrome #1']
+        ,['pooltogether',       '2022-07-14',   'Pooltogether #1']
+        ,['lyra',               '2022-08-02',   '']
+        ,['rubicon',            '2022-07-15',   '']
+        ,['perpetual-protocol', '2022-07-14',   '']
+        ,['thales',             '2022-07-14',   ''] #TVL not relevant
+        ,['aave-v3',            '2022-08-04',   'Aave - Liquidity Mining']
+        ,['wepiggy',            '2022-08-03',   '']
+        ,['stargate',           '2022-08-05',   '']
+        ,['pika-protocol',      '2022-08-29',   '']
+        ,['synthetix',          '2022-08-25',   ''] #This is when Curve incentives started, so not really 1:1
+        ,['pickle',             '2022-09-09',   '']
+        ,['aelin',              '2022-09-12',   '']
+        ,['polynomial-protocol','2022-09-14',   '']
+        ,['xtoken',             '2022-09-19',   '']
+        ,['hop-protocol',       '2022-09-22',   '']
+        ,['beethoven-x',        '2022-09-29',   '']
+        ,['uniswap-v3',         '2022-10-26',   '']
+        ,['arrakis-finance',    '2022-10-26',   '']
+        ,['gamma',              '2022-10-26',   '']
+        ,['revert-compoundor',  '2022-11-03',   '']
+        ,['beefy',      '2022-09-13',   ''] #Incenvitived VELO - Seems like Beefy boost started Oct 24? Unclear
         ]
 # print(protocols[0])
 prod = []
