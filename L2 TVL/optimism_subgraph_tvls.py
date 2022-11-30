@@ -83,18 +83,18 @@ def get_velodrome_pool_tvl(pid, min_ts = 0, max_ts = 99999999999999):
         velo_tvl = velo_tvl.merge(velo_reserves, on =['id','id_rank','pool_id','timestamp'])
 
         velo_tvl['timestamp_dt'] = pd.to_datetime(velo_tvl['timestamp'],unit='s')
+        velo_tvl['timestamp_day'] = pd.to_datetime(velo_tvl['timestamp'],unit='s').dt.floor('d')
 
         velo_tvl['inputTokenBalances'] = velo_tvl['inputTokenBalances'] / (10 ** 18)
         velo_tvl['inputToken_tvl'] = velo_tvl['totalValueLockedUSD'] * ( velo_tvl['inputTokenWeights'] / 100 )
-
         # velo_tvl['inputToken_price'] = velo_tvl['inputToken_tvl'] / velo_tvl['inputTokenBalances']
 
         #Standardize Columns
         # date	token	token_value	usd_value	protocol
         velo_tvl['protocol'] = 'Velodrome'
-        velo_tvl = velo_tvl[['timestamp_dt','pool_inputTokens_symbol','inputTokenBalances','inputToken_tvl','protocol']]
+        velo_tvl = velo_tvl[['timestamp_day','pool_inputTokens_symbol','inputTokenBalances','inputToken_tvl','protocol']]
         velo_tvl = velo_tvl.rename(columns={
-                'timestamp_dt':'date',
+                'timestamp_day':'date',
                 'pool_inputTokens_symbol':'token',
                 'inputTokenBalances':'token_value',
                 'inputToken_tvl':'usd_value'
