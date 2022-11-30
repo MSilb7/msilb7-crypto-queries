@@ -329,7 +329,7 @@ latest_data_df['cumul_flows_per_op_latest'] = latest_data_df['cumul_net_dollar_f
 latest_data_df['last_price_flows_per_op_at_program_end'] = latest_data_df['cumul_last_price_net_dollar_flow_at_program_end'] / latest_data_df['num_op']
 latest_data_df['last_price_flows_per_op_latest'] = latest_data_df['cumul_last_price_net_dollar_flow'] / latest_data_df['num_op']
 
-latest_data_df['flows_retention'] = (latest_data_df['cumul_net_dollar_flow_at_program_end'] - latest_data_df['cumul_net_dollar_flow']) / latest_data_df['cumul_net_dollar_flow_at_program_end']
+latest_data_df['flows_retention'] = latest_data_df['cumul_net_dollar_flow'] / latest_data_df['cumul_net_dollar_flow_at_program_end']
 
 
 # In[ ]:
@@ -517,7 +517,7 @@ cumul_fig.show()
 print("yay")
 
 
-# In[70]:
+# In[ ]:
 
 
 # ! jupyter nbconvert --to python optimism_app_net_flows.ipynb
