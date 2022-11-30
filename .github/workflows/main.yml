@@ -101,6 +101,7 @@ jobs:
              git commit -m "Add changes" -a
              # echo "::set-output name=push::true"
              echo "push=true" >> $GITHUB_OUTPUT
+          fi
         shell: bash
       - name: Push changes
         if: steps.commit.outputs.push == 'true'
