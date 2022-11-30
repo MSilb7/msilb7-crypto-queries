@@ -1,0 +1,27 @@
+,Date,Program,# OP,Period,Source,Start,End,Net Flows (at End Date),Net Flows (Latest),Net Flows per OP (at End Date),Net Flows per OP (Latest),Net Flows per OP @ Current Prices (at End Date),Net Flows per OP @ Current Prices (Latest),Net Flows Retained
+0,2022-11-30,Velodrome,"3,000,000",Post-Program,Partner Fund,2022-07-13,2022-11-17,"$53,557,284.00","$54,509,267.62",$17.85,$18.17,$11.94,$11.89,101.8%
+1,2022-11-30,Perpetual Protocol,"9,000,000",During Program,Gov Fund - Phase 0,2022-07-14,,,"$-11,227,353.94",,$-1.25,,$-1.24,
+2,2022-11-30,Rubicon,"900,000",During Program,Gov Fund - Phase 0,2022-07-15,,,"$8,434,387.18",,$9.37,,$7.04,
+3,2022-11-30,Thales,"900,000",During Program,Gov Fund - Phase 0,2022-07-15,,,"$128,603.65",,$0.14,,$0.14,
+4,2022-11-30,L2Dao - L2DAO/OP: Velodrome,"300,000",Post-Program,Gov Fund - Phase 0,2022-07-20,2022-08-22,"$293,057.33","$48,863.44",$0.98,$0.16,$0.80,$0.10,16.7%
+5,2022-11-30,Pooltogether,"450,000",During Program,Partner Fund,2022-07-22,,,"$25,261,325.82",,$56.14,,$56.14,
+6,2022-11-30,Lyra,"3,000,000",During Program,Gov Fund - Phase 0,2022-08-02,,,"$7,173,611.56",,$2.39,,$2.40,
+7,2022-11-30,Wepiggy,"300,000",During Program,Gov Fund - Phase 0,2022-08-03,,,"$2,789,678.57",,$9.30,,$9.31,
+8,2022-11-30,Aave V3 - Aave - Liquidity Mining,"5,000,000",Post-Program,Partner Fund,2022-08-04,2022-11-04,"$266,510,794.83","$117,415,868.40",$53.30,$23.48,$52.93,$12.93,44.1%
+9,2022-11-30,Stargate,"1,000,000",During Program,Gov Fund - Phase 0,2022-08-05,,,"$11,931,125.08",,$11.93,,$1.66,
+10,2022-11-30,Synthetix - sUSD & sETH: Curve,"9,000,000",During Program,Gov Fund - Phase 0,2022-08-25,,,"$14,397,695.56",,$1.60,,$1.50,
+11,2022-11-30,Pika Protocol,"9,000,000",During Program,Gov Fund - Phase 0,2022-08-29,,,"$7,493,310.85",,$0.83,,$0.83,
+12,2022-11-30,Pickle,"200,000",During Program,Gov Fund - Season 1,2022-09-09,,,"$1,271,288.88",,$6.36,,$6.36,
+13,2022-11-30,Aelin,"900,000",Post-Program,Gov Fund - Phase 0,2022-09-12,2022-09-14,$-49.00,"$-39,349.19",$-0.00,$-0.04,$-0.00,$-0.04,"-80,305.1%"
+14,2022-11-30,Beefy - BIFI/OP: Velodrome,"227,500",During Program,Gov Fund - Phase 0,2022-09-13,,,"$291,650.59",,$1.28,,$0.72,
+15,2022-11-30,Polynomial Protocol,"900,000",During Program,Gov Fund - Phase 0,2022-09-14,,,"$335,059.20",,$0.37,,$0.37,
+16,2022-11-30,Xtoken,"900,000",During Program,Gov Fund - Season 1,2022-09-19,,,"$2,619,853.64",,$2.91,,$1.41,
+17,2022-11-30,Hop Protocol,"1,000,000",During Program,Gov Fund - Phase 0,2022-09-22,,,"$11,096,428.83",,$11.10,,$7.31,
+18,2022-11-30,Beethoven X,"500,000",During Program,Gov Fund - Season 1,2022-09-29,,,"$14,679,623.27",,$29.36,,$29.38,
+19,2022-11-30,Beefy,"325,000",During Program,Gov Fund - Season 1,2022-10-24,,,"$2,471,513.06",,$7.60,,$7.66,
+20,2022-11-30,Arrakis Finance - Uniswap LM - Phase 1,"50,000",Post-Program,Gov Fund - Phase 0,2022-10-26,2022-11-21,"$1,236,936.63","$573,755.67",$24.74,$11.48,$23.87,$12.95,46.4%
+21,2022-11-30,Gamma - Uniswap LM - Phase 1,"50,000",Post-Program,Gov Fund - Phase 0,2022-10-26,2022-11-21,"$970,730.75","$626,916.99",$19.41,$12.54,$13.58,$4.84,64.6%
+23,2022-11-30,Xtoken - Uniswap LM - Phase 1,"50,000",Post-Program,Gov Fund - Phase 0,2022-10-26,2022-11-21,"$2,136,073.00","$1,917,662.23",$42.72,$38.35,$16.98,$11.12,89.8%
+22,2022-11-30,Uniswap V3 - Uniswap LM - Phase 1,"150,000",Post-Program,Gov Fund - Phase 0,2022-10-26,2022-11-21,"$13,848,172.66","$15,228,889.73",$92.32,$101.53,$3.89,$17.99,110.0%
+24,2022-11-30,Revert Compoundor,"240,000",During Program,Gov Fund - Season 2,2022-11-03,,,"$5,248,900.13",,$21.87,,$12.60,
+25,2022-11-30,Hundred Finance,"300,000",During Program,Gov Fund - Season 1,2022-11-28,,,"$2,258,947.86",,$7.53,,$7.53,
