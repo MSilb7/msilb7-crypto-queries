@@ -156,6 +156,7 @@ df_df = df_df[['date', 'token', 'token_value', 'usd_value', 'protocol', 'start_d
 
 
 subg_protocols = protocols[protocols['data_source'].str.contains('subgraph')].copy()
+subg_protocols['og_protocol'] = subg_protocols['protocol']
 subg_protocols['protocol'] = subg_protocols['data_source'].str.replace('subgraph-','')
 # display(subg_protocols)
 
@@ -168,6 +169,7 @@ for index, program in subg_protocols.iterrows():
                         sdf = subg.get_velodrome_pool_tvl(c)
                 sdf['start_date'] = program['start_date']
                 sdf['program_name'] = program['program_name']
+                sdf['protocol'] = program['og_protocol']
                 sdf = sdf.fillna(0)
                 dfs_sub.append(sdf)
 df_df_sub = pd.concat(dfs_sub)
@@ -240,7 +242,7 @@ data_df['net_price_stock_change'] = data_df['last_token_value'] * data_df['net_p
 
 # data_df[data_df['protocol']=='perpetual-protocol'].sort_values(by='date')
 # data_df.fillna(0)
-data_df.sample(5)
+# data_df.sample(5)
 # data_df[(data_df['protocol'] == 'pooltogether') & (data_df['date'] >= '2022-10-06') & (data_df['date'] <= '2022-10-12')].tail(10)
 
 
@@ -282,7 +284,7 @@ for s in summary_cols:
 netdf_df['program_rank_desc'] = netdf_df.groupby(['protocol', 'program_name'])['date'].\
                             rank(method='dense',ascending=False).astype(int)
 
-# display(netdf_df[netdf_df['protocol'] == 'velodrome'].sort_values(by='program_rank_desc'))
+# display(netdf_df[netdf_df['protocol'] == 'l2dao'].sort_values(by='program_rank_desc'))
 
 
 # In[ ]:
