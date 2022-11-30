@@ -4,6 +4,7 @@ import plotly.express as px
 import seaborn as sns
 import os
 
+# load latest file
 pwd = os.getcwd()
 # print(pwd)
 if 'L2 TVL/img_outputs' in pwd:
@@ -15,5 +16,5 @@ os.chdir(prepend + '/dashboards')
 # print(pwd2)
 df = pd.read_csv('../app/op_summer_latest_stats.csv')
 
-print(df)
+st.table(df)
 # print('weee')
