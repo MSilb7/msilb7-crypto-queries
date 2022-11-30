@@ -11,9 +11,6 @@ config.ini
 labels/etherscan-export.xlsx
 folder_ignore/
 Covalent API Testing.ipynb
-L2 TVL/img_outputs/png/net_app_flows.png
-L2 TVL/img_outputs/svg/net_app_flows.svg
-*.html
 L2 TVL/Oracles/Get Oracle Data.ipynb
 L2 TVL/velo_app_net_flows.ipynb
 L2 TVL/ignore/
@@ -21,10 +18,3 @@ L2 TVL/img_outputs/
 dune_exports/dune.env
 *.env
 dune_exports/
-L2 TVL/img_outputs/cumul_ndf.html
-L2 TVL/img_outputs/cumul_ndf_last_price.html
-L2 TVL/img_outputs/daily_ndf.html
-L2 TVL/img_outputs/png/cumul_ndf.png
-L2 TVL/img_outputs/png/daily_ndf.png
-L2 TVL/img_outputs/svg/cumul_ndf.svg
-L2 TVL/img_outputs/svg/daily_ndf.svg
