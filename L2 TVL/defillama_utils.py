@@ -2,6 +2,7 @@ import pandas as pd
 import asyncio, aiohttp, nest_asyncio
 from aiohttp_retry import RetryClient, ExponentialRetry
 import requests as r
+import numpy as np
 nest_asyncio.apply()
 
 header = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:71.0) Gecko/20100101 Firefox/71.0'}
@@ -12,13 +13,13 @@ statuses.remove(429)
 async def get_tvl(apistring, header, statuses, chains, prot):
         prod = []
         retry_client = RetryClient()
+
         async with retry_client.get(apistring, retry_options=ExponentialRetry(attempts=10), raise_for_status=statuses) as response:
                 try:
                         prot_req = await response.json()
                         cats = prot_req['category']
                         prot_req = prot_req['chainTvls']
                         for ch in chains:
-                                
                                 ad = pd.json_normalize( prot_req[ch]['tokens'] )
                                 ad_usd = pd.json_normalize( prot_req[ch]['tokensInUsd'] )
                                 try: #if there's generic tvl
@@ -54,13 +55,14 @@ async def get_tvl(apistring, header, statuses, chains, prot):
                                 #         ad['start_date'] = pd.to_datetime(prot[1])
                                         # ad['date'] = ad['date'] - timedelta(days=1) #change to eod vs sod
                                         prod.append(ad)
+                                        # print(ad)
                 except Exception as e:
                         raise Exception("Could not convert json")
         await retry_client.close()
         # print(prod)
         return prod
 
-def get_range(protocols, header = header, statuses = statuses):
+def get_range(protocols, chains = '', header = header, statuses = statuses):
         data_dfs = []
         fee_df = []
         # for dt in date_range:
@@ -78,10 +80,13 @@ def get_range(protocols, header = header, statuses = statuses):
         prod = []
         tasks = []
         for index,proto in protocols.iterrows():
-                #     print(proto)
                 prot = proto['slug']
-                chains = proto['chainTvls']
+                try:
+                        chains = np.where(chains == '', proto['chainTvls'], chains)
+                except:
+                        chains = chains
                 apic = api_str + prot
+
                 #     time.sleep(0.1)
                 tasks.append( get_tvl(apic, header, statuses, chains, prot) )
         # print(tasks)
@@ -104,7 +109,8 @@ def get_range(protocols, header = header, statuses = statuses):
                                 except:
                                         continue
         df_df_all = pd.concat(df_list)
-
+        df_df_all = df_df_all.fillna(0)
+        
         return df_df_all
 
 def remove_bad_cats(netdf):

@@ -21,3 +21,10 @@ L2 TVL/img_outputs/
 dune_exports/dune.env
 *.env
 dune_exports/
+L2 TVL/img_outputs/cumul_ndf.html
+L2 TVL/img_outputs/cumul_ndf_last_price.html
+L2 TVL/img_outputs/daily_ndf.html
+L2 TVL/img_outputs/png/cumul_ndf.png
+L2 TVL/img_outputs/png/daily_ndf.png
+L2 TVL/img_outputs/svg/cumul_ndf.svg
+L2 TVL/img_outputs/svg/daily_ndf.svg
