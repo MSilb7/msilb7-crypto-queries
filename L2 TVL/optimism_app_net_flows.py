@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[36]:
+# In[ ]:
 
 
 # ! pip install pandas
@@ -12,7 +12,7 @@
 # ! pip freeze = requirements.txt
 
 
-# In[37]:
+# In[ ]:
 
 
 import pandas as pd
@@ -27,7 +27,7 @@ import optimism_subgraph_tvls as subg
 import defillama_utils as dfl
 
 
-# In[38]:
+# In[ ]:
 
 
 pwd = os.getcwd()
@@ -37,10 +37,11 @@ else:
     prepend = 'L2 TVL/'
 
 
-# In[39]:
+# In[ ]:
 
 
 # Protocol Incentive Start Dates
+# Eventually, move this to its own file / csv
 protocols = pd.DataFrame(
     [
         # name, incentive start date
@@ -65,13 +66,13 @@ protocols = pd.DataFrame(
             ,['beefy',              '2022-10-24',   '',   '', 'Gov Fund - Season 1', 'defillama',''] #Incenvitived VELO - Seems like Beefy boost started Oct 24? Unclear
             ,['hundred-finance',    '2022-11-28',   '',   '', 'Gov Fund - Season 1', 'defillama','']
             #Uniswap LM Program
-            ,['uniswap-v3',         '2022-10-26',   '',   'Uniswap LM - Phase 1', 'Gov Fund - Phase 0', 'defillama','']
-            ,['arrakis-finance',    '2022-10-26',   '',   'Uniswap LM - Phase 1', 'Gov Fund - Phase 0','defillama','']
-            ,['gamma',              '2022-10-26',   '',   'Uniswap LM - Phase 1', 'Gov Fund - Phase 0','defillama','']
-            ,['xtoken',             '2022-10-26',   '',   'Uniswap LM - Phase 1', 'Gov Fund - Phase 0','defillama','']
+            ,['uniswap-v3',         '2022-10-26',   '2022-11-21',   'Uniswap LM - Phase 1', 'Gov Fund - Phase 0', 'defillama','']
+            ,['arrakis-finance',    '2022-10-26',   '2022-11-21',   'Uniswap LM - Phase 1', 'Gov Fund - Phase 0','defillama','']
+            ,['gamma',              '2022-10-26',   '2022-11-21',   'Uniswap LM - Phase 1', 'Gov Fund - Phase 0','defillama','']
+            ,['xtoken',             '2022-10-26',   '2022-11-21',   'Uniswap LM - Phase 1', 'Gov Fund - Phase 0','defillama','']
             # Other DEX Programs
             ,['synthetix',    '2022-08-25',   '',   'sUSD & sETH: Curve', 'Gov Fund - Phase 0', 'subgraph-curve',['0x7bc5728bc2b59b45a58d9a576e2ffc5f0505b35e','0x061b87122ed14b9526a813209c8a59a633257bab']] # susd/usd + seth/eth Curve incentives started
-            ,['l2dao',    '2022-07-20',   '',   'L2DAO/OP: Velodrome', 'Gov Fund - Phase 0', 'subgraph-velodrome',['0xfc77e39de40e54f820e313039207dc850e4c9e60']] # l2dao/op incentives
+            ,['l2dao',    '2022-07-20',   '2022-08-22',   'L2DAO/OP: Velodrome', 'Gov Fund - Phase 0', 'subgraph-velodrome',['0xfc77e39de40e54f820e313039207dc850e4c9e60']] # l2dao/op incentives - estimating end date based on last distribution to Velo gauge + 7 days
             ,['beefy',    '2022-09-13',   '',   'BIFI/OP: Velodrome', 'Gov Fund - Phase 0', 'subgraph-velodrome',['0x81f638e5d063618fc5f6a976e48e9b803b3240c0']] # bifi/op incentives
             ]
         , columns = ['protocol','start_date', 'end_date','name', 'op_source', 'data_source','contracts']
@@ -101,7 +102,7 @@ protocols = protocols.sort_values(by='start_date', ascending=True)
 # display(protocols)
 
 
-# In[40]:
+# In[ ]:
 
 
 api_str = 'https://api.llama.fi/protocol/'
@@ -150,7 +151,7 @@ df_df = df_df[['date', 'token', 'token_value', 'usd_value', 'protocol', 'start_d
 # df_df = pd.concat(prod)
 
 
-# In[41]:
+# In[ ]:
 
 
 subg_protocols = protocols[protocols['data_source'].str.contains('subgraph')].copy()
@@ -172,7 +173,7 @@ df_df_sub = pd.concat(dfs_sub)
 # display(df_df_sub.columns)
 
 
-# In[42]:
+# In[ ]:
 
 
 df_df = pd.concat([df_df, df_df_sub])
@@ -180,7 +181,7 @@ df_df['start_date'] = pd.to_datetime(df_df['start_date'])
 # display(df_df)
 
 
-# In[43]:
+# In[ ]:
 
 
 # df_df
@@ -190,7 +191,7 @@ df_df['start_date'] = pd.to_datetime(df_df['start_date'])
 #         print( prot[0] )
 
 
-# In[44]:
+# In[ ]:
 
 
 data_df = df_df.copy()#merge(cg_df, on=['date','token'],how='inner')
@@ -212,7 +213,7 @@ last_df = last_df[['token','protocol','program_name','last_price_usd']]
 # display(last_df)
 
 
-# In[45]:
+# In[ ]:
 
 
 data_df = data_df.merge(last_df, on=['token','protocol','program_name'], how='left')
@@ -233,7 +234,7 @@ data_df['net_price_stock_change'] = data_df['last_token_value'] * data_df['net_p
 # display(data_df)
 
 
-# In[46]:
+# In[ ]:
 
 
 # data_df[data_df['protocol']=='perpetual-protocol'].sort_values(by='date')
@@ -242,7 +243,7 @@ data_df.sample(5)
 # data_df[(data_df['protocol'] == 'pooltogether') & (data_df['date'] >= '2022-10-06') & (data_df['date'] <= '2022-10-12')].tail(10)
 
 
-# In[47]:
+# In[ ]:
 
 
 netdf_df = data_df[data_df['date']>= data_df['start_date']][['date','protocol','program_name','net_dollar_flow','net_price_stock_change','last_price_flow','usd_value']]
@@ -259,13 +260,13 @@ netdf_df['cumul_net_price_stock_change'] = netdf_df['net_price_stock_change'].gr
 netdf_df.reset_index(inplace=True)
 
 
-# In[48]:
+# In[ ]:
 
 
 netdf_df[(netdf_df['date'] >= '2022-10-06') & (netdf_df['date'] <= '2022-10-12')].tail(10)
 
 
-# In[49]:
+# In[ ]:
 
 
 during_str = 'During Program'
@@ -278,7 +279,7 @@ netdf_df['period'] = np.where(
         )
 
 
-# In[50]:
+# In[ ]:
 
 
 fig = px.line(netdf_df, x="date", y="net_dollar_flow", color="program_name", \
@@ -352,7 +353,7 @@ fig_last.write_html(prepend + "img_outputs/cumul_ndf_last_price.html", include_p
 # cumul_fig.show()
 
 
-# In[53]:
+# In[ ]:
 
 
 # Program-Specific Charts
