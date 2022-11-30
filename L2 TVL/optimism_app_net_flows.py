@@ -371,7 +371,7 @@ latest_data_df_format = latest_data_df_format.rename(columns={
 })
 latest_data_df_format = latest_data_df_format.fillna(0)
 latest_data_df_format = latest_data_df_format.reset_index(drop=True)
-latest_data_df_format = latest_data_df_format.sort_values(by=['start_date','num_op'], ascending = [True,False])
+latest_data_df_format = latest_data_df_format.sort_values(by=['Start','# OP'], ascending = [True,False])
 pd_html = pu.generate_html(latest_data_df_format)
 
 open(prepend + "img_outputs/app/op_summer_latest_stats.html", "w").write(pd_html)
