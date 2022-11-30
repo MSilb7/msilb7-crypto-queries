@@ -384,7 +384,7 @@ latest_data_df_format = latest_data_df_format.rename(columns={
     ,'last_price_flows_per_op_latest': 'Net Flows per OP @ Current Prices (Latest)'
     ,'flows_retention' : 'Net Flows Retained'
 })
-latest_data_df_format = latest_data_df_format.fillna(0)
+latest_data_df_format = latest_data_df_format.fillna('')
 latest_data_df_format = latest_data_df_format.reset_index(drop=True)
 latest_data_df_format = latest_data_df_format.sort_values(by=['Start','# OP'], ascending = [True,False])
 pd_html = pu.generate_html(latest_data_df_format)
