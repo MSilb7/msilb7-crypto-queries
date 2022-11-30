@@ -357,16 +357,6 @@ latest_data_df_format = latest_data_df_format[new_cols]
 latest_data_df_format['num_op'] = latest_data_df_format['num_op'].apply(lambda x: '{0:,.0f}'.format(x) if not pd.isna(x) else x )
 latest_data_df_format['flows_retention'] = latest_data_df_format['flows_retention'].apply(lambda x: '{:,.1%}'.format(x) if not pd.isna(x) else x )
 
-format_cols = [
-    'cumul_net_dollar_flow','cumul_last_price_net_dollar_flow','cumul_net_price_stock_change',
-    'cumul_net_dollar_flow_at_program_end', 'cumul_last_price_net_dollar_flow_at_program_end', 'cumul_net_price_stock_change_at_program_end',
-    'cumul_flows_per_op_at_program_end','cumul_flows_per_op_latest','last_price_flows_per_op_at_program_end','last_price_flows_per_op_latest']
-for f in format_cols:
-    latest_data_df_format[f] = latest_data_df_format[f].apply(lambda x: '${0:,.2f}'.format(x) if not pd.isna(x) else x )
-
-
-latest_data_df_format[latest_data_df_format['protocol'] == 'xtoken'].tail(10)
-
 latest_data_df_format = latest_data_df_format[[
     'date','program_name', 'num_op','period','op_source','start_date','end_date'
     ,'cumul_net_dollar_flow_at_program_end'
@@ -374,6 +364,19 @@ latest_data_df_format = latest_data_df_format[[
     ,'cumul_flows_per_op_at_program_end','cumul_flows_per_op_latest', 'last_price_flows_per_op_at_program_end','last_price_flows_per_op_latest'
     ,'flows_retention'
 ]]
+latest_data_df_format.to_csv(prepend + 'img_outputs/app/op_summer_latest_stats.csv')
+
+format_cols = [
+    'cumul_net_dollar_flow'#,'cumul_last_price_net_dollar_flow'
+    # ,'cumul_net_price_stock_change'
+    ,'cumul_net_dollar_flow_at_program_end'
+    # , 'cumul_last_price_net_dollar_flow_at_program_end'
+    # , 'cumul_net_price_stock_change_at_program_end'
+    ,'cumul_flows_per_op_at_program_end','cumul_flows_per_op_latest','last_price_flows_per_op_at_program_end','last_price_flows_per_op_latest']
+for f in format_cols:
+    latest_data_df_format[f] = latest_data_df_format[f].apply(lambda x: '${0:,.2f}'.format(x) if not pd.isna(x) else x )
+
+
 latest_data_df_format = latest_data_df_format.rename(columns={
     'date':'Date', 'program_name':'Program', 'num_op': '# OP'
     ,'period': 'Period','op_source': 'Source','start_date':'Start','end_date':'End'
@@ -391,7 +394,6 @@ latest_data_df_format = latest_data_df_format.sort_values(by=['Start','# OP'], a
 pd_html = pu.generate_html(latest_data_df_format)
 
 open(prepend + "img_outputs/app/op_summer_latest_stats.html", "w").write(pd_html)
-latest_data_df_format.to_csv(prepend + 'img_outputs/app/op_summer_latest_stats.csv')
 
 # latest_data_df_format.to_html('op_summer_latest_stats.html')
 
