@@ -90,12 +90,14 @@ jobs:
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "github-actions"
-          git add --all
+          git add --A
           if [-z "$(git status --porcelain)"]; then
-             echo "::set-output name=push::false"
+             # echo "::set-output name=push::false"
+             run: echo "{name}={value}" >> $GITHUB_OUTPUT
           else
              git commit -m "Add changes" -a
-             echo "::set-output name=push::true"
+             # echo "::set-output name=push::true"
+             run: echo "{name}={value}" >> $GITHUB_OUTPUT
           fi
         shell: bash
       - name: Push changes
