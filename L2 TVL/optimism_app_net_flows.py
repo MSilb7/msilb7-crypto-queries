@@ -308,6 +308,7 @@ post_str = 'Post-Program'
 netdf_df['period'] = np.where(
         netdf_df['date'] > netdf_df['end_date'], post_str, during_str
         )
+netdf_df.to_csv('prepend + "img_outputs/app/op_summer_daily_stats.csv')
 
 
 # In[ ]:
@@ -390,6 +391,8 @@ latest_data_df_format = latest_data_df_format.sort_values(by=['Start','# OP'], a
 pd_html = pu.generate_html(latest_data_df_format)
 
 open(prepend + "img_outputs/app/op_summer_latest_stats.html", "w").write(pd_html)
+latest_data_df_format.to_csv('prepend + "img_outputs/app/op_summer_latest_stats.csv')
+
 # latest_data_df_format.to_html('op_summer_latest_stats.html')
 
 
