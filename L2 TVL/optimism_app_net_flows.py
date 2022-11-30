@@ -385,12 +385,12 @@ for p in proto_names:
     #     color_discrete_map=px.colors.qualitative.G10
     )
     
-    if not os.path.exists("img_outputs/app"):
-      os.mkdir("img_outputs/app")
-    if not os.path.exists("img_outputs/app/svg"):
-      os.mkdir("img_outputs/app/svg")
-    if not os.path.exists("img_outputs/app/png"):
-      os.mkdir("img_outputs/app/png")
+    if not os.path.exists(prepend + "img_outputs/app"):
+      os.mkdir(prepend + "img_outputs/app")
+    if not os.path.exists(prepend + "img_outputs/app/svg"):
+      os.mkdir(prepend + "img_outputs/app/svg")
+    if not os.path.exists(prepend + "img_outputs/app/png"):
+      os.mkdir(prepend + "img_outputs/app/png")
     
     cumul_fig_app.write_image(prepend + "img_outputs/app/svg/cumul_ndf_" + p + ".svg") #prepend + 
     cumul_fig_app.write_image(prepend + "img_outputs/app/png/cumul_ndf_" + p + ".png") #prepend + 
@@ -406,7 +406,7 @@ cumul_fig.show()
 print("yay")
 
 
-# In[ ]:
+# In[19]:
 
 
 # ! jupyter nbconvert --to python optimism_app_net_flows.ipynb
