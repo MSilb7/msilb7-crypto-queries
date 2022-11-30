@@ -58,8 +58,9 @@ jobs:
     # needs: build
     # runs-on: ubuntu-latest
     # steps:
-      - name: Update App Fee Charts
-        run: python L2_Fees/optimism_app_fees.py
+    # TO READD
+      #- name: Update App Fee Charts
+        #run: python L2_Fees/optimism_app_fees.py
   # op_summer:
     # needs: build
     # runs-on: ubuntu-latest
@@ -70,8 +71,9 @@ jobs:
     # needs: build
     # runs-on: ubuntu-latest
     # steps:
-      - name: Update Total App Flow Charts
-        run: python L2\ \TVL/total_app_net_flows_async.py
+    #TO READD
+      #- name: Update Total App Flow Charts
+        #run: python L2\ \TVL/total_app_net_flows_async.py
   # commit_results:
     # if: ${{ always() }} #Always runs even if prior jobs fail - so that one bad job doesn't f everything up.
     # needs: build #[build, app_fees, op_summer, total_tvl_flow]
@@ -90,7 +92,7 @@ jobs:
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "github-actions"
-          git add --A
+          git add -A
           if [-z "$(git status --porcelain)"]; then
              # echo "::set-output name=push::false"
              run: echo "{name}={value}" >> $GITHUB_OUTPUT
