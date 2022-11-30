@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[3]:
+# In[36]:
 
 
 # ! pip install pandas
@@ -12,7 +12,7 @@
 # ! pip freeze = requirements.txt
 
 
-# In[4]:
+# In[37]:
 
 
 import pandas as pd
@@ -27,7 +27,7 @@ import optimism_subgraph_tvls as subg
 import defillama_utils as dfl
 
 
-# In[5]:
+# In[38]:
 
 
 pwd = os.getcwd()
@@ -37,7 +37,7 @@ else:
     prepend = 'L2 TVL/'
 
 
-# In[6]:
+# In[39]:
 
 
 # Protocol Incentive Start Dates
@@ -101,7 +101,7 @@ protocols = protocols.sort_values(by='start_date', ascending=True)
 # display(protocols)
 
 
-# In[7]:
+# In[40]:
 
 
 api_str = 'https://api.llama.fi/protocol/'
@@ -150,7 +150,7 @@ df_df = df_df[['date', 'token', 'token_value', 'usd_value', 'protocol', 'start_d
 # df_df = pd.concat(prod)
 
 
-# In[8]:
+# In[41]:
 
 
 subg_protocols = protocols[protocols['data_source'].str.contains('subgraph')].copy()
@@ -172,7 +172,7 @@ df_df_sub = pd.concat(dfs_sub)
 # display(df_df_sub.columns)
 
 
-# In[9]:
+# In[42]:
 
 
 df_df = pd.concat([df_df, df_df_sub])
@@ -180,7 +180,7 @@ df_df['start_date'] = pd.to_datetime(df_df['start_date'])
 # display(df_df)
 
 
-# In[10]:
+# In[43]:
 
 
 # df_df
@@ -190,7 +190,7 @@ df_df['start_date'] = pd.to_datetime(df_df['start_date'])
 #         print( prot[0] )
 
 
-# In[11]:
+# In[44]:
 
 
 data_df = df_df.copy()#merge(cg_df, on=['date','token'],how='inner')
@@ -212,7 +212,7 @@ last_df = last_df[['token','protocol','program_name','last_price_usd']]
 # display(last_df)
 
 
-# In[12]:
+# In[45]:
 
 
 data_df = data_df.merge(last_df, on=['token','protocol','program_name'], how='left')
@@ -233,7 +233,7 @@ data_df['net_price_stock_change'] = data_df['last_token_value'] * data_df['net_p
 # display(data_df)
 
 
-# In[13]:
+# In[46]:
 
 
 # data_df[data_df['protocol']=='perpetual-protocol'].sort_values(by='date')
@@ -242,7 +242,7 @@ data_df.sample(5)
 # data_df[(data_df['protocol'] == 'pooltogether') & (data_df['date'] >= '2022-10-06') & (data_df['date'] <= '2022-10-12')].tail(10)
 
 
-# In[14]:
+# In[47]:
 
 
 netdf_df = data_df[data_df['date']>= data_df['start_date']][['date','protocol','program_name','net_dollar_flow','net_price_stock_change','last_price_flow','usd_value']]
@@ -259,13 +259,13 @@ netdf_df['cumul_net_price_stock_change'] = netdf_df['net_price_stock_change'].gr
 netdf_df.reset_index(inplace=True)
 
 
-# In[15]:
+# In[48]:
 
 
 netdf_df[(netdf_df['date'] >= '2022-10-06') & (netdf_df['date'] <= '2022-10-12')].tail(10)
 
 
-# In[16]:
+# In[49]:
 
 
 during_str = 'During Program'
@@ -278,7 +278,7 @@ netdf_df['period'] = np.where(
         )
 
 
-# In[17]:
+# In[50]:
 
 
 fig = px.line(netdf_df, x="date", y="net_dollar_flow", color="program_name", \
@@ -352,7 +352,7 @@ fig_last.write_html(prepend + "img_outputs/cumul_ndf_last_price.html", include_p
 # cumul_fig.show()
 
 
-# In[18]:
+# In[53]:
 
 
 # Program-Specific Charts
@@ -392,9 +392,10 @@ for p in proto_names:
     if not os.path.exists(prepend + "img_outputs/app/png"):
       os.mkdir(prepend + "img_outputs/app/png")
     
-    p_file = p.replace(' ','_')
-    p_file = p.replace(':','')
-    p_file = p.replace('-','')
+    p_file = p
+    p_file = p_file.replace(' ','_')
+    p_file = p_file.replace(':','')
+    p_file = p_file.replace('/','-')
     cumul_fig_app.write_image(prepend + "img_outputs/app/svg/cumul_ndf_" + p_file + ".svg") #prepend + 
     cumul_fig_app.write_image(prepend + "img_outputs/app/png/cumul_ndf_" + p_file + ".png") #prepend + 
     cumul_fig_app.write_html(prepend + "img_outputs/app/cumul_ndf_" + p_file + ".html", include_plotlyjs='cdn')
