@@ -49,6 +49,7 @@ jobs:
           pip install -U asyncio
           pip install -U aiohttp
           pip install -U nest_asyncio
+          pip install -U subgrounds
 
       # Runs a single command using the runners shell
       # - name: Run a one-line script
