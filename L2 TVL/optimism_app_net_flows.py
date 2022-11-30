@@ -269,7 +269,7 @@ netdf_df = netdf_df.merge(protocols[['program_name','protocol','op_source','star
 # display(program_end_df)
 
 summary_cols = ['cumul_net_dollar_flow','cumul_last_price_net_dollar_flow','cumul_net_price_stock_change']
-program_end_df = netdf_df[netdf_df['date'] == netdf_df['end_date']].groupby(['protocol', 'program_name']).sum()
+program_end_df = netdf_df[pd.to_datetime(netdf_df['date']) == pd.to_datetime(netdf_df['end_date'])].groupby(['protocol', 'program_name']).sum()
 program_end_df.reset_index(inplace=True)
 # display(program_end_df)
 for s in summary_cols:
