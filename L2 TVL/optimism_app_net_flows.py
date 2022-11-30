@@ -329,6 +329,8 @@ latest_data_df['cumul_flows_per_op_latest'] = latest_data_df['cumul_net_dollar_f
 latest_data_df['last_price_flows_per_op_at_program_end'] = latest_data_df['cumul_last_price_net_dollar_flow_at_program_end'] / latest_data_df['num_op']
 latest_data_df['last_price_flows_per_op_latest'] = latest_data_df['cumul_last_price_net_dollar_flow'] / latest_data_df['num_op']
 
+latest_data_df['flows_retention'] = (latest_data_df['cumul_net_dollar_flow_at_program_end'] - latest_data_df['cumul_net_dollar_flow']) / latest_data_df['cumul_net_dollar_flow_at_program_end']
+
 
 # In[ ]:
 
@@ -344,6 +346,7 @@ new_cols = new_cols.drop(drop_cols)
 latest_data_df_format = latest_data_df_format[new_cols]
 
 latest_data_df_format['num_op'] = latest_data_df_format['num_op'].apply(lambda x: '{0:,.0f}'.format(x) if not pd.isna(x) else x )
+latest_data_df_format['flows_retention'] = latest_data_df_format['flows_retention'].apply(lambda x: '{:,.1%}'.format(x) if not pd.isna(x) else x )
 
 format_cols = [
     'cumul_net_dollar_flow','cumul_last_price_net_dollar_flow','cumul_net_price_stock_change',
@@ -360,6 +363,7 @@ latest_data_df_format = latest_data_df_format[[
     ,'cumul_net_dollar_flow_at_program_end'
     ,'cumul_net_dollar_flow'
     ,'cumul_flows_per_op_at_program_end','cumul_flows_per_op_latest', 'last_price_flows_per_op_at_program_end','last_price_flows_per_op_latest'
+    ,'flows_retention'
 ]]
 latest_data_df_format = latest_data_df_format.rename(columns={
     'date':'Date', 'program_name':'Program', 'num_op': '# OP'
@@ -370,6 +374,7 @@ latest_data_df_format = latest_data_df_format.rename(columns={
     ,'cumul_flows_per_op_latest': 'Net Flows per OP (Latest)'
     ,'last_price_flows_per_op_at_program_end': 'Net Flows per OP @ Current Prices (at End Date)'
     ,'last_price_flows_per_op_latest': 'Net Flows per OP @ Current Prices (Latest)'
+    ,'flows_retention' : 'Net Flows Retained'
 })
 latest_data_df_format = latest_data_df_format.fillna(0)
 latest_data_df_format = latest_data_df_format.reset_index(drop=True)
@@ -512,7 +517,7 @@ cumul_fig.show()
 print("yay")
 
 
-# In[ ]:
+# In[70]:
 
 
 # ! jupyter nbconvert --to python optimism_app_net_flows.ipynb
