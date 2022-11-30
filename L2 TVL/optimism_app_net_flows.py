@@ -528,7 +528,7 @@ cumul_fig.show()
 print("yay")
 
 
-# In[ ]:
+# In[1]:
 
 
 # ! jupyter nbconvert --to python optimism_app_net_flows.ipynb
