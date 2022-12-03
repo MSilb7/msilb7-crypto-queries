@@ -364,6 +364,7 @@ latest_data_df_format = latest_data_df_format[[
     ,'cumul_flows_per_op_at_program_end','cumul_flows_per_op_latest', 'last_price_flows_per_op_at_program_end','last_price_flows_per_op_latest'
     ,'flows_retention'
 ]]
+latest_data_df_format = latest_data_df_format.reset_index(drop=True)
 latest_data_df_format.to_csv(prepend + 'img_outputs/app/op_summer_latest_stats.csv')
 
 format_cols = [

@@ -1,3 +1,4 @@
+# streamlit run "L2 TVL/img_outputs/dashboards/op_summer.py"
 import streamlit as st
 import pandas as pd
 import plotly.express as px
@@ -6,7 +7,7 @@ import os
 
 # load latest file
 pwd = os.getcwd()
-# print(pwd)
+print(pwd)
 if 'L2 TVL/img_outputs' in pwd:
     prepend = ''
 else:
