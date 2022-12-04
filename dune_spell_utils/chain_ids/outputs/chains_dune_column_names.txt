@@ -1,1 +1,1 @@
-`name`,`chain`,`nativeCurrency`,`chainId`,`explorer`
+`name`,`chain`,`nativeCurrency`,`chainId`,`networkId`,`infoURL`,`explorer`
