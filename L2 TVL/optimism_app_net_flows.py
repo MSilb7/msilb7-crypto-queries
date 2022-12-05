@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[ ]:
+# In[27]:
 
 
 # ! pip install pandas
@@ -12,7 +12,7 @@
 # ! pip freeze = requirements.txt
 
 
-# In[ ]:
+# In[28]:
 
 
 import pandas as pd
@@ -28,7 +28,7 @@ import defillama_utils as dfl
 import pandas_utils as pu
 
 
-# In[ ]:
+# In[29]:
 
 
 pwd = os.getcwd()
@@ -38,7 +38,7 @@ else:
     prepend = 'L2 TVL/'
 
 
-# In[ ]:
+# In[30]:
 
 
 # Protocol Incentive Start Dates
@@ -103,7 +103,7 @@ protocols = protocols.sort_values(by='start_date', ascending=True)
 # display(protocols)
 
 
-# In[ ]:
+# In[31]:
 
 
 api_str = 'https://api.llama.fi/protocol/'
@@ -152,7 +152,7 @@ df_df = df_df[['date', 'token', 'token_value', 'usd_value', 'protocol', 'start_d
 # df_df = pd.concat(prod)
 
 
-# In[ ]:
+# In[32]:
 
 
 subg_protocols = protocols[protocols['data_source'].str.contains('subgraph')].copy()
@@ -176,13 +176,13 @@ df_df_sub = pd.concat(dfs_sub)
 # display(df_df_sub.columns)
 
 
-# In[ ]:
+# In[33]:
 
 
 # display(df_df_sub.sort_values(by='date'))
 
 
-# In[ ]:
+# In[34]:
 
 
 df_df = pd.concat([df_df, df_df_sub])
@@ -190,7 +190,7 @@ df_df['start_date'] = pd.to_datetime(df_df['start_date'])
 # display(df_df)
 
 
-# In[ ]:
+# In[35]:
 
 
 # df_df
@@ -200,7 +200,7 @@ df_df['start_date'] = pd.to_datetime(df_df['start_date'])
 #         print( prot[0] )
 
 
-# In[ ]:
+# In[36]:
 
 
 data_df = df_df.copy()#merge(cg_df, on=['date','token'],how='inner')
@@ -222,7 +222,7 @@ last_df = last_df[['token','protocol','program_name','last_price_usd']]
 # display(last_df)
 
 
-# In[ ]:
+# In[37]:
 
 
 data_df = data_df.merge(last_df, on=['token','protocol','program_name'], how='left')
@@ -243,7 +243,7 @@ data_df['net_price_stock_change'] = data_df['last_token_value'] * data_df['net_p
 # display(data_df)
 
 
-# In[ ]:
+# In[38]:
 
 
 # data_df[data_df['protocol']=='perpetual-protocol'].sort_values(by='date')
@@ -252,7 +252,7 @@ data_df['net_price_stock_change'] = data_df['last_token_value'] * data_df['net_p
 # data_df[(data_df['protocol'] == 'pooltogether') & (data_df['date'] >= '2022-10-06') & (data_df['date'] <= '2022-10-12')].tail(10)
 
 
-# In[ ]:
+# In[39]:
 
 
 netdf_df = data_df[data_df['date']>= data_df['start_date']][['date','protocol','program_name','net_dollar_flow','net_price_stock_change','last_price_flow','usd_value']]
@@ -293,13 +293,13 @@ netdf_df['program_rank_desc'] = netdf_df.groupby(['protocol', 'program_name'])['
 # display(netdf_df[netdf_df['protocol'] == 'l2dao'].sort_values(by='program_rank_desc'))
 
 
-# In[ ]:
+# In[40]:
 
 
 # netdf_df[(netdf_df['date'] >= '2022-10-06') & (netdf_df['date'] <= '2022-10-12')].tail(10)
 
 
-# In[ ]:
+# In[41]:
 
 
 during_str = 'During Program'
@@ -311,7 +311,7 @@ netdf_df['period'] = np.where(
 netdf_df.to_csv(prepend + 'img_outputs/app/op_summer_daily_stats.csv')
 
 
-# In[ ]:
+# In[42]:
 
 
 latest_data_df = netdf_df[netdf_df['program_rank_desc'] == 1]
@@ -344,7 +344,7 @@ latest_data_df['last_price_flows_retention'] = \
                 * np.where(latest_data_df['cumul_last_price_net_dollar_flow'] < 0, -1, 1)
 
 
-# In[ ]:
+# In[43]:
 
 
 latest_data_df_format = latest_data_df.copy()
@@ -404,7 +404,7 @@ open(prepend + "img_outputs/app/op_summer_latest_stats.html", "w").write(pd_html
 # latest_data_df_format.to_html('op_summer_latest_stats.html')
 
 
-# In[ ]:
+# In[44]:
 
 
 fig = px.line(netdf_df, x="date", y="net_dollar_flow", color="program_name", \
@@ -478,7 +478,7 @@ fig_last.write_html(prepend + "img_outputs/cumul_ndf_last_price.html", include_p
 # cumul_fig.show()
 
 
-# In[ ]:
+# In[45]:
 
 
 # Program-Specific Charts
@@ -523,7 +523,7 @@ for val in value_list:
       if not os.path.exists(prepend + "img_outputs/app" + folder_path):
         os.mkdir(prepend + "img_outputs/app" + folder_path)
       if not os.path.exists(prepend + "img_outputs/app" + folder_path + "/svg"):
-        os.mkdir(prepend + "img_outputs/app" + folder_path "/svg")
+        os.mkdir(prepend + "img_outputs/app" + folder_path + "/svg")
       if not os.path.exists(prepend + "img_outputs/app" + folder_path + "/png"):
         os.mkdir(prepend + "img_outputs/app/" + folder_path + "png")
       
@@ -531,9 +531,9 @@ for val in value_list:
       p_file = p_file.replace(' ','_')
       p_file = p_file.replace(':','')
       p_file = p_file.replace('/','-')
-      cumul_fig_app.write_image(prepend + "img_outputs/app" + folder_path "/svg/cumul_ndf_" + p_file + ".svg") #prepend + 
-      cumul_fig_app.write_image(prepend + "img_outputs/app" + folder_path "/png/cumul_ndf_" + p_file + ".png") #prepend + 
-      cumul_fig_app.write_html(prepend + "img_outputs/app" + folder_path "/cumul_ndf_" + p_file + ".html", include_plotlyjs='cdn')
+      cumul_fig_app.write_image(prepend + "img_outputs/app" + folder_path + "/svg/cumul_ndf_" + p_file + ".svg") #prepend + 
+      cumul_fig_app.write_image(prepend + "img_outputs/app" + folder_path + "/png/cumul_ndf_" + p_file + ".png") #prepend + 
+      cumul_fig_app.write_html(prepend + "img_outputs/app" + folder_path + "/cumul_ndf_" + p_file + ".html", include_plotlyjs='cdn')
       # cumul_fig_app.show()
 
 
