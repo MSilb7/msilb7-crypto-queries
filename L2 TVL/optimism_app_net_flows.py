@@ -339,6 +339,9 @@ latest_data_df['last_price_flows_per_op_latest'] = latest_data_df['cumul_last_pr
 latest_data_df['flows_retention'] = \
                 latest_data_df['cumul_net_dollar_flow'] / latest_data_df['cumul_net_dollar_flow_at_program_end'] \
                 * np.where(latest_data_df['cumul_net_dollar_flow'] < 0, -1, 1)
+latest_data_df['last_price_flows_retention'] = \
+                latest_data_df['cumul_last_price_net_dollar_flow'] / latest_data_df['cumul_net_dollar_flow_at_program_end'] \
+                * np.where(latest_data_df['cumul_last_price_net_dollar_flow'] < 0, -1, 1)
 
 
 # In[ ]:
@@ -356,13 +359,14 @@ latest_data_df_format = latest_data_df_format[new_cols]
 
 latest_data_df_format['num_op'] = latest_data_df_format['num_op'].apply(lambda x: '{0:,.0f}'.format(x) if not pd.isna(x) else x )
 latest_data_df_format['flows_retention'] = latest_data_df_format['flows_retention'].apply(lambda x: '{:,.1%}'.format(x) if not pd.isna(x) else x )
+latest_data_df_format['last_price_flows_retention'] = latest_data_df_format['last_price_flows_retention'].apply(lambda x: '{:,.1%}'.format(x) if not pd.isna(x) else x )
 
 latest_data_df_format = latest_data_df_format[[
     'date','program_name', 'num_op','period','op_source','start_date','end_date'
     ,'cumul_net_dollar_flow_at_program_end'
     ,'cumul_net_dollar_flow'
     ,'cumul_flows_per_op_at_program_end','cumul_flows_per_op_latest', 'last_price_flows_per_op_at_program_end','last_price_flows_per_op_latest'
-    ,'flows_retention'
+    ,'flows_retention', 'last_price_flows_retention'
 ]]
 latest_data_df_format = latest_data_df_format.reset_index(drop=True)
 latest_data_df_format.to_csv(prepend + 'img_outputs/app/op_summer_latest_stats.csv')
@@ -388,6 +392,7 @@ latest_data_df_format = latest_data_df_format.rename(columns={
     ,'last_price_flows_per_op_at_program_end': 'Net Flows per OP @ Current Prices (at End Date)'
     ,'last_price_flows_per_op_latest': 'Net Flows per OP @ Current Prices (Latest)'
     ,'flows_retention' : 'Net Flows Retained'
+    ,'last_price_flows_retention' : 'Net Flows Retained @ Current Prices'
 })
 latest_data_df_format = latest_data_df_format.fillna('')
 latest_data_df_format = latest_data_df_format.reset_index(drop=True)
