@@ -488,10 +488,10 @@ value_list = ['cumul_net_dollar_flow','cumul_last_price_net_dollar_flow']
 for val in value_list:
   if val == 'cumul_last_price_net_dollar_flow':
     postpend = " - At Last Price"
-    folder = "/last_price"
+    folder_path = "/last_price"
   else:
     postpend = ""
-    folder = ""
+    folder_path = ""
   proto_names = netdf_df['program_name'].drop_duplicates()
   # print(proto_names)
   for p in proto_names:
@@ -520,20 +520,20 @@ for val in value_list:
       #     color_discrete_map=px.colors.qualitative.G10
       )
       
-      if not os.path.exists(prepend + "img_outputs/app" + folder):
-        os.mkdir(prepend + "img_outputs/app" + folder)
-      if not os.path.exists(prepend + "img_outputs/app" + folder "/svg"):
-        os.mkdir(prepend + "img_outputs/app" + folder "/svg")
-      if not os.path.exists(prepend + "img_outputs/app" + folder "/png"):
-        os.mkdir(prepend + "img_outputs/app/" + folder + "png")
+      if not os.path.exists(prepend + "img_outputs/app" + folder_path):
+        os.mkdir(prepend + "img_outputs/app" + folder_path)
+      if not os.path.exists(prepend + "img_outputs/app" + folder_path + "/svg"):
+        os.mkdir(prepend + "img_outputs/app" + folder_path "/svg")
+      if not os.path.exists(prepend + "img_outputs/app" + folder_path + "/png"):
+        os.mkdir(prepend + "img_outputs/app/" + folder_path + "png")
       
       p_file = p
       p_file = p_file.replace(' ','_')
       p_file = p_file.replace(':','')
       p_file = p_file.replace('/','-')
-      cumul_fig_app.write_image(prepend + "img_outputs/app" + folder "/svg/cumul_ndf_" + p_file + ".svg") #prepend + 
-      cumul_fig_app.write_image(prepend + "img_outputs/app" + folder "/png/cumul_ndf_" + p_file + ".png") #prepend + 
-      cumul_fig_app.write_html(prepend + "img_outputs/app" + folder "/cumul_ndf_" + p_file + ".html", include_plotlyjs='cdn')
+      cumul_fig_app.write_image(prepend + "img_outputs/app" + folder_path "/svg/cumul_ndf_" + p_file + ".svg") #prepend + 
+      cumul_fig_app.write_image(prepend + "img_outputs/app" + folder_path "/png/cumul_ndf_" + p_file + ".png") #prepend + 
+      cumul_fig_app.write_html(prepend + "img_outputs/app" + folder_path "/cumul_ndf_" + p_file + ".html", include_plotlyjs='cdn')
       # cumul_fig_app.show()
 
 
