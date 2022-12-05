@@ -483,49 +483,58 @@ fig_last.write_html(prepend + "img_outputs/cumul_ndf_last_price.html", include_p
 
 # Program-Specific Charts
 
-proto_names = netdf_df['program_name'].drop_duplicates()
-# print(proto_names)
-for p in proto_names:
-    cumul_fig_app = go.Figure()
-    p_df = netdf_df[netdf_df['program_name'] == p]
-    # cumul_fig_app = px.area(p_df, x="date", y="cumul_net_dollar_flow", color="period")
-    
-    during_df = p_df[p_df['period'] == during_str]
-    cumul_fig_app.add_trace(go.Scatter(x= during_df['date'] \
-                                   , y= during_df['cumul_net_dollar_flow'] \
-                                    , name = during_str \
-                                  ,fill='tozeroy')) # fill down to xaxis
-    
-    post_df = p_df[p_df['period'] == post_str]
-    cumul_fig_app.add_trace(go.Scatter(x= post_df['date'] \
-                                   , y= post_df['cumul_net_dollar_flow'] \
-                                    , name = post_str \
-                                  ,fill='tozeroy')) # fill down to xaxis
+value_list = ['cumul_net_dollar_flow','cumul_last_price_net_dollar_flow']
 
-    cumul_fig_app.update_layout(yaxis_tickprefix = '$')
-    cumul_fig_app.update_layout(
-        title=p + ": Cumulative Net Dollar Flow since Program Announcement",
-        xaxis_title="Day",
-        yaxis_title="Cumulative Net Dollar Flow (N$F)",
-        legend_title="Period",
-    #     color_discrete_map=px.colors.qualitative.G10
-    )
-    
-    if not os.path.exists(prepend + "img_outputs/app"):
-      os.mkdir(prepend + "img_outputs/app")
-    if not os.path.exists(prepend + "img_outputs/app/svg"):
-      os.mkdir(prepend + "img_outputs/app/svg")
-    if not os.path.exists(prepend + "img_outputs/app/png"):
-      os.mkdir(prepend + "img_outputs/app/png")
-    
-    p_file = p
-    p_file = p_file.replace(' ','_')
-    p_file = p_file.replace(':','')
-    p_file = p_file.replace('/','-')
-    cumul_fig_app.write_image(prepend + "img_outputs/app/svg/cumul_ndf_" + p_file + ".svg") #prepend + 
-    cumul_fig_app.write_image(prepend + "img_outputs/app/png/cumul_ndf_" + p_file + ".png") #prepend + 
-    cumul_fig_app.write_html(prepend + "img_outputs/app/cumul_ndf_" + p_file + ".html", include_plotlyjs='cdn')
-    # cumul_fig_app.show()
+for val in value_list:
+  if val == 'cumul_last_price_net_dollar_flow':
+    postpend = " - At Last Price"
+    folder = "/last_price"
+  else:
+    postpend = ""
+    folder = ""
+  proto_names = netdf_df['program_name'].drop_duplicates()
+  # print(proto_names)
+  for p in proto_names:
+      cumul_fig_app = go.Figure()
+      p_df = netdf_df[netdf_df['program_name'] == p]
+      # cumul_fig_app = px.area(p_df, x="date", y="cumul_net_dollar_flow", color="period")
+      
+      during_df = p_df[p_df['period'] == during_str]
+      cumul_fig_app.add_trace(go.Scatter(x= during_df['date'] \
+                                    , y= during_df[val] \
+                                      , name = during_str \
+                                    ,fill='tozeroy')) # fill down to xaxis
+      
+      post_df = p_df[p_df['period'] == post_str]
+      cumul_fig_app.add_trace(go.Scatter(x= post_df['date'] \
+                                    , y= post_df[val] \
+                                      , name = post_str \
+                                    ,fill='tozeroy')) # fill down to xaxis
+
+      cumul_fig_app.update_layout(yaxis_tickprefix = '$')
+      cumul_fig_app.update_layout(
+          title=p + ": Cumulative Net Dollar Flow since Program Announcement" + postpend,
+          xaxis_title="Day",
+          yaxis_title="Cumulative Net Dollar Flow (N$F)",
+          legend_title="Period",
+      #     color_discrete_map=px.colors.qualitative.G10
+      )
+      
+      if not os.path.exists(prepend + "img_outputs/app" + folder):
+        os.mkdir(prepend + "img_outputs/app" + folder)
+      if not os.path.exists(prepend + "img_outputs/app" + folder "/svg"):
+        os.mkdir(prepend + "img_outputs/app" + folder "/svg")
+      if not os.path.exists(prepend + "img_outputs/app" + folder "/png"):
+        os.mkdir(prepend + "img_outputs/app/" + folder + "png")
+      
+      p_file = p
+      p_file = p_file.replace(' ','_')
+      p_file = p_file.replace(':','')
+      p_file = p_file.replace('/','-')
+      cumul_fig_app.write_image(prepend + "img_outputs/app" + folder "/svg/cumul_ndf_" + p_file + ".svg") #prepend + 
+      cumul_fig_app.write_image(prepend + "img_outputs/app" + folder "/png/cumul_ndf_" + p_file + ".png") #prepend + 
+      cumul_fig_app.write_html(prepend + "img_outputs/app" + folder "/cumul_ndf_" + p_file + ".html", include_plotlyjs='cdn')
+      # cumul_fig_app.show()
 
 
 # In[ ]:
