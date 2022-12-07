@@ -51,6 +51,7 @@ start_date = date.today()-timedelta(days=trailing_num_days +1)
 # start_date = datetime.strptime('2022-07-13', '%Y-%m-%d').date()
 
 
+
 # In[ ]:
 
 
@@ -76,7 +77,6 @@ res = res[res['category'] != 'Chain'] #chain staking (i.e. polygon, stacks, xdai
 
 
 # In[ ]:
-
 
 
 protocols = res[['slug','chainTvls']]
@@ -214,11 +214,22 @@ df_df_all = pd.concat(df_list)
 # In[ ]:
 
 
-# df_df_all
+#create an extra day to handle for tokens dropping to 0
+df_df_shift = df_df_all.copy()
+df_df_shift['date'] = df_df_shift['date'] + timedelta(days=1)
+df_df_shift['token_value'] = 0
+df_df_shift['usd_value'] = 0
+
+#merge back in
+df_df_all = pd.concat([df_df_all,df_df_shift])
+df_df_all = df_df_all[df_df_all['date'] <= pd.to_datetime("today") ]
+
+df_df_all = df_df_all.groupby(['date','token','protocol']).sum().reset_index()
+df_df_shift = []
+display(df_df_all)
 
 
 # In[ ]:
-
 
 
 # df_df_all = pd.concat(df_df_all)
@@ -238,6 +249,7 @@ df_df['last_token_value'] = df_df.groupby(['token','protocol','chain'])['token_v
 df_df = df_df[df_df['date'].dt.date >= start_date ]
 
 
+
 # In[ ]:
 
 
@@ -250,11 +262,16 @@ df_df = df_df[df_df['date'].dt.date >= start_date ]
 # In[ ]:
 
 
-
 data_df = df_df.copy()
-data_df['token_value'] = data_df['token_value'].replace(0, np.nan)
+# data_df['token_value'] = data_df['token_value'].replace(0, np.nan) #keep zeroes
 # price = usd value / num tokens
 data_df['price_usd'] = data_df['usd_value']/data_df['token_value']
+data_df['last_price_usd'] = data_df.groupby(['token','protocol', 'program_name'])['price_usd'].shift(1)
+
+# If first instnace of token, make sure there's no price diff
+data_df['last_price_usd'] = data_df[['last_price_usd', 'price_usd']].bfill(axis=1).iloc[:, 0]
+#Forward fill if token drops off
+data_df['price_usd'] = data_df[['price_usd','last_price_usd']].bfill(axis=1).iloc[:, 0]
 
 data_df.sort_values(by='date',inplace=True)
 
@@ -299,6 +316,7 @@ netdf_df.drop(columns=['index'],inplace=True)
 # display(netdf_df[netdf_df['protocol']=='makerdao'])
 
 
+
 # In[ ]:
 
 
@@ -309,7 +327,8 @@ netdf_df.drop(columns=['index'],inplace=True)
 
 
 #get latest
-netdf_df['rank_desc'] = netdf_df.groupby(['protocol', 'chain'])['date'].                            rank(method='dense',ascending=False).astype(int)
+netdf_df['rank_desc'] = netdf_df.groupby(['protocol', 'chain'])['date'].\
+                            rank(method='dense',ascending=False).astype(int)
 # display(netdf_df[netdf_df['protocol'] == 'lyra'])
 netdf_df = netdf_df[  #( netdf_df['rank_desc'] == 1 ) &\
                         (~netdf_df['chain'].str.contains('-borrowed')) &\
@@ -337,13 +356,15 @@ summary_df = summary_df.sort_values(by='date',ascending=True)
 # summary_df = summary_df[(summary_df['chain'] == 'Solana') & (summary_df['protocol'] == 'uxd')]
 for i in drange:
         if i == 0:
-                summary_df['cumul_net_dollar_flow'] = summary_df[['protocol','chain','net_dollar_flow']]                                    .groupby(['protocol','chain']).cumsum()
+                summary_df['cumul_net_dollar_flow'] = summary_df[['protocol','chain','net_dollar_flow']]\
+                                    .groupby(['protocol','chain']).cumsum()
                 summary_df['flow_direction'] = np.where(summary_df['cumul_net_dollar_flow']>=0,1,-1)
                 summary_df['abs_cumul_net_dollar_flow'] = abs(summary_df['cumul_net_dollar_flow'])
         else:
                 col_str = 'cumul_net_dollar_flow_' + str(i) + 'd'
                 # print(col_str)
-                summary_df[col_str] = summary_df[['protocol','chain','net_dollar_flow']]                                    .groupby(['protocol','chain'])['net_dollar_flow'].transform(lambda x: x.rolling(i, min_periods=1).sum() )
+                summary_df[col_str] = summary_df[['protocol','chain','net_dollar_flow']]\
+                                    .groupby(['protocol','chain'])['net_dollar_flow'].transform(lambda x: x.rolling(i, min_periods=1).sum() )
                                 #         .rolling(i, min_periods=1).sum()\ #This caused errors and mismatches
                                 #     .reset_index(level=0,drop=True)#.values
                 summary_df['flow_direction_' + str(i) + 'd'] = np.where(summary_df[col_str]>=0,1,-1)
@@ -364,18 +385,22 @@ for i in drange:
                 hval = 'cumul_net_dollar_flow'
                 cval = 'flow_direction'
                 saveval = 'net_app_flows'
-                titleval = "App Net Flows Change by App -> Chain - Last " + str(trailing_num_days) +                             " Days - (Apps with > $" + str(min_tvl/1e6) + "M TVL Shown)"
+                titleval = "App Net Flows Change by App -> Chain - Last " + str(trailing_num_days) + \
+                            " Days - (Apps with > $" + str(min_tvl/1e6) + "M TVL Shown)"
         else:
                 yval = 'abs_cumul_net_dollar_flow_' + str(i) +'d'
                 hval = 'cumul_net_dollar_flow_' + str(i) +'d'
                 cval = 'flow_direction_' + str(i) +'d'
                 saveval = 'net_app_flows_' + str(i) +'d'
-                titleval = "App Net Flows Change by App -> Chain - Last " + str(i) +                             " Days - (Apps with > $" + str(min_tvl/1e6) + "M TVL Shown)"
+                titleval = "App Net Flows Change by App -> Chain - Last " + str(i) + \
+                            " Days - (Apps with > $" + str(min_tvl/1e6) + "M TVL Shown)"
         # print(yval)
         # print(cval)
         # print(titleval)
         # print(hval)
-        fig = px.treemap(summary_df[summary_df[yval] !=0],                  path=[px.Constant("all"), 'chain', 'protocol'], #                  path=[px.Constant("all"), 'token', 'chain', 'protocol'], \
+        fig = px.treemap(summary_df[summary_df[yval] !=0], \
+                 path=[px.Constant("all"), 'chain', 'protocol'], \
+#                  path=[px.Constant("all"), 'token', 'chain', 'protocol'], \
                  values=yval, color=cval
 #                 ,color_discrete_map={'-1':'red', '1':'green'})
                 ,color_continuous_scale='Spectral'
@@ -402,7 +427,6 @@ for i in drange:
 
 
 # In[ ]:
-
 
 
 # summary_df['flow_direction'] = np.where(summary_df['cumul_net_dollar_flow']>=0,1,-1)
@@ -446,7 +470,8 @@ for i in drange:
 
 # fig_7d.show()
 
-fig_app = px.treemap(summary_df[summary_df['abs_cumul_net_dollar_flow'] !=0],                 #  path=[px.Constant("all"), 'chain', 'protocol'], \
+fig_app = px.treemap(summary_df[summary_df['abs_cumul_net_dollar_flow'] !=0], \
+                #  path=[px.Constant("all"), 'chain', 'protocol'], \
 #                  path=[px.Constant("all"), 'token', 'chain', 'protocol'], \
                         path=[px.Constant("all"), 'protocol','chain'], \
                  values='abs_cumul_net_dollar_flow', color='flow_direction'

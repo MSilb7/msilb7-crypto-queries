@@ -118,11 +118,11 @@ dfl_protocols = protocols[protocols['data_source'] == 'defillama'].copy()
 
 dfl_slugs = dfl_protocols[['protocol']].drop_duplicates()
 dfl_slugs = dfl_slugs.rename(columns={'protocol':'slug'})
-df_df = dfl.get_range(dfl_slugs[['slug']],['Optimism'])
+df_dfl = dfl.get_range(dfl_slugs[['slug']],['Optimism'])
 
-df_df = df_df.merge(dfl_protocols, on ='protocol')
+df_dfl = df_dfl.merge(dfl_protocols, on ='protocol')
 
-df_df = df_df[['date', 'token', 'token_value', 'usd_value', 'protocol', 'start_date','program_name']]
+df_dfl = df_dfl[['date', 'token', 'token_value', 'usd_value', 'protocol', 'start_date','program_name']]
 
 # display(df_df)
 # for id, prot in dfl_protocols.iterrows():
@@ -187,9 +187,25 @@ df_df_sub = pd.concat(dfs_sub)
 # In[ ]:
 
 
-df_df = pd.concat([df_df, df_df_sub])
-df_df['start_date'] = pd.to_datetime(df_df['start_date'])
-# display(df_df)
+df_df_comb = pd.concat([df_dfl, df_df_sub])
+df_df_comb['start_date'] = pd.to_datetime(df_df_comb['start_date'])
+# display(df_df_comb)
+
+#create an extra day to handle for tokens dropping to 0
+df_df_shift = df_df_comb.copy()
+df_df_shift['date'] = df_df_shift['date'] + timedelta(days=1)
+df_df_shift['token_value'] = 0
+df_df_shift['usd_value'] = 0
+
+#merge back in
+df_df = pd.concat([df_df_comb,df_df_shift])
+df_df = df_df[df_df['date'] <= pd.to_datetime("today") ]
+
+df_df = df_df.groupby(['date','token','protocol','start_date','program_name']).sum().reset_index()
+
+# display(
+#         df_df[(df_df['protocol']=='revert-compoundor') & (df_df['date'] == '2022-11-09')] 
+#         )
 
 
 # In[ ]:
@@ -200,6 +216,9 @@ df_df['start_date'] = pd.to_datetime(df_df['start_date'])
 # display(df_df)
 # for prot in protocols:
 #         print( prot[0] )
+# display(
+#         df_df[(df_df['protocol'] =='revert-compoundor') & (df_df['date'] =='2022-11-09')].tail(10)
+# )
 
 
 # In[ ]:
@@ -207,10 +226,10 @@ df_df['start_date'] = pd.to_datetime(df_df['start_date'])
 
 data_df = df_df.copy()#merge(cg_df, on=['date','token'],how='inner')
 
-data_df = data_df[data_df['token_value'] > 0]
+# data_df = data_df[data_df['token_value'] > 0] #Exclude this, so we can read flows
 
 data_df.sort_values(by='date',inplace=True)
-data_df['token_value'] = data_df['token_value'].replace(0, np.nan)
+# data_df['token_value'] = data_df['token_value'].replace(0, np.nan) #keep zeroes
 data_df['price_usd'] = data_df['usd_value']/data_df['token_value']
 
 data_df['rank_desc'] = data_df.groupby(['protocol', 'program_name', 'token'])['date'].\
@@ -230,7 +249,14 @@ last_df = last_df[['token','protocol','program_name','last_price_usd']]
 data_df = data_df.merge(last_df, on=['token','protocol','program_name'], how='left')
 
 data_df['last_token_value'] = data_df.groupby(['token','protocol', 'program_name'])['token_value'].shift(1)
+
 data_df['last_price_usd'] = data_df.groupby(['token','protocol', 'program_name'])['price_usd'].shift(1)
+
+# If first instnace of token, make sure there's no price diff
+data_df['last_price_usd'] = data_df[['last_price_usd', 'price_usd']].bfill(axis=1).iloc[:, 0]
+#Forward fill if token drops off
+data_df['price_usd'] = data_df[['price_usd','last_price_usd']].bfill(axis=1).iloc[:, 0]
+
 data_df['last_token_value'] = data_df['last_token_value'].fillna(0)
 
 data_df['net_token_flow'] = data_df['token_value'] - data_df['last_token_value']
@@ -311,6 +337,18 @@ netdf_df['period'] = np.where(
         netdf_df['date'] > netdf_df['end_date'], post_str, during_str
         )
 netdf_df.to_csv(prepend + 'img_outputs/app/op_summer_daily_stats.csv')
+
+
+# In[ ]:
+
+
+# display(
+#         netdf_df[(netdf_df['protocol'] =='revert-compoundor') & (netdf_df['date'] <='2022-11-15')].tail(10)
+# )
+
+# display(
+#         data_df[(data_df['protocol'] =='revert-compoundor') & (data_df['date'] =='2022-11-09')]
+# )
 
 
 # In[ ]:
