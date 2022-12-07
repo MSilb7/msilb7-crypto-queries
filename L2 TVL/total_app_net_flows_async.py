@@ -84,6 +84,7 @@ protocols = res[['slug','chainTvls']]
 re = res['chainTvls']
 # r[1].keys()
 protocols['chainTvls'] = protocols['chainTvls'].apply(lambda x: list(x.keys()) )
+# protocols = protocols.head()
 # protocols[protocols['chainTvls'].map(set(['Arbitrum']).issubset)]
 
 
