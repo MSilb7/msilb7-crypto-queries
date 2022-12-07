@@ -214,7 +214,7 @@ df_df_all = pd.concat(df_list)
 # In[ ]:
 
 
-display(df_df_all)
+# display(df_df_all)
 
 
 # In[ ]:
