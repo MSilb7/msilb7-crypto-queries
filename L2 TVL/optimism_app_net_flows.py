@@ -75,6 +75,8 @@ protocols = pd.DataFrame(
             ,[1,'synthetix',  9000000,    '2022-08-25',   '',   'sUSD & sETH: Curve', 'Gov Fund - Phase 0', 'subgraph-curve',['0x7bc5728bc2b59b45a58d9a576e2ffc5f0505b35e','0x061b87122ed14b9526a813209c8a59a633257bab']] # susd/usd + seth/eth Curve incentives started
             ,[1,'l2dao',  300000,    '2022-07-20',   '2022-08-22',   'L2DAO/OP: Velodrome', 'Gov Fund - Phase 0', 'subgraph-velodrome',['0xfc77e39de40e54f820e313039207dc850e4c9e60']] # l2dao/op incentives - estimating end date based on last distribution to Velo gauge + 7 days
             ,[1,'beefy',  650000*.35,    '2022-09-13',   '',   'BIFI/OP: Velodrome', 'Gov Fund - Phase 0', 'subgraph-velodrome',['0x81f638e5d063618fc5f6a976e48e9b803b3240c0']] # bifi/op incentives
+            #
+            ,[1,'velodrome',  4000000,  '2022-11-24',   '',   'Velodrome #2 (Tour de OP)', 'Gov Fund - Season 2', 'defillama','']
             ]
         , columns = ['include_in_summary','protocol','num_op','start_date', 'end_date','name', 'op_source', 'data_source','contracts']
     )
