@@ -357,6 +357,18 @@ new_cols = new_cols.drop(drop_cols)
 # print(new_cols)
 latest_data_df_format = latest_data_df_format[new_cols]
 
+<<<<<<< HEAD
+season_summary_s0_no_perp = season_summary[(season_summary['op_source'] == 'Gov Fund - Phase 0') \
+                                                & (season_summary['protocol'] != 'perpetual-protocol')]
+
+season_summary_s0_no_perp['op_source'] = 'Gov Fund - Phase 0 (Excl. Perp)'
+
+season_summary = pd.concat([season_summary, season_summary_s0_no_perp])
+
+season_summary = season_summary.groupby('op_source').sum()
+season_summary.reset_index(inplace=True)
+season_summary.head()
+=======
 latest_data_df_format['num_op'] = latest_data_df_format['num_op'].apply(lambda x: '{0:,.0f}'.format(x) if not pd.isna(x) else x )
 latest_data_df_format['flows_retention'] = latest_data_df_format['flows_retention'].apply(lambda x: '{:,.1%}'.format(x) if not pd.isna(x) else x )
 latest_data_df_format['last_price_flows_retention'] = latest_data_df_format['last_price_flows_retention'].apply(lambda x: '{:,.1%}'.format(x) if not pd.isna(x) else x )
@@ -380,6 +392,7 @@ format_cols = [
     ,'cumul_flows_per_op_at_program_end','cumul_flows_per_op_latest','last_price_flows_per_op_at_program_end','last_price_flows_per_op_latest']
 for f in format_cols:
     latest_data_df_format[f] = latest_data_df_format[f].apply(lambda x: '${0:,.2f}'.format(x) if not pd.isna(x) else x )
+>>>>>>> parent of 1143c5be (updates)
 
 
 latest_data_df_format = latest_data_df_format.rename(columns={
