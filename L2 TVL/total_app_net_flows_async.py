@@ -214,6 +214,12 @@ df_df_all = pd.concat(df_list)
 # In[ ]:
 
 
+# display(df_df_all)
+
+
+# In[ ]:
+
+
 #create an extra day to handle for tokens dropping to 0
 df_df_shift = df_df_all.copy()
 df_df_shift['date'] = df_df_shift['date'] + timedelta(days=1)
@@ -224,9 +230,9 @@ df_df_shift['usd_value'] = 0
 df_df_all = pd.concat([df_df_all,df_df_shift])
 df_df_all = df_df_all[df_df_all['date'] <= pd.to_datetime("today") ]
 
-df_df_all = df_df_all.groupby(['date','token','protocol']).sum().reset_index()
+df_df_all = df_df_all.groupby(['date','token','chain','protocol']).sum().reset_index()
 df_df_shift = []
-display(df_df_all)
+# display(df_df_all)
 
 
 # In[ ]:
@@ -235,6 +241,7 @@ display(df_df_all)
 # df_df_all = pd.concat(df_df_all)
 # print(df_df_all[2])
 print("done api")
+# display(df_df_all)
 
 
 # In[ ]:
