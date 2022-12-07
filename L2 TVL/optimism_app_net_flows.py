@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[27]:
+# In[ ]:
 
 
 # ! pip install pandas
@@ -12,7 +12,7 @@
 # ! pip freeze = requirements.txt
 
 
-# In[28]:
+# In[ ]:
 
 
 import pandas as pd
@@ -28,7 +28,7 @@ import defillama_utils as dfl
 import pandas_utils as pu
 
 
-# In[29]:
+# In[ ]:
 
 
 pwd = os.getcwd()
@@ -38,7 +38,7 @@ else:
     prepend = 'L2 TVL/'
 
 
-# In[30]:
+# In[ ]:
 
 
 # Protocol Incentive Start Dates
@@ -47,36 +47,36 @@ protocols = pd.DataFrame(
     [
         # name, incentive start date
             # General Programs
-             ['velodrome',  3000000,          '2022-07-13',   '2022-11-17',   '', 'Partner Fund', 'defillama','']
-            ,['pooltogether',   450000, '2022-07-22',   '', '', 'Partner Fund', 'defillama','']
-            ,['lyra',   3000000,               '2022-08-02',   '',   '', 'Gov Fund - Phase 0', 'defillama','']
-            ,['rubicon',    900000,            '2022-07-15',   '',   '', 'Gov Fund - Phase 0', 'defillama','']
-            ,['perpetual-protocol', 9000000, '2022-07-14',   '',   '', 'Gov Fund - Phase 0', 'defillama','']
-            ,['thales', 900000,             '2022-07-15',   '',   '', 'Gov Fund - Phase 0', 'defillama',''] #TVL not relevant
-            ,['aave-v3',    5000000,            '2022-08-04',   '2022-11-04',   'Aave - Liquidity Mining', 'Partner Fund', 'defillama','']
-            ,['wepiggy',    300000,            '2022-08-03',   '',   '', 'Gov Fund - Phase 0', 'defillama','']
-            ,['stargate',   1000000,           '2022-08-05',   '',   '', 'Gov Fund - Phase 0', 'defillama','']
-            ,['pika-protocol',  9000000,      '2022-08-29',   '',   '', 'Gov Fund - Phase 0', 'defillama','']
-            ,['pickle', 200000,             '2022-09-09',   '',   '', 'Gov Fund - Season 1', 'defillama','']
-            ,['aelin',  900000,              '2022-09-12',   '2022-09-14',   '', 'Gov Fund - Phase 0', 'defillama','']
-            ,['polynomial-protocol',    900000, '2022-09-14',   '',   '', 'Gov Fund - Phase 0', 'defillama','']
-            ,['xtoken', 900000,             '2022-09-19',   '',   '', 'Gov Fund - Season 1', 'defillama','']
-            ,['hop-protocol',   1000000,       '2022-09-22',   '',   '', 'Gov Fund - Phase 0', 'defillama','']
-            ,['beethoven-x',    500000,        '2022-09-29',   '',   '', 'Gov Fund - Season 1', 'defillama','']
-            ,['revert-compoundor',  240000,  '2022-11-03',   '',   '', 'Gov Fund - Season 2', 'defillama','']
-            ,['beefy',  650000*.5,              '2022-10-24',   '',   '', 'Gov Fund - Season 1', 'defillama',''] #Incenvitived VELO - Seems like Beefy boost started Oct 24? Unclear
-            ,['hundred-finance',    300000,    '2022-11-28',   '',   '', 'Gov Fund - Season 1', 'defillama','']
+             [1,'velodrome',  3000000,          '2022-07-13',   '2022-11-17',   '', 'Partner Fund', 'defillama','']
+            ,[1,'pooltogether',   450000, '2022-07-22',   '', '', 'Partner Fund', 'defillama','']
+            ,[1,'lyra',   3000000,               '2022-08-02',   '',   '', 'Gov Fund - Phase 0', 'defillama','']
+            ,[1,'rubicon',    900000,            '2022-07-15',   '',   '', 'Gov Fund - Phase 0', 'defillama','']
+            ,[1,'perpetual-protocol', 9000000, '2022-07-14',   '',   '', 'Gov Fund - Phase 0', 'defillama','']
+            ,[1,'thales', 900000,             '2022-07-15',   '',   '', 'Gov Fund - Phase 0', 'defillama',''] #TVL not relevant
+            ,[1,'aave-v3',    5000000,            '2022-08-04',   '2022-11-04',   'Aave - Liquidity Mining', 'Partner Fund', 'defillama','']
+            ,[1,'wepiggy',    300000,            '2022-08-03',   '',   '', 'Gov Fund - Phase 0', 'defillama','']
+            ,[1,'stargate',   1000000,           '2022-08-05',   '',   '', 'Gov Fund - Phase 0', 'defillama','']
+            ,[1,'pika-protocol',  9000000,      '2022-08-29',   '',   '', 'Gov Fund - Phase 0', 'defillama','']
+            ,[1,'pickle', 200000,             '2022-09-09',   '',   '', 'Gov Fund - Season 1', 'defillama','']
+            ,[1,'aelin',  900000,              '2022-09-12',   '2022-09-14',   '', 'Gov Fund - Phase 0', 'defillama','']
+            ,[1,'polynomial-protocol',    900000, '2022-09-14',   '',   '', 'Gov Fund - Phase 0', 'defillama','']
+            ,[1,'xtoken', 900000,             '2022-09-19',   '',   '', 'Gov Fund - Season 1', 'defillama','']
+            ,[1,'hop-protocol',   1000000,       '2022-09-22',   '',   '', 'Gov Fund - Phase 0', 'defillama','']
+            ,[1,'beethoven-x',    500000,        '2022-09-29',   '',   '', 'Gov Fund - Season 1', 'defillama','']
+            ,[1,'revert-compoundor',  240000,  '2022-11-03',   '',   '', 'Gov Fund - Season 2', 'defillama','']
+            ,[1,'beefy',  650000*.5,              '2022-10-24',   '',   '', 'Gov Fund - Season 1', 'defillama',''] #Incenvitived VELO - Seems like Beefy boost started Oct 24? Unclear
+            ,[1,'hundred-finance',    300000,    '2022-11-28',   '',   '', 'Gov Fund - Season 1', 'defillama','']
             #Uniswap LM Program
-            ,['uniswap-v3', 150000,         '2022-10-26',   '2022-11-21',   'Uniswap LM - Phase 1', 'Gov Fund - Phase 0', 'defillama','']
-            ,['arrakis-finance',    50000,    '2022-10-26',   '2022-11-21',   'Uniswap LM - Phase 1', 'Gov Fund - Phase 0','defillama','']
-            ,['gamma',    50000,              '2022-10-26',   '2022-11-21',   'Uniswap LM - Phase 1', 'Gov Fund - Phase 0','defillama','']
-            ,['xtoken',    50000,             '2022-10-26',   '2022-11-21',   'Uniswap LM - Phase 1', 'Gov Fund - Phase 0','defillama','']
+            ,[0,'uniswap-v3', 150000,         '2022-10-26',   '2022-11-21',   'Uniswap LM - Phase 1', 'Gov Fund - Phase 0', 'defillama','']
+            ,[1,'arrakis-finance',    50000,    '2022-10-26',   '2022-11-21',   'Uniswap LM - Phase 1', 'Gov Fund - Phase 0','defillama','']
+            ,[1,'gamma',    50000,              '2022-10-26',   '2022-11-21',   'Uniswap LM - Phase 1', 'Gov Fund - Phase 0','defillama','']
+            ,[1,'xtoken',    50000,             '2022-10-26',   '2022-11-21',   'Uniswap LM - Phase 1', 'Gov Fund - Phase 0','defillama','']
             # Other DEX Programs
-            ,['synthetix',  9000000,    '2022-08-25',   '',   'sUSD & sETH: Curve', 'Gov Fund - Phase 0', 'subgraph-curve',['0x7bc5728bc2b59b45a58d9a576e2ffc5f0505b35e','0x061b87122ed14b9526a813209c8a59a633257bab']] # susd/usd + seth/eth Curve incentives started
-            ,['l2dao',  300000,    '2022-07-20',   '2022-08-22',   'L2DAO/OP: Velodrome', 'Gov Fund - Phase 0', 'subgraph-velodrome',['0xfc77e39de40e54f820e313039207dc850e4c9e60']] # l2dao/op incentives - estimating end date based on last distribution to Velo gauge + 7 days
-            ,['beefy',  650000*.35,    '2022-09-13',   '',   'BIFI/OP: Velodrome', 'Gov Fund - Phase 0', 'subgraph-velodrome',['0x81f638e5d063618fc5f6a976e48e9b803b3240c0']] # bifi/op incentives
+            ,[1,'synthetix',  9000000,    '2022-08-25',   '',   'sUSD & sETH: Curve', 'Gov Fund - Phase 0', 'subgraph-curve',['0x7bc5728bc2b59b45a58d9a576e2ffc5f0505b35e','0x061b87122ed14b9526a813209c8a59a633257bab']] # susd/usd + seth/eth Curve incentives started
+            ,[1,'l2dao',  300000,    '2022-07-20',   '2022-08-22',   'L2DAO/OP: Velodrome', 'Gov Fund - Phase 0', 'subgraph-velodrome',['0xfc77e39de40e54f820e313039207dc850e4c9e60']] # l2dao/op incentives - estimating end date based on last distribution to Velo gauge + 7 days
+            ,[1,'beefy',  650000*.35,    '2022-09-13',   '',   'BIFI/OP: Velodrome', 'Gov Fund - Phase 0', 'subgraph-velodrome',['0x81f638e5d063618fc5f6a976e48e9b803b3240c0']] # bifi/op incentives
             ]
-        , columns = ['protocol','num_op','start_date', 'end_date','name', 'op_source', 'data_source','contracts']
+        , columns = ['include_in_summary','protocol','num_op','start_date', 'end_date','name', 'op_source', 'data_source','contracts']
     )
 # print(protocols[0])
 protocols['id_format'] = protocols['protocol'].str.replace('-',' ').str.title()
@@ -103,7 +103,7 @@ protocols = protocols.sort_values(by='start_date', ascending=True)
 # display(protocols)
 
 
-# In[31]:
+# In[ ]:
 
 
 api_str = 'https://api.llama.fi/protocol/'
@@ -152,7 +152,7 @@ df_df = df_df[['date', 'token', 'token_value', 'usd_value', 'protocol', 'start_d
 # df_df = pd.concat(prod)
 
 
-# In[32]:
+# In[ ]:
 
 
 subg_protocols = protocols[protocols['data_source'].str.contains('subgraph')].copy()
@@ -176,13 +176,13 @@ df_df_sub = pd.concat(dfs_sub)
 # display(df_df_sub.columns)
 
 
-# In[33]:
+# In[ ]:
 
 
 # display(df_df_sub.sort_values(by='date'))
 
 
-# In[34]:
+# In[ ]:
 
 
 df_df = pd.concat([df_df, df_df_sub])
@@ -190,7 +190,7 @@ df_df['start_date'] = pd.to_datetime(df_df['start_date'])
 # display(df_df)
 
 
-# In[35]:
+# In[ ]:
 
 
 # df_df
@@ -200,7 +200,7 @@ df_df['start_date'] = pd.to_datetime(df_df['start_date'])
 #         print( prot[0] )
 
 
-# In[36]:
+# In[ ]:
 
 
 data_df = df_df.copy()#merge(cg_df, on=['date','token'],how='inner')
@@ -222,7 +222,7 @@ last_df = last_df[['token','protocol','program_name','last_price_usd']]
 # display(last_df)
 
 
-# In[37]:
+# In[ ]:
 
 
 data_df = data_df.merge(last_df, on=['token','protocol','program_name'], how='left')
@@ -243,7 +243,7 @@ data_df['net_price_stock_change'] = data_df['last_token_value'] * data_df['net_p
 # display(data_df)
 
 
-# In[38]:
+# In[ ]:
 
 
 # data_df[data_df['protocol']=='perpetual-protocol'].sort_values(by='date')
@@ -252,7 +252,7 @@ data_df['net_price_stock_change'] = data_df['last_token_value'] * data_df['net_p
 # data_df[(data_df['protocol'] == 'pooltogether') & (data_df['date'] >= '2022-10-06') & (data_df['date'] <= '2022-10-12')].tail(10)
 
 
-# In[39]:
+# In[ ]:
 
 
 netdf_df = data_df[data_df['date']>= data_df['start_date']][['date','protocol','program_name','net_dollar_flow','net_price_stock_change','last_price_flow','usd_value']]
@@ -269,7 +269,7 @@ netdf_df['cumul_net_price_stock_change'] = netdf_df['net_price_stock_change'].gr
 # reset & get program data
 netdf_df.reset_index(inplace=True)
 
-netdf_df = netdf_df.merge(protocols[['program_name','protocol','op_source','start_date','end_date','num_op']], on=['program_name','protocol'])
+netdf_df = netdf_df.merge(protocols[['include_in_summary','program_name','protocol','op_source','start_date','end_date','num_op']], on=['program_name','protocol'])
 
 # check info at program end
 # display(program_end_df)
@@ -293,13 +293,13 @@ netdf_df['program_rank_desc'] = netdf_df.groupby(['protocol', 'program_name'])['
 # display(netdf_df[netdf_df['protocol'] == 'l2dao'].sort_values(by='program_rank_desc'))
 
 
-# In[40]:
+# In[ ]:
 
 
 # netdf_df[(netdf_df['date'] >= '2022-10-06') & (netdf_df['date'] <= '2022-10-12')].tail(10)
 
 
-# In[41]:
+# In[ ]:
 
 
 during_str = 'During Program'
@@ -311,7 +311,7 @@ netdf_df['period'] = np.where(
 netdf_df.to_csv(prepend + 'img_outputs/app/op_summer_daily_stats.csv')
 
 
-# In[42]:
+# In[ ]:
 
 
 latest_data_df = netdf_df[netdf_df['program_rank_desc'] == 1]
@@ -330,34 +330,15 @@ latest_data_df['days_since_program_end'] = \
         - pd.to_datetime(latest_data_df['start_date']) \
         )
 
-latest_data_df['cumul_flows_per_op_at_program_end'] = latest_data_df['cumul_net_dollar_flow_at_program_end'] / latest_data_df['num_op']
-latest_data_df['cumul_flows_per_op_latest'] = latest_data_df['cumul_net_dollar_flow'] / latest_data_df['num_op']
-
-latest_data_df['last_price_flows_per_op_at_program_end'] = latest_data_df['cumul_last_price_net_dollar_flow_at_program_end'] / latest_data_df['num_op']
-latest_data_df['last_price_flows_per_op_latest'] = latest_data_df['cumul_last_price_net_dollar_flow'] / latest_data_df['num_op']
-
-latest_data_df['flows_retention'] = \
-                latest_data_df['cumul_net_dollar_flow'] / latest_data_df['cumul_net_dollar_flow_at_program_end'] \
-                * np.where(latest_data_df['cumul_net_dollar_flow'] < 0, -1, 1)
-latest_data_df['last_price_flows_retention'] = \
-                latest_data_df['cumul_last_price_net_dollar_flow'] / latest_data_df['cumul_last_price_net_dollar_flow_at_program_end'] \
-                * np.where(latest_data_df['cumul_last_price_net_dollar_flow'] < 0, -1, 1)
 
 
-# In[43]:
+
+# In[ ]:
 
 
-latest_data_df_format = latest_data_df.copy()
-new_cols = latest_data_df_format.columns
-drop_cols = ['net_dollar_flow',
-       'net_price_stock_change', 'last_price_flow', 'usd_value',
-       'tvl_change', 'error'
-       ]
-new_cols = new_cols.drop(drop_cols)
-# print(new_cols)
-latest_data_df_format = latest_data_df_format[new_cols]
+# Generate agg summary df
+season_summary = latest_data_df[latest_data_df['include_in_summary'] == 1].copy()
 
-<<<<<<< HEAD
 season_summary_s0_no_perp = season_summary[(season_summary['op_source'] == 'Gov Fund - Phase 0') \
                                                 & (season_summary['protocol'] != 'perpetual-protocol')]
 
@@ -368,56 +349,108 @@ season_summary = pd.concat([season_summary, season_summary_s0_no_perp])
 season_summary = season_summary.groupby('op_source').sum()
 season_summary.reset_index(inplace=True)
 season_summary.head()
-=======
-latest_data_df_format['num_op'] = latest_data_df_format['num_op'].apply(lambda x: '{0:,.0f}'.format(x) if not pd.isna(x) else x )
-latest_data_df_format['flows_retention'] = latest_data_df_format['flows_retention'].apply(lambda x: '{:,.1%}'.format(x) if not pd.isna(x) else x )
-latest_data_df_format['last_price_flows_retention'] = latest_data_df_format['last_price_flows_retention'].apply(lambda x: '{:,.1%}'.format(x) if not pd.isna(x) else x )
-
-latest_data_df_format = latest_data_df_format[[
-    'date','program_name', 'num_op','period','op_source','start_date','end_date'
-    ,'cumul_net_dollar_flow_at_program_end'
-    ,'cumul_net_dollar_flow'
-    ,'cumul_flows_per_op_at_program_end','cumul_flows_per_op_latest', 'last_price_flows_per_op_at_program_end','last_price_flows_per_op_latest'
-    ,'flows_retention', 'last_price_flows_retention'
-]]
-latest_data_df_format = latest_data_df_format.reset_index(drop=True)
-latest_data_df_format.to_csv(prepend + 'img_outputs/app/op_summer_latest_stats.csv')
-
-format_cols = [
-    'cumul_net_dollar_flow'#,'cumul_last_price_net_dollar_flow'
-    # ,'cumul_net_price_stock_change'
-    ,'cumul_net_dollar_flow_at_program_end'
-    # , 'cumul_last_price_net_dollar_flow_at_program_end'
-    # , 'cumul_net_price_stock_change_at_program_end'
-    ,'cumul_flows_per_op_at_program_end','cumul_flows_per_op_latest','last_price_flows_per_op_at_program_end','last_price_flows_per_op_latest']
-for f in format_cols:
-    latest_data_df_format[f] = latest_data_df_format[f].apply(lambda x: '${0:,.2f}'.format(x) if not pd.isna(x) else x )
->>>>>>> parent of 1143c5be (updates)
 
 
-latest_data_df_format = latest_data_df_format.rename(columns={
-    'date':'Date', 'program_name':'Program', 'num_op': '# OP'
-    ,'period': 'Period','op_source': 'Source','start_date':'Start','end_date':'End'
-    ,'cumul_net_dollar_flow_at_program_end':'Net Flows (at End Date)'
-    ,'cumul_net_dollar_flow':'Net Flows (Latest)'
-    ,'cumul_flows_per_op_at_program_end': 'Net Flows per OP (at End Date)'
-    ,'cumul_flows_per_op_latest': 'Net Flows per OP (Latest)'
-    ,'last_price_flows_per_op_at_program_end': 'Net Flows per OP @ Current Prices (at End Date)'
-    ,'last_price_flows_per_op_latest': 'Net Flows per OP @ Current Prices (Latest)'
-    ,'flows_retention' : 'Net Flows Retained'
-    ,'last_price_flows_retention' : 'Net Flows Retained @ Current Prices'
-})
-latest_data_df_format = latest_data_df_format.fillna('')
-latest_data_df_format = latest_data_df_format.reset_index(drop=True)
-latest_data_df_format = latest_data_df_format.sort_values(by=['Start','# OP'], ascending = [True,False])
-pd_html = pu.generate_html(latest_data_df_format)
+# In[ ]:
 
-open(prepend + "img_outputs/app/op_summer_latest_stats.html", "w").write(pd_html)
+
+df_list = [latest_data_df, season_summary]
+latest_data_df.name = 'latest_data_df'
+season_summary.name = 'season_summary'
+
+for df in df_list:
+
+        df['cumul_flows_per_op_at_program_end'] = df['cumul_net_dollar_flow_at_program_end'] / df['num_op']
+        df['cumul_flows_per_op_latest'] = df['cumul_net_dollar_flow'] / df['num_op']
+
+        df['last_price_flows_per_op_at_program_end'] = df['cumul_last_price_net_dollar_flow_at_program_end'] / df['num_op']
+        df['last_price_flows_per_op_latest'] = df['cumul_last_price_net_dollar_flow'] / df['num_op']
+
+        df['flows_retention'] = \
+                        df['cumul_net_dollar_flow'] / df['cumul_net_dollar_flow_at_program_end'] \
+                        * np.where(df['cumul_net_dollar_flow'] < 0, -1, 1)
+        df['last_price_flows_retention'] = \
+                        df['cumul_last_price_net_dollar_flow'] / df['cumul_last_price_net_dollar_flow_at_program_end'] \
+                        * np.where(df['cumul_last_price_net_dollar_flow'] < 0, -1, 1)
+
+
+# In[ ]:
+
+
+for df in df_list:
+    #get df name
+    col_list = [
+        'date','program_name', 'num_op','period','op_source','start_date','end_date'
+        ,'cumul_net_dollar_flow_at_program_end'
+        ,'cumul_net_dollar_flow'
+        ,'cumul_flows_per_op_at_program_end','cumul_flows_per_op_latest', 'last_price_flows_per_op_at_program_end','last_price_flows_per_op_latest'
+        ,'flows_retention', 'last_price_flows_retention'
+    ]
+    summary_exclude_list = ['date','program_name','period','start_date','end_date']
+    sort_cols = ['Start','# OP']
+
+    if df.name == 'latest_data_df':
+        html_name = 'op_summer_latest_stats'
+    elif df.name == 'season_summary':
+        html_name = 'season_summary_stats'
+        sort_cols = ['Source','# OP']
+        col_list = [x for x in col_list if x not in summary_exclude_list]
+    else:
+        html_name = 'other'
+
+    df_format = df.copy()
+    new_cols = df_format.columns
+    drop_cols = ['net_dollar_flow',
+        'net_price_stock_change', 'last_price_flow', 'usd_value',
+        'tvl_change', 'error'
+        ]
+    new_cols = new_cols.drop(drop_cols)
+    # print(new_cols)
+    df_format = df_format[new_cols]
+
+    df_format['num_op'] = df_format['num_op'].apply(lambda x: '{0:,.0f}'.format(x) if not pd.isna(x) else x )
+    df_format['flows_retention'] = df_format['flows_retention'].apply(lambda x: '{:,.1%}'.format(x) if not pd.isna(x) else x )
+    df_format['last_price_flows_retention'] = df_format['last_price_flows_retention'].apply(lambda x: '{:,.1%}'.format(x) if not pd.isna(x) else x )
+
+    df_format = df_format[col_list]
+    df_format = df_format.reset_index(drop=True)
+    df_format.to_csv(prepend + 'img_outputs/app/op_summer_latest_stats.csv')
+
+    format_cols = [
+        'cumul_net_dollar_flow'#,'cumul_last_price_net_dollar_flow'
+        # ,'cumul_net_price_stock_change'
+        ,'cumul_net_dollar_flow_at_program_end'
+        # , 'cumul_last_price_net_dollar_flow_at_program_end'
+        # , 'cumul_net_price_stock_change_at_program_end'
+        ,'cumul_flows_per_op_at_program_end','cumul_flows_per_op_latest','last_price_flows_per_op_at_program_end','last_price_flows_per_op_latest']
+    for f in format_cols:
+        df_format[f] = df_format[f].apply(lambda x: '${0:,.2f}'.format(x) if not pd.isna(x) else x )
+
+
+    df_format = df_format.rename(columns={
+        'date':'Date', 'program_name':'Program', 'num_op': '# OP'
+        ,'period': 'Period','op_source': 'Source','start_date':'Start','end_date':'End'
+        ,'cumul_net_dollar_flow_at_program_end':'Net Flows (at End Date)'
+        ,'cumul_net_dollar_flow':'Net Flows (Latest)'
+        ,'cumul_flows_per_op_at_program_end': 'Net Flows per OP (at End Date)'
+        ,'cumul_flows_per_op_latest': 'Net Flows per OP (Latest)'
+        ,'last_price_flows_per_op_at_program_end': 'Net Flows per OP @ Current Prices (at End Date)'
+        ,'last_price_flows_per_op_latest': 'Net Flows per OP @ Current Prices (Latest)'
+        ,'flows_retention' : 'Net Flows Retained'
+        ,'last_price_flows_retention' : 'Net Flows Retained @ Current Prices'
+    })
+    df_format = df_format.fillna('')
+    df_format = df_format.reset_index(drop=True)
+    df_format = df_format.sort_values(by=sort_cols, ascending = [True,False])
+
+    pd_html = pu.generate_html(df_format)
+    open(prepend + "img_outputs/app/" + html_name + ".html", "w").write(pd_html)
+
 
 # latest_data_df_format.to_html('op_summer_latest_stats.html')
 
 
-# In[44]:
+# In[ ]:
 
 
 fig = px.line(netdf_df, x="date", y="net_dollar_flow", color="program_name", \
@@ -491,7 +524,7 @@ fig_last.write_html(prepend + "img_outputs/cumul_ndf_last_price.html", include_p
 # cumul_fig.show()
 
 
-# In[45]:
+# In[ ]:
 
 
 # Program-Specific Charts
@@ -538,7 +571,7 @@ for val in value_list:
       if not os.path.exists(prepend + "img_outputs/app" + folder_path + "/svg"):
         os.mkdir(prepend + "img_outputs/app" + folder_path + "/svg")
       if not os.path.exists(prepend + "img_outputs/app" + folder_path + "/png"):
-        os.mkdir(prepend + "img_outputs/app/" + folder_path + "png")
+        os.mkdir(prepend + "img_outputs/app/" + folder_path + "/png")
       
       p_file = p
       p_file = p_file.replace(' ','_')
