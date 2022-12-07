@@ -221,7 +221,7 @@ df_df_all2 = df_df_all.copy()
 # df_df_all2['token_value'] = df_df_all2['token_value'].fillna(0)
 df_df_all2['token_value'] = df_df_all2['token_value'].astype('float64')
 df_df_all2['usd_value'] = df_df_all2['usd_value'].astype('float64')
-display(df_df_all2)
+# display(df_df_all2)
 
 
 # In[ ]:
@@ -251,7 +251,7 @@ df_df_all = df_df_all.groupby(['date','token','chain','protocol']).sum(['usd_val
 # display(df_df_all)
 df_df_all = df_df_all.reset_index()
 df_df_shift = []
-display(df_df_all)
+# display(df_df_all)
 
 
 # In[ ]:
@@ -261,7 +261,7 @@ display(df_df_all)
 # print(df_df_all[2])
 print("done api")
 # display(df_df_all)
-display(df_df_all)
+# display(df_df_all)
 
 
 # In[ ]:
