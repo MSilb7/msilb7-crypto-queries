@@ -220,6 +220,7 @@ df_df_all = pd.concat(df_list)
 df_df_all2 = df_df_all.copy()
 # df_df_all2['token_value'] = df_df_all2['token_value'].fillna(0)
 df_df_all2['token_value'] = df_df_all2['token_value'].astype('float64')
+df_df_all2['usd_value'] = df_df_all2['usd_value'].astype('float64')
 display(df_df_all2)
 
 

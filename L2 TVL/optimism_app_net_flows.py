@@ -191,6 +191,10 @@ df_df_comb = pd.concat([df_dfl, df_df_sub])
 df_df_comb['start_date'] = pd.to_datetime(df_df_comb['start_date'])
 # display(df_df_comb)
 
+# Make sure datatypes are clean
+df_df_comb['token_value'] = df_df_comb['token_value'].astype('float64')
+df_df_comb['usd_value'] = df_df_comb['usd_value'].astype('float64')
+
 #create an extra day to handle for tokens dropping to 0
 df_df_shift = df_df_comb.copy()
 df_df_shift['date'] = df_df_shift['date'] + timedelta(days=1)
