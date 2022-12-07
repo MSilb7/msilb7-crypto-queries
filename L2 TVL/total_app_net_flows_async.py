@@ -196,6 +196,7 @@ df_df = get_range(protocols)
 # In[ ]:
 
 
+# print(df_df)
 df_list = []
 for dat in df_df:
         if isinstance(dat,list):
@@ -216,24 +217,40 @@ df_df_all = pd.concat(df_list)
 
 
 # display(df_df_all)
+df_df_all2 = df_df_all.copy()
+# df_df_all2['token_value'] = df_df_all2['token_value'].fillna(0)
+df_df_all2['token_value'] = df_df_all2['token_value'].astype('float64')
+display(df_df_all2)
 
 
 # In[ ]:
 
 
 #create an extra day to handle for tokens dropping to 0
-df_df_shift = df_df_all.copy()
+
+print(df_df_all2.dtypes)
+
+df_df_all_u = df_df_all2.fillna(0)
+df_df_shift = df_df_all_u.copy()
 df_df_shift['date'] = df_df_shift['date'] + timedelta(days=1)
-df_df_shift['token_value'] = 0
-df_df_shift['usd_value'] = 0
+df_df_shift['token_value'] = 0.0
+df_df_shift['usd_value'] = 0.0
 
 #merge back in
-df_df_all = pd.concat([df_df_all,df_df_shift])
+df_df_all = pd.concat([df_df_all_u,df_df_shift])
+
+print(df_df_all.dtypes)
+
+# display(df_df_all)
 df_df_all = df_df_all[df_df_all['date'] <= pd.to_datetime("today") ]
 
-df_df_all = df_df_all.groupby(['date','token','chain','protocol']).sum().reset_index()
-df_df_shift = []
+df_df_all['token_value'] = df_df_all['token_value'].fillna(0)
+df_df_all = df_df_all.groupby(['date','token','chain','protocol']).sum(['usd_value','token_value'])
+
 # display(df_df_all)
+df_df_all = df_df_all.reset_index()
+df_df_shift = []
+display(df_df_all)
 
 
 # In[ ]:
@@ -243,6 +260,7 @@ df_df_shift = []
 # print(df_df_all[2])
 print("done api")
 # display(df_df_all)
+display(df_df_all)
 
 
 # In[ ]:
