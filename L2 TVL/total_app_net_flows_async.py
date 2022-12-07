@@ -214,7 +214,7 @@ df_df_all = pd.concat(df_list)
 # In[ ]:
 
 
-# display(df_df_all)
+display(df_df_all)
 
 
 # In[ ]:
@@ -270,10 +270,11 @@ df_df = df_df[df_df['date'].dt.date >= start_date ]
 
 
 data_df = df_df.copy()
+data_df = data_df.sort_values(by='date')
 # data_df['token_value'] = data_df['token_value'].replace(0, np.nan) #keep zeroes
 # price = usd value / num tokens
 data_df['price_usd'] = data_df['usd_value']/data_df['token_value']
-data_df['last_price_usd'] = data_df.groupby(['token','protocol', 'program_name'])['price_usd'].shift(1)
+data_df['last_price_usd'] = data_df.groupby(['token','protocol', 'chain'])['price_usd'].shift(1)
 
 # If first instnace of token, make sure there's no price diff
 data_df['last_price_usd'] = data_df[['last_price_usd', 'price_usd']].bfill(axis=1).iloc[:, 0]
