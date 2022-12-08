@@ -167,7 +167,7 @@ df_df_sub = pd.concat(dfs_sub)
 
 
 df_df_comb = pd.concat([df_dfl, df_df_sub])
-display(df_df_comb)
+# display(df_df_comb)
 df_df_comb['start_date'] = pd.to_datetime(df_df_comb['start_date'])
 df_df_comb['end_date'] = pd.to_datetime(df_df_comb['end_date'])
 df_df_comb['date'] = pd.to_datetime(df_df_comb['date'])
