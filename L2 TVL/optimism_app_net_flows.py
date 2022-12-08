@@ -461,14 +461,16 @@ for df in df_list:
     df_format.to_csv(prepend + 'img_outputs/app/op_summer_latest_stats.csv')
 
     format_cols = [
-        'cumul_net_dollar_flow'#,'cumul_last_price_net_dollar_flow'
-        # ,'cumul_net_price_stock_change'
-        ,'cumul_net_dollar_flow_at_program_end'
-        # , 'cumul_last_price_net_dollar_flow_at_program_end'
-        # , 'cumul_net_price_stock_change_at_program_end'
+        'cumul_net_dollar_flow','cumul_net_dollar_flow_at_program_end'
         ,'cumul_flows_per_op_at_program_end','cumul_flows_per_op_latest','last_price_flows_per_op_at_program_end','last_price_flows_per_op_latest']
+    format_mil_cols = [
+        'cumul_net_dollar_flow', 'cumul_net_dollar_flow_at_program_end', 'cumul_flows_per_op_at_program_end',
+        'cumul_last_price_net_dollar_flow_at_program_end'
+    ]
     for f in format_cols:
         df_format[f] = df_format[f].apply(lambda x: '${0:,.2f}'.format(x) if not pd.isna(x) else x )
+    for f in format_mil_cols:
+        df_format[f] = df_format[f].apply(lambda x: '${0:,.2f}M'.format(x/1e6) if not pd.isna(x) else x )
 
 
     df_format = df_format.rename(columns={
@@ -476,6 +478,7 @@ for df in df_list:
         ,'period': 'Period','op_source': 'Source','start_date':'Start','end_date':'End'
         ,'cumul_net_dollar_flow_at_program_end':'Net Flows (at End Date)'
         ,'cumul_net_dollar_flow':'Net Flows (Latest)'
+        'cumul_last_price_net_dollar_flow_at_program_end':'Net Flows @ Current Prices (Latest)'
         ,'cumul_flows_per_op_at_program_end': 'Net Flows per OP (at End Date)'
         ,'cumul_flows_per_op_latest': 'Net Flows per OP (Latest)'
         ,'last_price_flows_per_op_at_program_end': 'Net Flows per OP @ Current Prices (at End Date)'
