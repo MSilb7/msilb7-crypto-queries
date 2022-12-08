@@ -403,6 +403,7 @@ latest_data_df['days_since_program_end'] = \
         - pd.to_datetime(latest_data_df['start_date']) \
         )
 
+latest_data_df = latest_data_df[latest_data_df['date'] <= pd.to_datetime("today").floor('d')]
 
 
 
