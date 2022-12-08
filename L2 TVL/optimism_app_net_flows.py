@@ -83,6 +83,12 @@ protocols = pd.DataFrame(
 # print(protocols[0])
 protocols['id_format'] = protocols['protocol'].str.replace('-',' ').str.title()
 
+date_cols = ['start_date', 'end_date']
+for d in date_cols:
+    protocols[d] = pd.to_datetime( protocols[d] )
+    
+protocols['id_format'] = protocols['protocol'].str.replace('-',' ').str.title()
+
 # protocols['program_name'] = np.where( protocols['name'] == '', protocols['id_format'], protocols['name'])
 protocols['coalesce'] = np.where( protocols['name'] == ''
                                     , protocols['id_format']
@@ -110,7 +116,6 @@ protocols = protocols.sort_values(by='start_date', ascending=True)
 
 api_str = 'https://api.llama.fi/protocol/'
 
-
 prod = []
 s = r.Session()
 
@@ -122,36 +127,7 @@ df_dfl = dfl.get_range(dfl_slugs[['slug']],['Optimism'])
 
 df_dfl = df_dfl.merge(dfl_protocols, on ='protocol')
 
-df_dfl = df_dfl[['date', 'token', 'token_value', 'usd_value', 'protocol', 'start_date','program_name']]
-
-# display(df_df)
-# for id, prot in dfl_protocols.iterrows():
-#     # print(api_str + prot['protocol'])
-#     try:
-#         tp = s.get(api_str + prot['protocol']).json()['chainTvls']['Optimism']
-#         # print(tp)
-#         ad = pd.json_normalize( tp['tokens'] )
-#         ad_usd = pd.json_normalize( tp['tokensInUsd'] )
-#         if not ad.empty:
-#             ad = pd.melt(ad,id_vars = ['date'])
-#             ad = ad.rename(columns={'variable':'token','value':'token_value'})
-#             ad_usd = pd.melt(ad_usd,id_vars = ['date'])
-#             ad_usd = ad_usd.rename(columns={'variable':'token','value':'usd_value'})
-#             ad = ad.merge(ad_usd,on=['date','token'])
-            
-#             ad['date'] = pd.to_datetime(ad['date'], unit ='s') #convert to days
-
-#             ad['token'] = ad['token'].str.replace('tokens.','', regex=False)
-#             ad['protocol'] = prot['protocol']
-#             ad['start_date'] = pd.to_datetime(prot['start_date'])
-#             ad['program_name'] = prot['program_name']
-#             # ad['date'] = ad['date'] - timedelta(days=1) #change to eod vs sod
-#             prod.append(ad)
-#             time.sleep(0.5)
-#     except:
-#         continue
-
-# df_df = pd.concat(prod)
+df_dfl = df_dfl[['date', 'token', 'token_value', 'usd_value', 'protocol', 'start_date','end_date','program_name']]
 
 
 # In[ ]:
@@ -170,6 +146,7 @@ for index, program in subg_protocols.iterrows():
                 elif program['protocol'] == 'velodrome':
                         sdf = subg.get_velodrome_pool_tvl(c)
                 sdf['start_date'] = program['start_date']
+                sdf['end_date'] = program['end_date']
                 sdf['program_name'] = program['program_name']
                 sdf['protocol'] = program['og_protocol']
                 sdf = sdf.fillna(0)
@@ -181,7 +158,7 @@ df_df_sub = pd.concat(dfs_sub)
 # In[ ]:
 
 
-# display(df_df_sub.sort_values(by='date'))
+display(df_df_sub.sort_values(by='date'))
 
 
 # In[ ]:
@@ -205,7 +182,7 @@ df_df_shift['usd_value'] = 0
 df_df = pd.concat([df_df_comb,df_df_shift])
 df_df = df_df[df_df['date'] <= pd.to_datetime("today") ]
 
-df_df = df_df.groupby(['date','token','protocol','start_date','program_name']).sum().reset_index()
+df_df = df_df.groupby(['date','token','protocol','start_date','end_date','program_name']).sum(numeric_only=True).reset_index()
 
 # display(
 #         df_df[(df_df['protocol']=='revert-compoundor') & (df_df['date'] == '2022-11-09')] 
@@ -267,9 +244,15 @@ data_df['net_token_flow'] = data_df['token_value'] - data_df['last_token_value']
 data_df['net_price_change'] = data_df['price_usd'] - data_df['last_price_usd']
 
 data_df['net_dollar_flow'] = data_df['net_token_flow'] * data_df['price_usd']
-data_df['last_price_flow'] = data_df['net_token_flow'] * data_df['last_price_usd']
+data_df['last_price_net_dollar_flow'] = data_df['net_token_flow'] * data_df['last_price_usd']
 
 data_df['net_price_stock_change'] = data_df['last_token_value'] * data_df['net_price_change']
+
+
+# display(data_df)
+
+
+# In[ ]:
 
 
 # display(data_df)
@@ -287,27 +270,48 @@ data_df['net_price_stock_change'] = data_df['last_token_value'] * data_df['net_p
 # In[ ]:
 
 
-netdf_df = data_df[data_df['date']>= data_df['start_date']][['date','protocol','program_name','net_dollar_flow','net_price_stock_change','last_price_flow','usd_value']]
+netdf_df = data_df[data_df['date']>= data_df['start_date']][['date','protocol','program_name','net_dollar_flow','net_price_stock_change','last_price_net_dollar_flow','usd_value','start_date','end_date']]
 
-netdf_df = netdf_df.groupby(['date','protocol','program_name']).sum(['net_dollar_flow','net_price_stock_change','last_price_flow','usd_value'])
+netdf_df = netdf_df.groupby(['date','protocol','program_name','start_date','end_date']).sum(['net_dollar_flow','net_price_stock_change','last_price_net_dollar_flow','usd_value'])
+
+# reset & get program data
+netdf_df.reset_index(inplace=True)
 
 netdf_df['tvl_change'] = netdf_df['usd_value'] - netdf_df.groupby(['protocol', 'program_name'])['usd_value'].shift(1)
 netdf_df['error'] = netdf_df['tvl_change'] - (netdf_df['net_dollar_flow'] + netdf_df['net_price_stock_change'])
 
+cumul_cols = ['net_dollar_flow','last_price_net_dollar_flow','net_price_stock_change']
+for c in cumul_cols:
+        netdf_df['cumul_' + c] = netdf_df.groupby(['protocol', 'program_name'])[c].cumsum()
+        # netdf_df['cumul_last_price_net_dollar_flow'] = netdf_df.groupby(['protocol', 'program_name'])['last_price_net_dollar_flow'].cumsum()
+        # netdf_df['cumul_net_price_stock_change'] = netdf_df.groupby(['protocol', 'program_name'])['net_price_stock_change'].cumsum()
 
-netdf_df['cumul_net_dollar_flow'] = netdf_df['net_dollar_flow'].groupby(['protocol', 'program_name']).cumsum()
-netdf_df['cumul_last_price_net_dollar_flow'] = netdf_df['last_price_flow'].groupby(['protocol', 'program_name']).cumsum()
-netdf_df['cumul_net_price_stock_change'] = netdf_df['net_price_stock_change'].groupby(['protocol', 'program_name']).cumsum()
-# reset & get program data
-netdf_df.reset_index(inplace=True)
+# display(netdf_df)
 
-netdf_df = netdf_df.merge(protocols[['include_in_summary','program_name','protocol','op_source','start_date','end_date','num_op']], on=['program_name','protocol'])
+#For Summary
+if_ended_cols = ['net_dollar_flow','last_price_net_dollar_flow']
+new_ended_cols = []
+for e in if_ended_cols:
+        netdf_df['cumul_' + e + '_if_ended'] = netdf_df[netdf_df['end_date'] != ''].groupby(['protocol', 'program_name'])[e].cumsum()
+        new_ended_cols.append('cumul_' + e + '_if_ended')
+#
+# print(new_ended_cols)
+
+for d in date_cols:
+        netdf_df[d] = pd.to_datetime(netdf_df[d])
+
+netdf_df = netdf_df.merge(protocols[['include_in_summary','program_name','protocol','op_source','start_date','end_date','num_op']], on=['program_name','protocol','start_date','end_date'])
 
 # check info at program end
 # display(program_end_df)
 
 summary_cols = ['cumul_net_dollar_flow','cumul_last_price_net_dollar_flow','cumul_net_price_stock_change']
-program_end_df = netdf_df[pd.to_datetime(netdf_df['date']) == pd.to_datetime(netdf_df['end_date'])].groupby(['protocol', 'program_name']).sum()
+
+# for sc in summary_cols:
+#         netdf_df[sc] = netdf_df[sc].astype('int64')
+summary_cols = summary_cols + new_ended_cols
+# print(summary_cols)
+program_end_df = netdf_df[pd.to_datetime(netdf_df['date']) == pd.to_datetime(netdf_df['end_date'])].groupby(['protocol', 'program_name']).sum(numeric_only=True)
 program_end_df.reset_index(inplace=True)
 # display(program_end_df)
 for s in summary_cols:
@@ -316,12 +320,13 @@ for s in summary_cols:
         netdf_df = netdf_df.merge(program_end_df[['protocol','program_name',s_new]], on=['protocol','program_name'], how = 'left')
 
 # netdf_df['cumul_net_dollar_flow_at_program_end'] = netdf_df[is_program_end].groupby(['protocol', 'program_name']).sum(['cumul_net_dollar_flow'])
-# netdf_df['cumul_last_price_net_dollar_flow_at_program_end'] = netdf_df[netdf_df['date'] == netdf_df['end_date']]['last_price_flow'].groupby(['protocol', 'program_name']).cumsum()
+# netdf_df['cumul_last_price_net_dollar_flow_at_program_end'] = netdf_df[netdf_df['date'] == netdf_df['end_date']]['last_price_net_dollar_flow'].groupby(['protocol', 'program_name']).cumsum()
 # netdf_df['cumul_net_price_stock_change_at_program_end'] = netdf_df[netdf_df['date'] == netdf_df['end_date']]['net_price_stock_change'].groupby(['protocol', 'program_name']).cumsum()
 
 netdf_df['program_rank_desc'] = netdf_df.groupby(['protocol', 'program_name'])['date'].\
                             rank(method='dense',ascending=False).astype(int)
 
+netdf_df['end_date'] = netdf_df['end_date'].fillna('')
 # display(netdf_df[netdf_df['protocol'] == 'l2dao'].sort_values(by='program_rank_desc'))
 
 
@@ -398,6 +403,12 @@ season_summary.head()
 # In[ ]:
 
 
+# display(season_summary)
+
+
+# In[ ]:
+
+
 df_list = [latest_data_df, season_summary]
 latest_data_df.name = 'latest_data_df'
 season_summary.name = 'season_summary'
@@ -407,14 +418,14 @@ for df in df_list:
         df['cumul_flows_per_op_at_program_end'] = df['cumul_net_dollar_flow_at_program_end'] / df['num_op']
         df['cumul_flows_per_op_latest'] = df['cumul_net_dollar_flow'] / df['num_op']
 
-        df['last_price_flows_per_op_at_program_end'] = df['cumul_last_price_net_dollar_flow_at_program_end'] / df['num_op']
-        df['last_price_flows_per_op_latest'] = df['cumul_last_price_net_dollar_flow'] / df['num_op']
+        df['last_price_net_dollar_flows_per_op_at_program_end'] = df['cumul_last_price_net_dollar_flow_at_program_end'] / df['num_op']
+        df['last_price_net_dollar_flows_per_op_latest'] = df['cumul_last_price_net_dollar_flow'] / df['num_op']
 
         df['flows_retention'] = \
-                        df['cumul_net_dollar_flow'] / df['cumul_net_dollar_flow_at_program_end'] \
+                        df['cumul_net_dollar_flow_if_ended'] / df['cumul_net_dollar_flow_at_program_end'] \
                         * np.where(df['cumul_net_dollar_flow'] < 0, -1, 1)
-        df['last_price_flows_retention'] = \
-                        df['cumul_last_price_net_dollar_flow'] / df['cumul_last_price_net_dollar_flow_at_program_end'] \
+        df['last_price_net_dollar_flows_retention'] = \
+                        df['cumul_last_price_net_dollar_flow_if_ended'] / df['cumul_last_price_net_dollar_flow_at_program_end'] \
                         * np.where(df['cumul_last_price_net_dollar_flow'] < 0, -1, 1)
 
 
@@ -428,8 +439,8 @@ for df in df_list:
         ,'cumul_net_dollar_flow_at_program_end'
         ,'cumul_net_dollar_flow'
         ,'cumul_flows_per_op_at_program_end','cumul_last_price_net_dollar_flow_at_program_end','cumul_flows_per_op_latest'
-        , 'last_price_flows_per_op_at_program_end','last_price_flows_per_op_latest'
-        ,'flows_retention', 'last_price_flows_retention'
+        , 'last_price_net_dollar_flows_per_op_at_program_end','last_price_net_dollar_flows_per_op_latest'
+        ,'flows_retention', 'last_price_net_dollar_flows_retention'
     ]
     summary_exclude_list = ['date','program_name','period','start_date','end_date']
     sort_cols = ['Start','# OP']
@@ -446,7 +457,7 @@ for df in df_list:
     df_format = df.copy()
     new_cols = df_format.columns
     drop_cols = ['net_dollar_flow',
-        'net_price_stock_change', 'last_price_flow', 'usd_value',
+        'net_price_stock_change', 'last_price_net_dollar_flow', 'usd_value',
         'tvl_change', 'error'
         ]
     new_cols = new_cols.drop(drop_cols)
@@ -455,14 +466,14 @@ for df in df_list:
 
     df_format['num_op'] = df_format['num_op'].apply(lambda x: '{0:,.0f}'.format(x) if not pd.isna(x) else x )
     df_format['flows_retention'] = df_format['flows_retention'].apply(lambda x: '{:,.1%}'.format(x) if not pd.isna(x) else x )
-    df_format['last_price_flows_retention'] = df_format['last_price_flows_retention'].apply(lambda x: '{:,.1%}'.format(x) if not pd.isna(x) else x )
+    df_format['last_price_net_dollar_flows_retention'] = df_format['last_price_net_dollar_flows_retention'].apply(lambda x: '{:,.1%}'.format(x) if not pd.isna(x) else x )
 
     df_format = df_format[col_list]
     df_format = df_format.reset_index(drop=True)
     df_format.to_csv(prepend + 'img_outputs/app/op_summer_latest_stats.csv')
 
     format_cols = [
-        'cumul_flows_per_op_at_program_end','cumul_flows_per_op_latest','last_price_flows_per_op_at_program_end','last_price_flows_per_op_latest']
+        'cumul_flows_per_op_at_program_end','cumul_flows_per_op_latest','last_price_net_dollar_flows_per_op_at_program_end','last_price_net_dollar_flows_per_op_latest']
     format_mil_cols = [
         'cumul_net_dollar_flow', 'cumul_net_dollar_flow_at_program_end',
         'cumul_last_price_net_dollar_flow_at_program_end'
@@ -481,10 +492,10 @@ for df in df_list:
         ,'cumul_last_price_net_dollar_flow_at_program_end':'Net Flows @ Current Prices (Latest)'
         ,'cumul_flows_per_op_at_program_end': 'Net Flows per OP (at End Date)'
         ,'cumul_flows_per_op_latest': 'Net Flows per OP (Latest)'
-        ,'last_price_flows_per_op_at_program_end': 'Net Flows per OP @ Current Prices (at End Date)'
-        ,'last_price_flows_per_op_latest': 'Net Flows per OP @ Current Prices (Latest)'
+        ,'last_price_net_dollar_flows_per_op_at_program_end': 'Net Flows per OP @ Current Prices (at End Date)'
+        ,'last_price_net_dollar_flows_per_op_latest': 'Net Flows per OP @ Current Prices (Latest)'
         ,'flows_retention' : 'Net Flows Retained'
-        ,'last_price_flows_retention' : 'Net Flows Retained @ Current Prices'
+        ,'last_price_net_dollar_flows_retention' : 'Net Flows Retained @ Current Prices'
     })
     df_format = df_format.fillna('')
     df_format = df_format.reset_index(drop=True)
