@@ -133,6 +133,12 @@ df_dfl = df_dfl[['date', 'token', 'token_value', 'usd_value', 'protocol', 'start
 # In[ ]:
 
 
+# display(df_dfl)
+
+
+# In[ ]:
+
+
 subg_protocols = protocols[protocols['data_source'].str.contains('subgraph')].copy()
 subg_protocols['og_protocol'] = subg_protocols['protocol']
 subg_protocols['protocol'] = subg_protocols['data_source'].str.replace('subgraph-','')
@@ -187,7 +193,10 @@ df_df_shift['usd_value'] = 0
 df_df = pd.concat([df_df_comb,df_df_shift])
 df_df = df_df[df_df['date'] <= pd.to_datetime("today") ]
 
-df_df = df_df.groupby(['date','token','protocol','start_date','end_date','program_name']).sum(numeric_only=True).reset_index()
+# Group - Exclude End Date since this is often null and overwritting could be weird, especially if we actually know an end date
+df_df['start_date'] = df_df['start_date'].fillna( pd.to_datetime("today").floor('d') )
+
+df_df = df_df.groupby(['date','token','protocol','start_date','program_name']).sum(numeric_only=True).reset_index()
 
 # display(
 #         df_df[(df_df['protocol']=='revert-compoundor') & (df_df['date'] == '2022-11-09')] 
@@ -199,7 +208,7 @@ df_df = df_df.groupby(['date','token','protocol','start_date','end_date','progra
 
 # df_df
 # df_df = df_df.fillna(0)
-# display(df_df)
+df_df.sample(20)
 # for prot in protocols:
 #         print( prot[0] )
 # display(
@@ -275,9 +284,9 @@ data_df['net_price_stock_change'] = data_df['last_token_value'] * data_df['net_p
 # In[ ]:
 
 
-netdf_df = data_df[data_df['date']>= data_df['start_date']][['date','protocol','program_name','net_dollar_flow','net_price_stock_change','last_price_net_dollar_flow','usd_value','start_date','end_date']]
+netdf_df = data_df[data_df['date']>= data_df['start_date']][['date','protocol','program_name','net_dollar_flow','net_price_stock_change','last_price_net_dollar_flow','usd_value']]
 
-netdf_df = netdf_df.groupby(['date','protocol','program_name','start_date','end_date']).sum(['net_dollar_flow','net_price_stock_change','last_price_net_dollar_flow','usd_value'])
+netdf_df = netdf_df.groupby(['date','protocol','program_name']).sum(['net_dollar_flow','net_price_stock_change','last_price_net_dollar_flow','usd_value'])
 
 # reset & get program data
 netdf_df.reset_index(inplace=True)
@@ -293,22 +302,28 @@ for c in cumul_cols:
 
 # display(netdf_df)
 
+# Bring Program info Back In
+netdf_df = netdf_df.merge(protocols[['include_in_summary','program_name','protocol','op_source','start_date','end_date','num_op']], on=['program_name','protocol'])
+
 #For Summary
 if_ended_cols = ['net_dollar_flow','last_price_net_dollar_flow']
 new_ended_cols = []
 for e in if_ended_cols:
-        netdf_df['cumul_' + e + '_if_ended'] = netdf_df[netdf_df['end_date'] != ''].groupby(['protocol', 'program_name'])[e].cumsum()
+        netdf_df['cumul_' + e + '_if_ended'] = netdf_df[~netdf_df['end_date'].isna()].groupby(['protocol', 'program_name'])[e].cumsum()
         new_ended_cols.append('cumul_' + e + '_if_ended')
 #
 # print(new_ended_cols)
+# display(netdf_df[netdf_df['protocol'] == 'revert-compoundor'])
 
 for d in date_cols:
         netdf_df[d] = pd.to_datetime(netdf_df[d])
 
-netdf_df = netdf_df.merge(protocols[['include_in_summary','program_name','protocol','op_source','start_date','end_date','num_op']], on=['program_name','protocol','start_date','end_date'])
-
 # check info at program end
 # display(program_end_df)
+
+
+# In[ ]:
+
 
 summary_cols = ['cumul_net_dollar_flow','cumul_last_price_net_dollar_flow','cumul_net_price_stock_change']
 
@@ -318,6 +333,8 @@ summary_cols = summary_cols + new_ended_cols
 # print(summary_cols)
 program_end_df = netdf_df[pd.to_datetime(netdf_df['date']) == pd.to_datetime(netdf_df['end_date'])].groupby(['protocol', 'program_name']).sum(numeric_only=True)
 program_end_df.reset_index(inplace=True)
+# display(program_end_df)
+
 # display(program_end_df)
 for s in summary_cols:
         s_new = s+'_at_program_end'
@@ -331,8 +348,10 @@ for s in summary_cols:
 netdf_df['program_rank_desc'] = netdf_df.groupby(['protocol', 'program_name'])['date'].\
                             rank(method='dense',ascending=False).astype(int)
 
-netdf_df['end_date'] = netdf_df['end_date'].fillna('')
-# display(netdf_df[netdf_df['protocol'] == 'l2dao'].sort_values(by='program_rank_desc'))
+# netdf_df.loc[ netdf_df['end_date'] == pd.to_datetime("2000-01-01"), 'end_date' ] == pd.to_datetime("1900-01-01")
+
+# np.where( netdf_df['end_date'] <= pd.to_datetime("2000-01-01") , pd.NaT , netdf_df['end_date'] )
+display(netdf_df[netdf_df['protocol'] == 'hundred-finance'].sort_values(by='program_rank_desc'))
 
 
 # In[ ]:
