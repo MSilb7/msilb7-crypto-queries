@@ -149,7 +149,9 @@ for index, program in subg_protocols.iterrows():
                 sdf['end_date'] = program['end_date']
                 sdf['program_name'] = program['program_name']
                 sdf['protocol'] = program['og_protocol']
-                sdf = sdf.fillna(0)
+
+                sdf['token_value'] = sdf['token_value'].fillna(0)
+                sdf['usd_value'] = sdf['usd_value'].fillna(0)
                 dfs_sub.append(sdf)
 df_df_sub = pd.concat(dfs_sub)
 # display(df_df_sub.columns)
@@ -165,7 +167,10 @@ df_df_sub = pd.concat(dfs_sub)
 
 
 df_df_comb = pd.concat([df_dfl, df_df_sub])
+display(df_df_comb)
 df_df_comb['start_date'] = pd.to_datetime(df_df_comb['start_date'])
+df_df_comb['end_date'] = pd.to_datetime(df_df_comb['end_date'])
+df_df_comb['date'] = pd.to_datetime(df_df_comb['date'])
 # display(df_df_comb)
 
 # Make sure datatypes are clean
