@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[ ]:
+# In[5]:
 
 
 # ! pip install pandas
@@ -12,7 +12,7 @@
 # ! pip freeze = requirements.txt
 
 
-# In[ ]:
+# In[6]:
 
 
 import pandas as pd
@@ -28,7 +28,7 @@ import defillama_utils as dfl
 import pandas_utils as pu
 
 
-# In[ ]:
+# In[7]:
 
 
 pwd = os.getcwd()
@@ -38,7 +38,7 @@ else:
     prepend = 'L2 TVL/'
 
 
-# In[ ]:
+# In[9]:
 
 
 # Protocol Incentive Start Dates
@@ -111,7 +111,7 @@ protocols = protocols.sort_values(by='start_date', ascending=True)
 # display(protocols)
 
 
-# In[ ]:
+# In[10]:
 
 
 api_str = 'https://api.llama.fi/protocol/'
@@ -130,13 +130,13 @@ df_dfl = df_dfl.merge(dfl_protocols, on ='protocol')
 df_dfl = df_dfl[['date', 'token', 'token_value', 'usd_value', 'protocol', 'start_date','end_date','program_name']]
 
 
-# In[ ]:
+# In[11]:
 
 
 # display(df_dfl)
 
 
-# In[ ]:
+# In[12]:
 
 
 subg_protocols = protocols[protocols['data_source'].str.contains('subgraph')].copy()
@@ -163,13 +163,13 @@ df_df_sub = pd.concat(dfs_sub)
 # display(df_df_sub.columns)
 
 
-# In[ ]:
+# In[13]:
 
 
 # display(df_df_sub.sort_values(by='date'))
 
 
-# In[ ]:
+# In[14]:
 
 
 df_df_comb = pd.concat([df_dfl, df_df_sub])
@@ -203,7 +203,7 @@ df_df = df_df.groupby(['date','token','protocol','start_date','program_name']).s
 #         )
 
 
-# In[ ]:
+# In[15]:
 
 
 # df_df
@@ -216,7 +216,7 @@ df_df.sample(20)
 # )
 
 
-# In[ ]:
+# In[16]:
 
 
 data_df = df_df.copy()#merge(cg_df, on=['date','token'],how='inner')
@@ -238,7 +238,7 @@ last_df = last_df[['token','protocol','program_name','last_price_usd']]
 # display(last_df)
 
 
-# In[ ]:
+# In[17]:
 
 
 data_df = data_df.merge(last_df, on=['token','protocol','program_name'], how='left')
@@ -266,13 +266,13 @@ data_df['net_price_stock_change'] = data_df['last_token_value'] * data_df['net_p
 # display(data_df)
 
 
-# In[ ]:
+# In[18]:
 
 
 # display(data_df)
 
 
-# In[ ]:
+# In[19]:
 
 
 # data_df[data_df['protocol']=='perpetual-protocol'].sort_values(by='date')
@@ -281,7 +281,7 @@ data_df['net_price_stock_change'] = data_df['last_token_value'] * data_df['net_p
 # data_df[(data_df['protocol'] == 'pooltogether') & (data_df['date'] >= '2022-10-06') & (data_df['date'] <= '2022-10-12')].tail(10)
 
 
-# In[ ]:
+# In[20]:
 
 
 netdf_df = data_df[data_df['date']>= data_df['start_date']][['date','protocol','program_name','net_dollar_flow','net_price_stock_change','last_price_net_dollar_flow','usd_value']]
@@ -322,7 +322,7 @@ for d in date_cols:
 # display(program_end_df)
 
 
-# In[ ]:
+# In[21]:
 
 
 summary_cols = ['cumul_net_dollar_flow','cumul_last_price_net_dollar_flow','cumul_net_price_stock_change']
@@ -354,13 +354,14 @@ netdf_df['program_rank_desc'] = netdf_df.groupby(['protocol', 'program_name'])['
 # display(netdf_df[netdf_df['protocol'] == 'hundred-finance'].sort_values(by='program_rank_desc'))
 
 
-# In[ ]:
+# In[22]:
 
 
 # netdf_df[(netdf_df['date'] >= '2022-10-06') & (netdf_df['date'] <= '2022-10-12')].tail(10)
+netdf_df.tail()
 
 
-# In[ ]:
+# In[23]:
 
 
 during_str = 'During Program'
@@ -372,7 +373,7 @@ netdf_df['period'] = np.where(
 netdf_df.to_csv(prepend + 'img_outputs/app/op_summer_daily_stats.csv')
 
 
-# In[ ]:
+# In[24]:
 
 
 # display(
@@ -384,7 +385,7 @@ netdf_df.to_csv(prepend + 'img_outputs/app/op_summer_daily_stats.csv')
 # )
 
 
-# In[ ]:
+# In[27]:
 
 
 latest_data_df = netdf_df[netdf_df['program_rank_desc'] == 1]
@@ -402,9 +403,6 @@ latest_data_df['days_since_program_end'] = \
         pd.to_datetime(latest_data_df['date']) \
         - pd.to_datetime(latest_data_df['start_date']) \
         )
-
-latest_data_df = latest_data_df[latest_data_df['date'] <= pd.to_datetime("today").floor('d')]
-
 
 
 # In[ ]:
@@ -531,6 +529,14 @@ for df in df_list:
 
 
 # latest_data_df_format.to_html('op_summer_latest_stats.html')
+
+
+# In[ ]:
+
+
+#Filter for Charts
+
+netdf_df = netdf_df[netdf_df['date'] <= pd.to_datetime("today").floor('d')]
 
 
 # In[ ]:
