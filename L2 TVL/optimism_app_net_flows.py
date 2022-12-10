@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[5]:
+# In[ ]:
 
 
 # ! pip install pandas
@@ -12,7 +12,7 @@
 # ! pip freeze = requirements.txt
 
 
-# In[6]:
+# In[ ]:
 
 
 import pandas as pd
@@ -28,7 +28,7 @@ import defillama_utils as dfl
 import pandas_utils as pu
 
 
-# In[7]:
+# In[ ]:
 
 
 pwd = os.getcwd()
@@ -38,7 +38,7 @@ else:
     prepend = 'L2 TVL/'
 
 
-# In[9]:
+# In[ ]:
 
 
 # Protocol Incentive Start Dates
@@ -111,7 +111,7 @@ protocols = protocols.sort_values(by='start_date', ascending=True)
 # display(protocols)
 
 
-# In[10]:
+# In[ ]:
 
 
 api_str = 'https://api.llama.fi/protocol/'
@@ -130,13 +130,13 @@ df_dfl = df_dfl.merge(dfl_protocols, on ='protocol')
 df_dfl = df_dfl[['date', 'token', 'token_value', 'usd_value', 'protocol', 'start_date','end_date','program_name']]
 
 
-# In[11]:
+# In[ ]:
 
 
 # display(df_dfl)
 
 
-# In[12]:
+# In[ ]:
 
 
 subg_protocols = protocols[protocols['data_source'].str.contains('subgraph')].copy()
@@ -163,13 +163,13 @@ df_df_sub = pd.concat(dfs_sub)
 # display(df_df_sub.columns)
 
 
-# In[13]:
+# In[ ]:
 
 
 # display(df_df_sub.sort_values(by='date'))
 
 
-# In[14]:
+# In[ ]:
 
 
 df_df_comb = pd.concat([df_dfl, df_df_sub])
@@ -203,7 +203,7 @@ df_df = df_df.groupby(['date','token','protocol','start_date','program_name']).s
 #         )
 
 
-# In[15]:
+# In[ ]:
 
 
 # df_df
@@ -216,7 +216,7 @@ df_df.sample(20)
 # )
 
 
-# In[16]:
+# In[ ]:
 
 
 data_df = df_df.copy()#merge(cg_df, on=['date','token'],how='inner')
@@ -227,8 +227,7 @@ data_df.sort_values(by='date',inplace=True)
 # data_df['token_value'] = data_df['token_value'].replace(0, np.nan) #keep zeroes
 data_df['price_usd'] = data_df['usd_value']/data_df['token_value']
 
-data_df['rank_desc'] = data_df.groupby(['protocol', 'program_name', 'token'])['date'].\
-                            rank(method='dense',ascending=False).astype(int)
+data_df['rank_desc'] = data_df.groupby(['protocol', 'program_name', 'token'])['date'].                            rank(method='dense',ascending=False).astype(int)
 
 data_df.sort_values(by='date',inplace=True)
 
@@ -238,7 +237,7 @@ last_df = last_df[['token','protocol','program_name','last_price_usd']]
 # display(last_df)
 
 
-# In[17]:
+# In[ ]:
 
 
 data_df = data_df.merge(last_df, on=['token','protocol','program_name'], how='left')
@@ -266,13 +265,13 @@ data_df['net_price_stock_change'] = data_df['last_token_value'] * data_df['net_p
 # display(data_df)
 
 
-# In[18]:
+# In[ ]:
 
 
-# display(data_df)
+data_df.to_csv('tvl_flows_by_token.csv')
 
 
-# In[19]:
+# In[ ]:
 
 
 # data_df[data_df['protocol']=='perpetual-protocol'].sort_values(by='date')
@@ -281,7 +280,7 @@ data_df['net_price_stock_change'] = data_df['last_token_value'] * data_df['net_p
 # data_df[(data_df['protocol'] == 'pooltogether') & (data_df['date'] >= '2022-10-06') & (data_df['date'] <= '2022-10-12')].tail(10)
 
 
-# In[20]:
+# In[ ]:
 
 
 netdf_df = data_df[data_df['date']>= data_df['start_date']][['date','protocol','program_name','net_dollar_flow','net_price_stock_change','last_price_net_dollar_flow','usd_value']]
@@ -322,7 +321,7 @@ for d in date_cols:
 # display(program_end_df)
 
 
-# In[21]:
+# In[ ]:
 
 
 summary_cols = ['cumul_net_dollar_flow','cumul_last_price_net_dollar_flow','cumul_net_price_stock_change']
@@ -345,8 +344,7 @@ for s in summary_cols:
 # netdf_df['cumul_last_price_net_dollar_flow_at_program_end'] = netdf_df[netdf_df['date'] == netdf_df['end_date']]['last_price_net_dollar_flow'].groupby(['protocol', 'program_name']).cumsum()
 # netdf_df['cumul_net_price_stock_change_at_program_end'] = netdf_df[netdf_df['date'] == netdf_df['end_date']]['net_price_stock_change'].groupby(['protocol', 'program_name']).cumsum()
 
-netdf_df['program_rank_desc'] = netdf_df.groupby(['protocol', 'program_name'])['date'].\
-                            rank(method='dense',ascending=False).astype(int)
+netdf_df['program_rank_desc'] = netdf_df.groupby(['protocol', 'program_name'])['date'].                            rank(method='dense',ascending=False).astype(int)
 
 # netdf_df.loc[ netdf_df['end_date'] == pd.to_datetime("2000-01-01"), 'end_date' ] == pd.to_datetime("1900-01-01")
 
@@ -354,14 +352,14 @@ netdf_df['program_rank_desc'] = netdf_df.groupby(['protocol', 'program_name'])['
 # display(netdf_df[netdf_df['protocol'] == 'hundred-finance'].sort_values(by='program_rank_desc'))
 
 
-# In[22]:
+# In[ ]:
 
 
 # netdf_df[(netdf_df['date'] >= '2022-10-06') & (netdf_df['date'] <= '2022-10-12')].tail(10)
 netdf_df.tail()
 
 
-# In[23]:
+# In[ ]:
 
 
 during_str = 'During Program'
@@ -373,7 +371,7 @@ netdf_df['period'] = np.where(
 netdf_df.to_csv(prepend + 'img_outputs/app/op_summer_daily_stats.csv')
 
 
-# In[24]:
+# In[ ]:
 
 
 # display(
@@ -385,7 +383,7 @@ netdf_df.to_csv(prepend + 'img_outputs/app/op_summer_daily_stats.csv')
 # )
 
 
-# In[27]:
+# In[ ]:
 
 
 latest_data_df = netdf_df[netdf_df['program_rank_desc'] == 1]
@@ -395,8 +393,7 @@ latest_data_df['date'] = latest_data_df['date'].dt.date
 #         pd.to_datetime(latest_data_df['end_date']) \
 #         - pd.to_datetime(latest_data_df['date'])
 
-latest_data_df['days_since_program_end'] = \
-        np.where(latest_data_df['end_date'] != '',
+latest_data_df['days_since_program_end'] =         np.where(latest_data_df['end_date'] != '',
         pd.to_datetime(latest_data_df['end_date']) \
         - pd.to_datetime(latest_data_df['date']) \
         , \
@@ -411,8 +408,7 @@ latest_data_df['days_since_program_end'] = \
 # Generate agg summary df
 season_summary = latest_data_df[latest_data_df['include_in_summary'] == 1].copy()
 
-season_summary_s0_no_perp = season_summary[(season_summary['op_source'] == 'Gov Fund - Phase 0') \
-                                                & (season_summary['protocol'] != 'perpetual-protocol')]
+season_summary_s0_no_perp = season_summary[(season_summary['op_source'] == 'Gov Fund - Phase 0')                                                 & (season_summary['protocol'] != 'perpetual-protocol')]
 
 season_summary_s0_no_perp['op_source'] = 'Gov Fund - Phase 0 (Excl. Perp)'
 
@@ -444,12 +440,8 @@ for df in df_list:
         df['last_price_net_dollar_flows_per_op_at_program_end'] = df['cumul_last_price_net_dollar_flow_at_program_end'] / df['num_op']
         df['last_price_net_dollar_flows_per_op_latest'] = df['cumul_last_price_net_dollar_flow'] / df['num_op']
 
-        df['flows_retention'] = \
-                        df['cumul_net_dollar_flow_if_ended'] / df['cumul_net_dollar_flow_at_program_end'] \
-                        * np.where(df['cumul_net_dollar_flow'] < 0, -1, 1)
-        df['last_price_net_dollar_flows_retention'] = \
-                        df['cumul_last_price_net_dollar_flow_if_ended'] / df['cumul_last_price_net_dollar_flow_at_program_end'] \
-                        * np.where(df['cumul_last_price_net_dollar_flow'] < 0, -1, 1)
+        df['flows_retention'] =                         df['cumul_net_dollar_flow_if_ended'] / df['cumul_net_dollar_flow_at_program_end']                         * np.where(df['cumul_net_dollar_flow'] < 0, -1, 1)
+        df['last_price_net_dollar_flows_retention'] =                         df['cumul_last_price_net_dollar_flow_if_ended'] / df['cumul_last_price_net_dollar_flow_at_program_end']                         * np.where(df['cumul_last_price_net_dollar_flow'] < 0, -1, 1)
 
 
 # In[ ]:
@@ -542,9 +534,7 @@ netdf_df = netdf_df[netdf_df['date'] <= pd.to_datetime("today").floor('d')]
 # In[ ]:
 
 
-fig = px.line(netdf_df, x="date", y="net_dollar_flow", color="program_name", \
-             title="Daily Net Dollar Flow since Program Announcement",\
-            labels={
+fig = px.line(netdf_df, x="date", y="net_dollar_flow", color="program_name",              title="Daily Net Dollar Flow since Program Announcement",            labels={
                      "date": "Day",
                      "net_dollar_flow": "Net Dollar Flow (N$F)"
                  }
@@ -572,10 +562,7 @@ cumul_fig = go.Figure()
 proto_names = netdf_df['program_name'].drop_duplicates()
 # print(proto_names)
 for p in proto_names:
-    cumul_fig.add_trace(go.Scatter(x=netdf_df[netdf_df['program_name'] == p]['date'] \
-                                   , y=netdf_df[netdf_df['program_name'] == p]['cumul_net_dollar_flow'] \
-                                    ,name = p\
-                                  ,fill='tozeroy')) # fill down to xaxis
+    cumul_fig.add_trace(go.Scatter(x=netdf_df[netdf_df['program_name'] == p]['date']                                    , y=netdf_df[netdf_df['program_name'] == p]['cumul_net_dollar_flow']                                     ,name = p                                  ,fill='tozeroy')) # fill down to xaxis
 
 cumul_fig.update_layout(yaxis_tickprefix = '$')
 cumul_fig.update_layout(
@@ -594,10 +581,7 @@ fig_last = go.Figure()
 proto_names = netdf_df['program_name'].drop_duplicates()
 # print(proto_names)
 for p in proto_names:
-    fig_last.add_trace(go.Scatter(x=netdf_df[netdf_df['program_name'] == p]['date'] \
-                                   , y=netdf_df[netdf_df['program_name'] == p]['cumul_last_price_net_dollar_flow'] \
-                                    ,name = p\
-                                  ,fill='tozeroy')) # fill down to xaxis
+    fig_last.add_trace(go.Scatter(x=netdf_df[netdf_df['program_name'] == p]['date']                                    , y=netdf_df[netdf_df['program_name'] == p]['cumul_last_price_net_dollar_flow']                                     ,name = p                                  ,fill='tozeroy')) # fill down to xaxis
 
 fig_last.update_layout(yaxis_tickprefix = '$')
 fig_last.update_layout(
@@ -635,16 +619,10 @@ for val in value_list:
       # cumul_fig_app = px.area(p_df, x="date", y="cumul_net_dollar_flow", color="period")
       
       during_df = p_df[p_df['period'] == during_str]
-      cumul_fig_app.add_trace(go.Scatter(x= during_df['date'] \
-                                    , y= during_df[val] \
-                                      , name = during_str \
-                                    ,fill='tozeroy')) # fill down to xaxis
+      cumul_fig_app.add_trace(go.Scatter(x= during_df['date']                                     , y= during_df[val]                                       , name = during_str                                     ,fill='tozeroy')) # fill down to xaxis
       
       post_df = p_df[p_df['period'] == post_str]
-      cumul_fig_app.add_trace(go.Scatter(x= post_df['date'] \
-                                    , y= post_df[val] \
-                                      , name = post_str \
-                                    ,fill='tozeroy')) # fill down to xaxis
+      cumul_fig_app.add_trace(go.Scatter(x= post_df['date']                                     , y= post_df[val]                                       , name = post_str                                     ,fill='tozeroy')) # fill down to xaxis
 
       cumul_fig_app.update_layout(yaxis_tickprefix = '$')
       cumul_fig_app.update_layout(
