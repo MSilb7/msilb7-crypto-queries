@@ -326,7 +326,7 @@ for d in date_cols:
 # In[ ]:
 
 
-summary_cols = ['cumul_net_dollar_flow','cumul_last_price_net_dollar_flow','cumul_net_price_stock_change']
+summary_cols = ['cumul_net_dollar_flow','cumul_last_price_net_dollar_flow','cumul_net_price_stock_change','num_op']
 
 # for sc in summary_cols:
 #         netdf_df[sc] = netdf_df[sc].astype('int64')
@@ -436,10 +436,10 @@ season_summary.name = 'season_summary'
 
 for df in df_list:
 
-        df['cumul_flows_per_op_at_program_end'] = df['cumul_net_dollar_flow_at_program_end'] / df['num_op']
+        df['cumul_flows_per_op_at_program_end'] = df['cumul_net_dollar_flow_at_program_end'] / df['num_op_at_program_end']
         df['cumul_flows_per_op_latest'] = df['cumul_net_dollar_flow'] / df['num_op']
 
-        df['last_price_net_dollar_flows_per_op_at_program_end'] = df['cumul_last_price_net_dollar_flow_at_program_end'] / df['num_op']
+        df['last_price_net_dollar_flows_per_op_at_program_end'] = df['cumul_last_price_net_dollar_flow_at_program_end'] / df['num_op_at_program_end']
         df['last_price_net_dollar_flows_per_op_latest'] = df['cumul_last_price_net_dollar_flow'] / df['num_op']
 
         df['flows_retention'] =                         df['cumul_net_dollar_flow_if_ended'] / df['cumul_net_dollar_flow_at_program_end']                         * np.where(df['cumul_net_dollar_flow'] < 0, -1, 1)
