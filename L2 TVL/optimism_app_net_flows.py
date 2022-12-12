@@ -184,6 +184,8 @@ df_df_comb['token_value'] = df_df_comb['token_value'].astype('float64')
 df_df_comb['usd_value'] = df_df_comb['usd_value'].astype('float64')
 
 #create an extra day to handle for tokens dropping to 0
+#this is a temp fix - longer term also: Get max of a token x date and do date + 1 = 0 (i.e. weth to eth flips)
+# find intermediate gaps. Call it a 0 flow in the in-between dates (i.e. pooltogether)
 df_df_shift = df_df_comb.copy()
 df_df_shift['date'] = df_df_shift['date'] + timedelta(days=1)
 df_df_shift['token_value'] = 0
