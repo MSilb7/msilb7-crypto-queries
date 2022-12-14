@@ -5,6 +5,12 @@ import plotly.express as px
 import seaborn as sns
 import os
 
+st.set_page_config(
+    page_title="OP Summer - Latest Stats",
+    page_icon="✅",
+    layout="wide",
+)
+
 # load latest file
 pwd = os.getcwd()
 print(pwd)
