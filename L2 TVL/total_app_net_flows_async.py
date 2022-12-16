@@ -316,7 +316,7 @@ data_df = data_df[~data_df['net_dollar_flow'].isna()]
 # In[ ]:
 
 
-data_df[(data_df['protocol']=='stargate') & (data_df['chain']=='Optimism') & (data_df['date']>='2022-10-31')]
+# data_df[(data_df['protocol']=='stargate') & (data_df['chain']=='Optimism') & (data_df['date']>='2022-10-31')]
 
 
 # In[ ]:
@@ -403,8 +403,11 @@ for i in drange:
 # display(summary_df[(summary_df['chain'] == 'Optimism') & (summary_df['protocol'] == 'qidao')].iloc[-7: , :15] )
 # display(summary_df[(summary_df['protocol']=='stargate') & (summary_df['chain']=='Optimism')])
 summary_df['pct_of_tvl'] = 100* summary_df['net_dollar_flow'] / summary_df['usd_value']
-summary_df = summary_df[summary_df['rank_desc'] == 1 ]
-summary_df.to_csv('latest_tvl_app_trends.csv')
+summary_df = summary_df[(summary_df['rank_desc'] == 1) & (summary_df['date'] >= pd.to_datetime("today") -timedelta(days=30))]
+
+os.makedirs('exports', exist_ok=True)  
+summary_df.to_csv('exports/latest_tvl_app_trends.csv')  
+
 # display(summary_df)
 for i in drange:
         fig = ''
