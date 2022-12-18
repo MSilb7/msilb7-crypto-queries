@@ -14,6 +14,7 @@ import time
 import os
 import asyncio, aiohttp, nest_asyncio
 from aiohttp_retry import RetryClient, ExponentialRetry
+import defillama_utils as dfl
 nest_asyncio.apply()
 header = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:71.0) Gecko/20100101 Firefox/71.0'}
 
@@ -51,7 +52,6 @@ start_date = date.today()-timedelta(days=trailing_num_days +1)
 # start_date = datetime.strptime('2022-07-13', '%Y-%m-%d').date()
 
 
-
 # In[ ]:
 
 
@@ -77,6 +77,7 @@ res = res[res['category'] != 'Chain'] #chain staking (i.e. polygon, stacks, xdai
 
 
 # In[ ]:
+
 
 
 protocols = res[['slug','chainTvls']]
@@ -117,100 +118,107 @@ statuses.remove(429)
 # In[ ]:
 
 
-async def get_tvl(apistring, header, statuses, chains, prot):
-        prod = []
-        retry_client = RetryClient()
-        async with retry_client.get(apistring, retry_options=ExponentialRetry(attempts=10), raise_for_status=statuses) as response:
-                try:
-                        prot_req = await response.json()
-                        prot_req = prot_req['chainTvls']
-                        for ch in chains:
-                                ad = pd.json_normalize( prot_req[ch]['tokens'] )
-                                ad_usd = pd.json_normalize( prot_req[ch]['tokensInUsd'] )
-                        #             ad = ad.merge(how='left')
-                                if not ad.empty:
-                                        ad = pd.melt(ad,id_vars = ['date'])
-                                        ad = ad.rename(columns={'variable':'token','value':'token_value'})
-                                        ad_usd = pd.melt(ad_usd,id_vars = ['date'])
-                                        ad_usd = ad_usd.rename(columns={'variable':'token','value':'usd_value'})
-                                        ad = ad.merge(ad_usd,on=['date','token'])
+# async def get_tvl(apistring, header, statuses, chains, prot):
+#         prod = []
+#         retry_client = RetryClient()
+#         async with retry_client.get(apistring, retry_options=ExponentialRetry(attempts=10), raise_for_status=statuses) as response:
+#                 try:
+#                         prot_req = await response.json()
+#                         prot_req = prot_req['chainTvls']
+#                         for ch in chains:
+#                                 ad = pd.json_normalize( prot_req[ch]['tokens'] )
+#                                 ad_usd = pd.json_normalize( prot_req[ch]['tokensInUsd'] )
+#                         #             ad = ad.merge(how='left')
+#                                 if not ad.empty:
+#                                         ad = pd.melt(ad,id_vars = ['date'])
+#                                         ad = ad.rename(columns={'variable':'token','value':'token_value'})
+#                                         ad_usd = pd.melt(ad_usd,id_vars = ['date'])
+#                                         ad_usd = ad_usd.rename(columns={'variable':'token','value':'usd_value'})
+#                                         ad = ad.merge(ad_usd,on=['date','token'])
                                         
-                                        ad['date'] = pd.to_datetime(ad['date'], unit ='s') #convert to days
-                                        ad['token'] = ad['token'].str.replace('tokens.','', regex=False)
-                                        ad['protocol'] = prot
-                                        ad['chain'] = ch
-                                #         ad['start_date'] = pd.to_datetime(prot[1])
-                                        # ad['date'] = ad['date'] - timedelta(days=1) #change to eod vs sod
-                                        prod.append(ad)
-                except Exception as e:
-                        raise Exception("Could not convert json")
-        await retry_client.close()
+#                                         ad['date'] = pd.to_datetime(ad['date'], unit ='s') #convert to days
+#                                         ad['token'] = ad['token'].str.replace('tokens.','', regex=False)
+#                                         ad['protocol'] = prot
+#                                         ad['chain'] = ch
+#                                 #         ad['start_date'] = pd.to_datetime(prot[1])
+#                                         # ad['date'] = ad['date'] - timedelta(days=1) #change to eod vs sod
+#                                         prod.append(ad)
+#                 except Exception as e:
+#                         raise Exception("Could not convert json")
+#         await retry_client.close()
         
-        return prod
+#         return prod
 
 
 # In[ ]:
 
 
-def get_range(protocols):
-        data_dfs = []
-        fee_df = []
-        # for dt in date_range:
-        #         await asyncio.gather()
-        #         data_dfs.append(res_df)
-        #         # res.columns
-        # try:
-        #         loop.close()
-        # except:
-        #         #nothing
-        loop = asyncio.get_event_loop()
-        #get by app
-        api_str = 'https://api.llama.fi/protocol/'
-        # print(protocols)
-        prod = []
-        tasks = []
-        for index,proto in protocols.iterrows():
-                #     print(proto)
-                prot = proto['slug']
-                chains = proto['chainTvls']
-                apic = api_str + prot
-                #     time.sleep(0.1)
-                tasks.append( get_tvl(apic, header, statuses, chains, prot) )
-        # print(tasks)
-        data_dfs = loop.run_until_complete(asyncio.gather(*tasks, return_exceptions=True))
-        # print(date_range)
-        # loop.close()
-        # print(data_dfs)
-        # fee_df = pd.concat(data_dfs)
-        # return fee_df
-        return data_dfs
+# def get_range(protocols):
+#         data_dfs = []
+#         fee_df = []
+#         # for dt in date_range:
+#         #         await asyncio.gather()
+#         #         data_dfs.append(res_df)
+#         #         # res.columns
+#         # try:
+#         #         loop.close()
+#         # except:
+#         #         #nothing
+#         loop = asyncio.get_event_loop()
+#         #get by app
+#         api_str = 'https://api.llama.fi/protocol/'
+#         # print(protocols)
+#         prod = []
+#         tasks = []
+#         for index,proto in protocols.iterrows():
+#                 #     print(proto)
+#                 prot = proto['slug']
+#                 chains = proto['chainTvls']
+#                 apic = api_str + prot
+#                 #     time.sleep(0.1)
+#                 tasks.append( get_tvl(apic, header, statuses, chains, prot) )
+#         # print(tasks)
+#         data_dfs = loop.run_until_complete(asyncio.gather(*tasks, return_exceptions=True))
+#         # print(date_range)
+#         # loop.close()
+#         # print(data_dfs)
+#         # fee_df = pd.concat(data_dfs)
+#         # return fee_df
+#         return data_dfs
 
 
 # In[ ]:
 
 
-df_df = get_range(protocols)
+df_df = dfl.get_range(protocols)
 # print (typeof(df_df_all) )
 
 
 # In[ ]:
 
 
-# print(df_df)
-df_list = []
-for dat in df_df:
-        if isinstance(dat,list):
-                # print(dat)
-                for pt in dat: #each list within the list (i.e. multiple chains)
-                        try:
-                                tempdf = pd.DataFrame(pt)
-                                if not tempdf.empty:
-                                        # print(tempdf)
-                                        df_list.append(tempdf)
-                        except:
-                                continue
-# df_df_all = pd.DataFrame()
-df_df_all = pd.concat(df_list)
+# display(df_df)
+df_df_all = df_df.copy()
+
+
+# In[ ]:
+
+
+# # print(df_df)
+# df_list = []
+# for dat in df_df:
+#         if isinstance(dat,list):
+#                 # print(dat)
+#                 for pt in dat: #each list within the list (i.e. multiple chains)
+#                         try:
+#                                 tempdf = pd.DataFrame(pt)
+#                                 if not tempdf.empty:
+#                                         # print(tempdf)
+#                                         df_list.append(tempdf)
+#                         except:
+#                                 continue
+# # df_df_all = pd.DataFrame()
+# df_df_all = pd.concat(df_list)
 
 
 # In[ ]:
@@ -257,6 +265,7 @@ df_df_shift = []
 # In[ ]:
 
 
+
 # df_df_all = pd.concat(df_df_all)
 # print(df_df_all[2])
 print("done api")
@@ -276,7 +285,6 @@ df_df['last_token_value'] = df_df.groupby(['token','protocol','chain'])['token_v
 df_df = df_df[df_df['date'].dt.date >= start_date ]
 
 
-
 # In[ ]:
 
 
@@ -287,6 +295,7 @@ df_df = df_df[df_df['date'].dt.date >= start_date ]
 
 
 # In[ ]:
+
 
 
 data_df = df_df.copy()
@@ -311,6 +320,8 @@ data_df['net_dollar_flow'] = data_df['net_token_flow'] * data_df['price_usd']
 
 data_df = data_df[abs(data_df['net_dollar_flow']) < 50_000_000_000] #50 bil error bar for bad prices
 data_df = data_df[~data_df['net_dollar_flow'].isna()]
+
+# display(data_df)
 
 
 # In[ ]:
@@ -344,7 +355,6 @@ netdf_df.drop(columns=['index'],inplace=True)
 # display(netdf_df[netdf_df['protocol']=='makerdao'])
 
 
-
 # In[ ]:
 
 
@@ -355,8 +365,7 @@ netdf_df.drop(columns=['index'],inplace=True)
 
 
 #get latest
-netdf_df['rank_desc'] = netdf_df.groupby(['protocol', 'chain'])['date'].\
-                            rank(method='dense',ascending=False).astype(int)
+netdf_df['rank_desc'] = netdf_df.groupby(['protocol', 'chain'])['date'].                            rank(method='dense',ascending=False).astype(int)
 # display(netdf_df[netdf_df['protocol'] == 'lyra'])
 netdf_df = netdf_df[  #( netdf_df['rank_desc'] == 1 ) &\
                         (~netdf_df['chain'].str.contains('-borrowed')) &\
@@ -384,15 +393,14 @@ summary_df = summary_df.sort_values(by='date',ascending=True)
 # summary_df = summary_df[(summary_df['chain'] == 'Solana') & (summary_df['protocol'] == 'uxd')]
 for i in drange:
         if i == 0:
-                summary_df['cumul_net_dollar_flow'] = summary_df[['protocol','chain','net_dollar_flow']]\
-                                    .groupby(['protocol','chain']).cumsum()
+                summary_df['cumul_net_dollar_flow'] = summary_df[['protocol','chain','net_dollar_flow']]                                    .groupby(['protocol','chain']).cumsum()
                 summary_df['flow_direction'] = np.where(summary_df['cumul_net_dollar_flow']>=0,1,-1)
                 summary_df['abs_cumul_net_dollar_flow'] = abs(summary_df['cumul_net_dollar_flow'])
+                # display(summary_df)
         else:
                 col_str = 'cumul_net_dollar_flow_' + str(i) + 'd'
                 # print(col_str)
-                summary_df[col_str] = summary_df[['protocol','chain','net_dollar_flow']]\
-                                    .groupby(['protocol','chain'])['net_dollar_flow'].transform(lambda x: x.rolling(i, min_periods=1).sum() )
+                summary_df[col_str] = summary_df[['protocol','chain','net_dollar_flow']]                                    .groupby(['protocol','chain'])['net_dollar_flow'].transform(lambda x: x.rolling(i, min_periods=1).sum() )
                                 #         .rolling(i, min_periods=1).sum()\ #This caused errors and mismatches
                                 #     .reset_index(level=0,drop=True)#.values
                 summary_df['flow_direction_' + str(i) + 'd'] = np.where(summary_df[col_str]>=0,1,-1)
@@ -416,22 +424,18 @@ for i in drange:
                 hval = 'cumul_net_dollar_flow'
                 cval = 'flow_direction'
                 saveval = 'net_app_flows'
-                titleval = "App Net Flows Change by App -> Chain - Last " + str(trailing_num_days) + \
-                            " Days - (Apps with > $" + str(min_tvl/1e6) + "M TVL Shown)"
+                titleval = "App Net Flows Change by App -> Chain - Last " + str(trailing_num_days) +                             " Days - (Apps with > $" + str(min_tvl/1e6) + "M TVL Shown)"
         else:
                 yval = 'abs_cumul_net_dollar_flow_' + str(i) +'d'
                 hval = 'cumul_net_dollar_flow_' + str(i) +'d'
                 cval = 'flow_direction_' + str(i) +'d'
                 saveval = 'net_app_flows_' + str(i) +'d'
-                titleval = "App Net Flows Change by App -> Chain - Last " + str(i) + \
-                            " Days - (Apps with > $" + str(min_tvl/1e6) + "M TVL Shown)"
+                titleval = "App Net Flows Change by App -> Chain - Last " + str(i) +                             " Days - (Apps with > $" + str(min_tvl/1e6) + "M TVL Shown)"
         # print(yval)
         # print(cval)
         # print(titleval)
         # print(hval)
-        fig = px.treemap(summary_df[summary_df[yval] !=0], \
-                 path=[px.Constant("all"), 'chain', 'protocol'], \
-#                  path=[px.Constant("all"), 'token', 'chain', 'protocol'], \
+        fig = px.treemap(summary_df[summary_df[yval] !=0],                  path=[px.Constant("all"), 'chain', 'protocol'], #                  path=[px.Constant("all"), 'token', 'chain', 'protocol'], \
                  values=yval, color=cval
 #                 ,color_discrete_map={'-1':'red', '1':'green'})
                 ,color_continuous_scale='Spectral'
@@ -458,6 +462,7 @@ for i in drange:
 
 
 # In[ ]:
+
 
 
 # summary_df['flow_direction'] = np.where(summary_df['cumul_net_dollar_flow']>=0,1,-1)
@@ -501,8 +506,7 @@ for i in drange:
 
 # fig_7d.show()
 
-fig_app = px.treemap(summary_df[summary_df['abs_cumul_net_dollar_flow'] !=0], \
-                #  path=[px.Constant("all"), 'chain', 'protocol'], \
+fig_app = px.treemap(summary_df[summary_df['abs_cumul_net_dollar_flow'] !=0],                 #  path=[px.Constant("all"), 'chain', 'protocol'], \
 #                  path=[px.Constant("all"), 'token', 'chain', 'protocol'], \
                         path=[px.Constant("all"), 'protocol','chain'], \
                  values='abs_cumul_net_dollar_flow', color='flow_direction'
