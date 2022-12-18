@@ -45,7 +45,7 @@ else:
 # In[ ]:
 
 
-trailing_num_days = 90
+trailing_num_days = 1000
 
 start_date = date.today()-timedelta(days=trailing_num_days +1)
 
@@ -190,6 +190,7 @@ statuses.remove(429)
 # In[ ]:
 
 
+# display(protocols)
 df_df = dfl.get_range(protocols)
 # print (typeof(df_df_all) )
 
@@ -204,6 +205,7 @@ df_df_all = df_df.copy()
 # In[ ]:
 
 
+# display(protocols)
 # # print(df_df)
 # df_list = []
 # for dat in df_df:
@@ -284,10 +286,13 @@ df_df['last_token_value'] = df_df.groupby(['token','protocol','chain'])['token_v
 #now actually filter
 df_df = df_df[df_df['date'].dt.date >= start_date ]
 
+# display(df_df[(df_df['chain'] == 'Optimism') & (df_df['protocol'] == 'aave-v3')])
+
 
 # In[ ]:
 
 
+# display(df_df)
 # sample = df_df[(df_df['protocol'] == 'uniswap') & (df_df['chain'] == 'Optimism')]
 # sample = sample.sort_values(by='date',ascending=False)
 # # display(sample)
@@ -458,6 +463,7 @@ for i in drange:
 # In[ ]:
 
 
+# display(summary_df[summary_df['chain'] == 'Optimism'])
 # display(summary_df[summary_df['protocol']=='makerdao'].iloc[: , :15])
 
 

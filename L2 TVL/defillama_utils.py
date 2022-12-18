@@ -65,6 +65,7 @@ async def get_tvl(apistring, header, statuses, chains, prot):
 def get_range(protocols, chains = '', header = header, statuses = statuses):
         data_dfs = []
         fee_df = []
+        og_chains = chains #get starting value
         # for dt in date_range:
         #         await asyncio.gather()
         #         data_dfs.append(res_df)
@@ -82,11 +83,12 @@ def get_range(protocols, chains = '', header = header, statuses = statuses):
         for index,proto in protocols.iterrows():
                 prot = proto['slug']
                 try:
-                        chains = np.where(chains == '', proto['chainTvls'], chains)
+                        if og_chains == '':
+                                chains = proto['chainTvls']
                 except:
-                        chains = chains
+                        chains = og_chains
                 apic = api_str + prot
-
+                # print(chains)
                 #     time.sleep(0.1)
                 tasks.append( get_tvl(apic, header, statuses, chains, prot) )
         # print(tasks)
