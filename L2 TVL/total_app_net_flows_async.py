@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[ ]:
+# In[31]:
 
 
 import pandas as pd
@@ -19,7 +19,7 @@ nest_asyncio.apply()
 header = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:71.0) Gecko/20100101 Firefox/71.0'}
 
 
-# In[ ]:
+# In[32]:
 
 
 #https://stackoverflow.com/questions/23267409/how-to-implement-retry-mechanism-into-python-requests-library
@@ -42,17 +42,21 @@ else:
     prepend = 'L2 TVL/'
 
 
-# In[ ]:
+# In[34]:
 
 
-trailing_num_days = 1000
+# date ranges to build charts for
+drange = [0, 1, 7, 30, 90, 180, 365]
+
+trailing_num_days = max(drange)
+# print(trailing_num_days)
 
 start_date = date.today()-timedelta(days=trailing_num_days +1)
 
 # start_date = datetime.strptime('2022-07-13', '%Y-%m-%d').date()
 
 
-# In[ ]:
+# In[5]:
 
 
 #get all apps > 10 m tvl
@@ -70,13 +74,13 @@ res = res[res['category'] != 'Chain'] #chain staking (i.e. polygon, stacks, xdai
 # display(res)
 
 
-# In[ ]:
+# In[6]:
 
 
 # display(res)
 
 
-# In[ ]:
+# In[7]:
 
 
 
@@ -89,7 +93,7 @@ protocols['chainTvls'] = protocols['chainTvls'].apply(lambda x: list(x.keys()) )
 # protocols[protocols['chainTvls'].map(set(['Arbitrum']).issubset)]
 
 
-# In[ ]:
+# In[8]:
 
 
 # protocols = protocols[ protocols['slug'] == 'uniswap-v3' ]
@@ -98,7 +102,7 @@ protocols['chainTvls'] = protocols['chainTvls'].apply(lambda x: list(x.keys()) )
 # ad
 
 
-# In[ ]:
+# In[9]:
 
 
 # api_str = 'https://api.llama.fi/protocol/uniswap'
@@ -107,7 +111,7 @@ protocols['chainTvls'] = protocols['chainTvls'].apply(lambda x: list(x.keys()) )
 # prot_req
 
 
-# In[ ]:
+# In[10]:
 
 
 statuses = {x for x in range(100, 600)}
@@ -115,7 +119,7 @@ statuses.remove(200)
 statuses.remove(429)
 
 
-# In[ ]:
+# In[11]:
 
 
 # async def get_tvl(apistring, header, statuses, chains, prot):
@@ -150,7 +154,7 @@ statuses.remove(429)
 #         return prod
 
 
-# In[ ]:
+# In[12]:
 
 
 # def get_range(protocols):
@@ -187,7 +191,7 @@ statuses.remove(429)
 #         return data_dfs
 
 
-# In[ ]:
+# In[13]:
 
 
 # display(protocols)
@@ -195,14 +199,14 @@ df_df = dfl.get_range(protocols)
 # print (typeof(df_df_all) )
 
 
-# In[ ]:
+# In[14]:
 
 
 # display(df_df)
 df_df_all = df_df.copy()
 
 
-# In[ ]:
+# In[15]:
 
 
 # display(protocols)
@@ -223,7 +227,7 @@ df_df_all = df_df.copy()
 # df_df_all = pd.concat(df_list)
 
 
-# In[ ]:
+# In[16]:
 
 
 # display(df_df_all)
@@ -234,7 +238,7 @@ df_df_all2['usd_value'] = df_df_all2['usd_value'].astype('float64')
 # display(df_df_all2)
 
 
-# In[ ]:
+# In[17]:
 
 
 #create an extra day to handle for tokens dropping to 0
@@ -264,7 +268,7 @@ df_df_shift = []
 # display(df_df_all)
 
 
-# In[ ]:
+# In[18]:
 
 
 
@@ -275,7 +279,7 @@ print("done api")
 # display(df_df_all)
 
 
-# In[ ]:
+# In[19]:
 
 
 #filter down a bit so we can do trailing comp w/o doing every row
@@ -289,7 +293,7 @@ df_df = df_df[df_df['date'].dt.date >= start_date ]
 # display(df_df[(df_df['chain'] == 'Optimism') & (df_df['protocol'] == 'aave-v3')])
 
 
-# In[ ]:
+# In[20]:
 
 
 # display(df_df)
@@ -299,7 +303,7 @@ df_df = df_df[df_df['date'].dt.date >= start_date ]
 # sample.to_csv('check_uni_error.csv')
 
 
-# In[ ]:
+# In[21]:
 
 
 
@@ -329,13 +333,13 @@ data_df = data_df[~data_df['net_dollar_flow'].isna()]
 # display(data_df)
 
 
-# In[ ]:
+# In[22]:
 
 
 # data_df[(data_df['protocol']=='stargate') & (data_df['chain']=='Optimism') & (data_df['date']>='2022-10-31')]
 
 
-# In[ ]:
+# In[23]:
 
 
 netdf_df = data_df[['date','protocol','chain','net_dollar_flow','usd_value']]
@@ -360,13 +364,13 @@ netdf_df.drop(columns=['index'],inplace=True)
 # display(netdf_df[netdf_df['protocol']=='makerdao'])
 
 
-# In[ ]:
+# In[24]:
 
 
 # netdf_df[(netdf_df['protocol']=='stargate') & (netdf_df['chain']=='Optimism')]
 
 
-# In[ ]:
+# In[25]:
 
 
 #get latest
@@ -389,11 +393,11 @@ netdf_df = netdf_df[  #( netdf_df['rank_desc'] == 1 ) &\
 # display(netdf_df[netdf_df['protocol']=='makerdao'])
 
 
-# In[ ]:
+# In[26]:
 
 
 summary_df = netdf_df.copy()
-drange = [0, 1, 7, 30, 90, 180, 365]
+
 summary_df = summary_df.sort_values(by='date',ascending=True)
 # summary_df = summary_df[(summary_df['chain'] == 'Solana') & (summary_df['protocol'] == 'uxd')]
 for i in drange:
@@ -460,14 +464,14 @@ for i in drange:
 # fig.update_layout(tickprefix = '$')
 
 
-# In[ ]:
+# In[27]:
 
 
 # display(summary_df[summary_df['chain'] == 'Optimism'])
 # display(summary_df[summary_df['protocol']=='makerdao'].iloc[: , :15])
 
 
-# In[ ]:
+# In[28]:
 
 
 
@@ -528,7 +532,7 @@ fig_app.update_layout(margin = dict(t=50, l=25, r=25, b=25))
 fig.show()
 
 
-# In[ ]:
+# In[29]:
 
 
 # fig.write_image(prepend + "img_outputs/svg/net_app_flows.svg") #prepend + 
@@ -544,7 +548,7 @@ fig_app.write_image(prepend + "img_outputs/png/net_app_flows_by_app.png") #prepe
 fig_app.write_html(prepend + "img_outputs/net_app_flows_by_app.html", include_plotlyjs='cdn')
 
 
-# In[ ]:
+# In[30]:
 
 
 # ! jupyter nbconvert --to python total_app_net_flows_async.ipynb
