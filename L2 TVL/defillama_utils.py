@@ -85,8 +85,10 @@ def get_range(protocols, chains = '', header = header, statuses = statuses):
                 try:
                         if og_chains == '':
                                 chains = proto['chainTvls']
+                        else:
+                                chains = [og_chains]
                 except:
-                        chains = og_chains
+                        chains = [og_chains]
                 apic = api_str + prot
                 # print(chains)
                 #     time.sleep(0.1)
@@ -202,3 +204,19 @@ def get_single_tvl(api_base, prot, chains, header = header, statuses = statuses)
         # print(prod)
         p_df = pd.concat(prod)
         return p_df
+
+def get_protocols_by_chain(chain_name):
+        protos = 'https://api.llama.fi/protocols'
+        s = r.Session()
+        #get all protocols
+        resp = pd.DataFrame( s.get(protos).json() )[['slug','chainTvls']]
+        # extract the chain names
+        resp['chainTvls'] = resp['chainTvls'].apply(lambda x: list(x.keys()) )
+        # set a true/false if the array contains the chain we want
+        resp['contains_chain'] = resp['chainTvls'].apply(lambda x: chain_name in x)
+        # filter where we have a match
+        proto_list = resp[['slug']][resp['contains_chain'] == True]
+        # clean up
+        proto_list = proto_list.reset_index(drop=True)
+        # boom
+        return proto_list
