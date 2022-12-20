@@ -68,7 +68,7 @@ def get_range(protocols, chains = '', header = header, statuses = statuses):
         if isinstance(chains, list):
                 og_chains = chains #get starting value
         else:
-                ogchains = [chains] #make it a list
+                og_chains = [chains] #make it a list
         # for dt in date_range:
         #         await asyncio.gather()
         #         data_dfs.append(res_df)
