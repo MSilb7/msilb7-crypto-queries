@@ -67,6 +67,8 @@ def get_range(protocols, chains = '', header = header, statuses = statuses):
         fee_df = []
         if isinstance(chains, list):
                 og_chains = chains #get starting value
+        elif chains == '':
+                og_chains = chains
         else:
                 og_chains = [chains] #make it a list
         # for dt in date_range:
