@@ -199,8 +199,10 @@ df_df = df_df[df_df['date'] <= pd.to_datetime("today") ]
 
 # Group - Exclude End Date since this is often null and overwritting could be weird, especially if we actually know an end date
 df_df['start_date'] = df_df['start_date'].fillna( pd.to_datetime("today").floor('d') )
+#Generate End Date Column
+df_df['end_date_30'] = df_df['end_date'].fillna(pd.to_datetime("today")).dt.floor('d') + timedelta(days = 30)
 
-df_df = df_df.groupby(['date','token','protocol','start_date','program_name']).sum(numeric_only=True).reset_index()
+df_df = df_df.groupby(['date','token','protocol','start_date','end_date_30','program_name']).sum(numeric_only=True).reset_index()
 
 # display(
 #         df_df[(df_df['protocol']=='revert-compoundor') & (df_df['date'] == '2022-11-09')] 
@@ -273,6 +275,12 @@ data_df['net_price_stock_change'] = data_df['last_token_value'] * data_df['net_p
 # In[ ]:
 
 
+#filter before start date
+data_df = data_df[data_df['date']>= data_df['start_date']]
+# filter lte end date + 30
+data_df = data_df[data_df['date']<= data_df['end_date_30']]
+data_df.drop('end_date_30', axis=1, inplace=True)
+
 data_df.to_csv('tvl_flows_by_token.csv')
 
 
@@ -288,7 +296,7 @@ data_df.to_csv('tvl_flows_by_token.csv')
 # In[ ]:
 
 
-netdf_df = data_df[data_df['date']>= data_df['start_date']][['date','protocol','program_name','net_dollar_flow','net_price_stock_change','last_price_net_dollar_flow','usd_value']]
+netdf_df = data_df[['date','protocol','program_name','net_dollar_flow','net_price_stock_change','last_price_net_dollar_flow','usd_value']]
 
 netdf_df = netdf_df.groupby(['date','protocol','program_name']).sum(['net_dollar_flow','net_price_stock_change','last_price_net_dollar_flow','usd_value'])
 
@@ -515,12 +523,12 @@ for df in df_list:
         'date':'Date', 'program_name':'Program', 'num_op': '# OP'
         ,'period': 'Period','op_source': 'Source','start_date':'Start','end_date':'End'
         ,'cumul_net_dollar_flow_at_program_end':'Net Flows (at End Date)'
-        ,'cumul_net_dollar_flow':'Net Flows (Latest)'
-        ,'cumul_last_price_net_dollar_flow_at_program_end':'Net Flows @ Current Prices (Latest)'
+        ,'cumul_net_dollar_flow':'Net Flows (End + 30)'
+        ,'cumul_last_price_net_dollar_flow_at_program_end':'Net Flows @ Current Prices (End + 30)'
         ,'cumul_flows_per_op_at_program_end': 'Net Flows per OP (at End Date)'
-        ,'cumul_flows_per_op_latest': 'Net Flows per OP (Latest)'
+        ,'cumul_flows_per_op_latest': 'Net Flows per OP (End + 30)'
         ,'last_price_net_dollar_flows_per_op_at_program_end': 'Net Flows per OP @ Current Prices (at End Date)'
-        ,'last_price_net_dollar_flows_per_op_latest': 'Net Flows per OP @ Current Prices (Latest)'
+        ,'last_price_net_dollar_flows_per_op_latest': 'Net Flows per OP @ Current Prices (End + 30)'
         ,'flows_retention' : 'Net Flows Retained'
         ,'last_price_net_dollar_flows_retention' : 'Net Flows Retained @ Current Prices'
     })
@@ -652,7 +660,7 @@ for val in value_list:
 
       cumul_fig_app.update_layout(yaxis_tickprefix = '$')
       cumul_fig_app.update_layout(
-          title=p + ": Cumulative Net Dollar Flow since Program Announcement" + postpend,
+          title=p + ": Cumulative Net Dollar Flow since Program Announcement, Until Program End + 30 Days" + postpend,
           xaxis_title="Day",
           yaxis_title="Cumulative Net Dollar Flow (N$F)",
           legend_title="Period",
@@ -687,5 +695,5 @@ print("yay")
 # In[ ]:
 
 
-# ! jupyter nbconvert --to python optimism_app_net_flows.ipynb
+get_ipython().system(' jupyter nbconvert --to python optimism_app_net_flows.ipynb')
 
