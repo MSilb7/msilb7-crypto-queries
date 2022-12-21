@@ -135,12 +135,6 @@ df_dfl = df_dfl[['date', 'token', 'token_value', 'usd_value', 'protocol', 'start
 # In[ ]:
 
 
-# display(df_dfl)
-
-
-# In[ ]:
-
-
 subg_protocols = protocols[protocols['data_source'].str.contains('subgraph')].copy()
 subg_protocols['og_protocol'] = subg_protocols['protocol']
 subg_protocols['protocol'] = subg_protocols['data_source'].str.replace('subgraph-','')
@@ -207,19 +201,6 @@ df_df = df_df.groupby(['date','token','protocol','start_date','end_date_30','pro
 # display(
 #         df_df[(df_df['protocol']=='revert-compoundor') & (df_df['date'] == '2022-11-09')] 
 #         )
-
-
-# In[ ]:
-
-
-# df_df
-# df_df = df_df.fillna(0)
-df_df.sample(20)
-# for prot in protocols:
-#         print( prot[0] )
-# display(
-#         df_df[(df_df['protocol'] =='revert-compoundor') & (df_df['date'] =='2022-11-09')].tail(10)
-# )
 
 
 # In[ ]:
@@ -388,18 +369,6 @@ netdf_df.to_csv(prepend + 'img_outputs/app/op_summer_daily_stats.csv')
 # In[ ]:
 
 
-# display(
-#         netdf_df[(netdf_df['protocol'] =='revert-compoundor') & (netdf_df['date'] <='2022-11-15')].tail(10)
-# )
-
-# display(
-#         data_df[(data_df['protocol'] =='revert-compoundor') & (data_df['date'] =='2022-11-09')]
-# )
-
-
-# In[ ]:
-
-
 latest_data_df = netdf_df[netdf_df['program_rank_desc'] == 1]
 latest_data_df['date'] = latest_data_df['date'].dt.date
 # latest_data_df['days_since_program_end'] 
@@ -438,7 +407,7 @@ season_summary.head()
 # In[ ]:
 
 
-# display(season_summary)
+
 
 
 # In[ ]:
@@ -695,5 +664,5 @@ print("yay")
 # In[ ]:
 
 
-get_ipython().system(' jupyter nbconvert --to python optimism_app_net_flows.ipynb')
+# ! jupyter nbconvert --to python optimism_app_net_flows.ipynb
 
