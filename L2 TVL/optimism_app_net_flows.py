@@ -629,7 +629,7 @@ for val in value_list:
 
       cumul_fig_app.update_layout(yaxis_tickprefix = '$')
       cumul_fig_app.update_layout(
-          title=p + ": Cumulative Net Dollar Flow since Program Announcement, Until Program End + 30 Days" + postpend,
+          title=p + "</br><sup>Cumulative Net Dollar Flow since Program Announcement, Until Program End + 30 Days" + postpend + "</sup>",
           xaxis_title="Day",
           yaxis_title="Cumulative Net Dollar Flow (N$F)",
           legend_title="Period",
