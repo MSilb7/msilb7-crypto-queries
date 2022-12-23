@@ -474,7 +474,9 @@ for df in df_list:
 
     df_format = df_format[col_list]
     df_format = df_format.reset_index(drop=True)
-    df_format.to_csv(prepend + 'img_outputs/app/op_summer_latest_stats.csv')
+    if not os.path.exists(prepend + "csv_outputs"):
+        os.mkdir(prepend + "csv_outputs")
+    df_format.to_csv(prepend + 'csv_outputs/' + html_name + '.csv')
 
     format_cols = [
         'cumul_flows_per_op_at_program_end','cumul_flows_per_op_latest','last_price_net_dollar_flows_per_op_at_program_end','last_price_net_dollar_flows_per_op_latest']
