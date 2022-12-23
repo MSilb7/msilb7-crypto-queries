@@ -363,7 +363,9 @@ post_str = 'Post-Program'
 netdf_df['period'] = np.where(
         netdf_df['date'] > netdf_df['end_date'], post_str, during_str
         )
-netdf_df.to_csv(prepend + 'img_outputs/app/op_summer_daily_stats.csv')
+if not os.path.exists(prepend + "csv_outputs"):
+        os.mkdir(prepend + "csv_outputs")
+netdf_df.to_csv(prepend + 'csv_outputs/op_summer_daily_stats.csv', index=False)
 
 
 # In[ ]:
@@ -476,7 +478,7 @@ for df in df_list:
     df_format = df_format.reset_index(drop=True)
     if not os.path.exists(prepend + "csv_outputs"):
         os.mkdir(prepend + "csv_outputs")
-    df_format.to_csv(prepend + 'csv_outputs/' + html_name + '.csv')
+    df_format.to_csv(prepend + 'csv_outputs/' + html_name + '.csv', index=False)
 
     format_cols = [
         'cumul_flows_per_op_at_program_end','cumul_flows_per_op_latest','last_price_net_dollar_flows_per_op_at_program_end','last_price_net_dollar_flows_per_op_latest']
