@@ -56,7 +56,7 @@ protocols = pd.DataFrame(
             ,[1,'aave-v3',    5000000,            '2022-08-04',   '2022-11-04',   'Aave - Liquidity Mining', 'Partner Fund', 'defillama','']
             ,[1,'wepiggy',    300000,            '2022-08-03',   '',   '', 'Gov Fund - Phase 0', 'defillama','']
             ,[1,'stargate',   1000000,           '2022-08-05',   '',   '', 'Gov Fund - Phase 0', 'defillama','']
-            ,[1,'pika-protocol',  9000000,      '2022-08-29',   '',   '', 'Gov Fund - Phase 0', 'defillama','']
+            ,[1,'pika-protocol',  900000,      '2022-08-29',   '',   '', 'Gov Fund - Phase 0', 'defillama','']
             ,[1,'pickle', 200000,             '2022-09-09',   '',   '', 'Gov Fund - Season 1', 'defillama','']
             ,[1,'aelin',  900000,              '2022-09-12',   '2022-09-14',   '', 'Gov Fund - Phase 0', 'defillama','']
             ,[1,'polynomial-protocol',    900000, '2022-09-14',   '',   '', 'Gov Fund - Phase 0', 'defillama','']
