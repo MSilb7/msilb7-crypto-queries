@@ -270,7 +270,15 @@ data_df['net_price_stock_change'] = data_df['last_token_value'] * data_df['net_p
 # In[ ]:
 
 
-data_df.to_csv('tvl_flows_by_token.csv')
+#filter before start date
+data_df = data_df[data_df['date']>= data_df['start_date']]
+# filter lte end date + 30
+data_df = data_df[data_df['date']<= data_df['end_date_30']]
+data_df.drop('end_date_30', axis=1, inplace=True)
+
+if not os.path.exists(prepend + "csv_outputs"):
+        os.mkdir(prepend + "csv_outputs")
+data_df.to_csv(prepend + 'csv_outputs/' + 'tvl_flows_by_token.csv')
 
 
 # In[ ]:
@@ -487,7 +495,10 @@ for df in df_list:
 
     df_format = df_format[col_list]
     df_format = df_format.reset_index(drop=True)
-    df_format.to_csv(prepend + 'img_outputs/app/op_summer_latest_stats.csv')
+
+    if not os.path.exists(prepend + "csv_outputs"):
+        os.mkdir(prepend + "csv_outputs")
+    df_format.to_csv(prepend + 'csv_outputs/' + html_name + '.csv', index=False)
 
     format_cols = [
         'cumul_flows_per_op_at_program_end','cumul_flows_per_op_latest','last_price_net_dollar_flows_per_op_at_program_end','last_price_net_dollar_flows_per_op_latest']
