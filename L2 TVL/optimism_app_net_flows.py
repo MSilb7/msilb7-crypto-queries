@@ -261,7 +261,9 @@ data_df = data_df[data_df['date']>= data_df['start_date']]
 data_df = data_df[data_df['date']<= data_df['end_date_30']]
 data_df.drop('end_date_30', axis=1, inplace=True)
 
-data_df.to_csv('tvl_flows_by_token.csv')
+if not os.path.exists(prepend + "csv_outputs"):
+        os.mkdir(prepend + "csv_outputs")
+data_df.to_csv(prepend + 'csv_outputs/' + 'tvl_flows_by_token.csv')
 
 
 # In[ ]:
@@ -468,6 +470,7 @@ for df in df_list:
 
     df_format = df_format[col_list]
     df_format = df_format.reset_index(drop=True)
+
     if not os.path.exists(prepend + "csv_outputs"):
         os.mkdir(prepend + "csv_outputs")
     df_format.to_csv(prepend + 'csv_outputs/' + html_name + '.csv', index=False)
