@@ -65,7 +65,12 @@ async def get_tvl(apistring, header, statuses, chains, prot):
 def get_range(protocols, chains = '', header = header, statuses = statuses):
         data_dfs = []
         fee_df = []
-        og_chains = chains #get starting value
+        if isinstance(chains, list):
+                og_chains = chains #get starting value
+        elif chains == '':
+                og_chains = chains
+        else:
+                og_chains = [chains] #make it a list
         # for dt in date_range:
         #         await asyncio.gather()
         #         data_dfs.append(res_df)
@@ -85,6 +90,8 @@ def get_range(protocols, chains = '', header = header, statuses = statuses):
                 try:
                         if og_chains == '':
                                 chains = proto['chainTvls']
+                        else:
+                                chains = og_chains
                 except:
                         chains = og_chains
                 apic = api_str + prot
@@ -202,3 +209,31 @@ def get_single_tvl(api_base, prot, chains, header = header, statuses = statuses)
         # print(prod)
         p_df = pd.concat(prod)
         return p_df
+
+def get_protocols_by_chain(chain_name, exclude_cex = True, exclude_chain = True):
+        protos = 'https://api.llama.fi/protocols'
+
+        category_excludes = []
+        if exclude_cex == True:
+                category_excludes.append('CEX')
+        if exclude_chain == True:
+                category_excludes.append('Chain')
+
+        s = r.Session()
+        #get all protocols
+        resp = pd.DataFrame( s.get(protos).json() )[['category','slug','chainTvls']]
+        # extract the chain names
+        resp['chainTvls'] = resp['chainTvls'].apply(lambda x: list(x.keys()) )
+        # set a true/false if the array contains the chain we want
+        resp['contains_chain'] = resp['chainTvls'].apply(lambda x: chain_name in x)
+        # set a true/false if the array doesn't contains the categories we want to exclude
+        resp['contains_cats'] = resp['category'].apply(lambda x: x not in category_excludes)
+        # filter where we have a match on chain
+        proto_list = resp[resp['contains_chain'] == True]
+        # filter where we have a match on cats
+        proto_list = proto_list[proto_list['contains_cats'] == True]
+        # clean up
+        proto_list = proto_list[['slug']]
+        proto_list = proto_list.reset_index(drop=True)
+        # boom
+        return proto_list
