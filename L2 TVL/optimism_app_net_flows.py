@@ -71,9 +71,7 @@ protocols = pd.DataFrame(
             ,[1,'gamma',    50000,              '2022-10-26',   '2022-11-21',   'Uniswap LM - Phase 1', 'Gov Fund - Phase 0','defillama','']
             ,[1,'xtoken',    50000,             '2022-10-26',   '2022-11-21',   'Uniswap LM - Phase 1', 'Gov Fund - Phase 0','defillama','']
             # Other DEX Programs
-            ,[0,'synthetix',  9000000,    '2022-08-25',   '',   'sUSD & sETH: Curve', 'Gov Fund - Phase 0', 'subgraph-curve',['0x7bc5728bc2b59b45a58d9a576e2ffc5f0505b35e','0x061b87122ed14b9526a813209c8a59a633257bab']] # susd/usd + seth/eth Curve incentives started
-            ,[1,'synthetix',  20000* (abs(pd.to_datetime("today")-pd.to_datetime('2022-08-25')).days / 7 ),    '2022-08-25',   '',   'sUSD-3Crv: Curve', 'Gov Fund - Phase 0', 'subgraph-curve',['0x061b87122ed14b9526a813209c8a59a633257bab']] # susd/usd + seth/eth Curve incentives started
-            ,[1,'synthetix',  20000* (abs(pd.to_datetime("today")-pd.to_datetime('2022-08-25')).days / 7 ),    '2022-08-25',   '',   'sETH-ETH: Curve', 'Gov Fund - Phase 0', 'subgraph-curve',['0x7bc5728bc2b59b45a58d9a576e2ffc5f0505b35e']] # susd/usd + seth/eth Curve incentives started
+            ,[1,'synthetix',  9000000,    '2022-08-25',   '',   'sUSD & sETH: Curve', 'Gov Fund - Phase 0', 'subgraph-curve',['0x7bc5728bc2b59b45a58d9a576e2ffc5f0505b35e','0x061b87122ed14b9526a813209c8a59a633257bab']] # susd/usd + seth/eth Curve incentives started
             ,[1,'l2dao',  300000,    '2022-07-20',   '2022-08-22',   'L2DAO/OP: Velodrome', 'Gov Fund - Phase 0', 'subgraph-velodrome',['0xfc77e39de40e54f820e313039207dc850e4c9e60']] # l2dao/op incentives - estimating end date based on last distribution to Velo gauge + 7 days
             ,[1,'beefy',  650000*.35,    '2022-09-13',   '',   'BIFI/OP: Velodrome', 'Gov Fund - Phase 0', 'subgraph-velodrome',['0x81f638e5d063618fc5f6a976e48e9b803b3240c0']] # bifi/op incentives
             # Season 2
@@ -130,6 +128,12 @@ df_dfl = dfl.get_range(dfl_slugs[['slug']],['Optimism'])
 df_dfl = df_dfl.merge(dfl_protocols, on ='protocol')
 
 df_dfl = df_dfl[['date', 'token', 'token_value', 'usd_value', 'protocol', 'start_date','end_date','program_name']]
+
+
+# In[ ]:
+
+
+# display(df_dfl)
 
 
 # In[ ]:
@@ -193,14 +197,25 @@ df_df = df_df[df_df['date'] <= pd.to_datetime("today") ]
 
 # Group - Exclude End Date since this is often null and overwritting could be weird, especially if we actually know an end date
 df_df['start_date'] = df_df['start_date'].fillna( pd.to_datetime("today").floor('d') )
-#Generate End Date Column
-df_df['end_date_30'] = df_df['end_date'].fillna(pd.to_datetime("today")).dt.floor('d') + timedelta(days = 30)
 
-df_df = df_df.groupby(['date','token','protocol','start_date','end_date_30','program_name']).sum(numeric_only=True).reset_index()
+df_df = df_df.groupby(['date','token','protocol','start_date','program_name']).sum(numeric_only=True).reset_index()
 
 # display(
 #         df_df[(df_df['protocol']=='revert-compoundor') & (df_df['date'] == '2022-11-09')] 
 #         )
+
+
+# In[ ]:
+
+
+# df_df
+# df_df = df_df.fillna(0)
+df_df.sample(20)
+# for prot in protocols:
+#         print( prot[0] )
+# display(
+#         df_df[(df_df['protocol'] =='revert-compoundor') & (df_df['date'] =='2022-11-09')].tail(10)
+# )
 
 
 # In[ ]:
@@ -278,7 +293,7 @@ data_df.to_csv(prepend + 'csv_outputs/' + 'tvl_flows_by_token.csv')
 # In[ ]:
 
 
-netdf_df = data_df[['date','protocol','program_name','net_dollar_flow','net_price_stock_change','last_price_net_dollar_flow','usd_value']]
+netdf_df = data_df[data_df['date']>= data_df['start_date']][['date','protocol','program_name','net_dollar_flow','net_price_stock_change','last_price_net_dollar_flow','usd_value']]
 
 netdf_df = netdf_df.groupby(['date','protocol','program_name']).sum(['net_dollar_flow','net_price_stock_change','last_price_net_dollar_flow','usd_value'])
 
@@ -363,9 +378,19 @@ post_str = 'Post-Program'
 netdf_df['period'] = np.where(
         netdf_df['date'] > netdf_df['end_date'], post_str, during_str
         )
-if not os.path.exists(prepend + "csv_outputs"):
-        os.mkdir(prepend + "csv_outputs")
-netdf_df.to_csv(prepend + 'csv_outputs/op_summer_daily_stats.csv', index=False)
+netdf_df.to_csv(prepend + 'img_outputs/app/op_summer_daily_stats.csv')
+
+
+# In[ ]:
+
+
+# display(
+#         netdf_df[(netdf_df['protocol'] =='revert-compoundor') & (netdf_df['date'] <='2022-11-15')].tail(10)
+# )
+
+# display(
+#         data_df[(data_df['protocol'] =='revert-compoundor') & (data_df['date'] =='2022-11-09')]
+# )
 
 
 # In[ ]:
@@ -407,7 +432,7 @@ season_summary.head()
 # In[ ]:
 
 
-
+# display(season_summary)
 
 
 # In[ ]:
@@ -491,12 +516,12 @@ for df in df_list:
         'date':'Date', 'program_name':'Program', 'num_op': '# OP'
         ,'period': 'Period','op_source': 'Source','start_date':'Start','end_date':'End'
         ,'cumul_net_dollar_flow_at_program_end':'Net Flows (at End Date)'
-        ,'cumul_net_dollar_flow':'Net Flows (End + 30)'
-        ,'cumul_last_price_net_dollar_flow_at_program_end':'Net Flows @ Current Prices (End + 30)'
+        ,'cumul_net_dollar_flow':'Net Flows (Latest)'
+        ,'cumul_last_price_net_dollar_flow_at_program_end':'Net Flows @ Current Prices (Latest)'
         ,'cumul_flows_per_op_at_program_end': 'Net Flows per OP (at End Date)'
-        ,'cumul_flows_per_op_latest': 'Net Flows per OP (End + 30)'
+        ,'cumul_flows_per_op_latest': 'Net Flows per OP (Latest)'
         ,'last_price_net_dollar_flows_per_op_at_program_end': 'Net Flows per OP @ Current Prices (at End Date)'
-        ,'last_price_net_dollar_flows_per_op_latest': 'Net Flows per OP @ Current Prices (End + 30)'
+        ,'last_price_net_dollar_flows_per_op_latest': 'Net Flows per OP @ Current Prices (Latest)'
         ,'flows_retention' : 'Net Flows Retained'
         ,'last_price_net_dollar_flows_retention' : 'Net Flows Retained @ Current Prices'
     })
@@ -614,7 +639,7 @@ for val in value_list:
 
       cumul_fig_app.update_layout(yaxis_tickprefix = '$')
       cumul_fig_app.update_layout(
-          title=p + "<br><sup>Cumulative Net Dollar Flow since Program Announcement, Until Program End + 30 Days" + postpend + "</sup>",
+          title=p + ": Cumulative Net Dollar Flow since Program Announcement" + postpend,
           xaxis_title="Day",
           yaxis_title="Cumulative Net Dollar Flow (N$F)",
           legend_title="Period",
