@@ -49,7 +49,7 @@ else:
 drange = [0, 1, 7, 30, 90, 180, 365]
 # Do we count net flows marked at the lastest token price (1) or the price on each day (0)
 # By default, we opt to 1, so that price movement isn't accidentally counted as + or - flow remainder
-mark_at_latest_price = 0#1 #some errors with missing token prices we need to fix first (i.e. rage trade on arbi marks usdc as 0)
+mark_at_latest_price = 1 #some errors with missing token prices we need to fix first (i.e. rage trade on arbi marks usdc as 0)
 
 trailing_num_days = max(drange)
 # print(trailing_num_days)
@@ -178,10 +178,13 @@ data_df['price_usd'] = data_df[['price_usd','last_price_usd']].bfill(axis=1).ilo
 # In[ ]:
 
 
-data_df['token_rank_desc'] = data_df.groupby(['protocol', 'chain','token'])['date'].\
+data_df['token_rank_desc'] = data_df.groupby(['chain','token'])['date'].\
                             rank(method='dense',ascending=False).astype(int)
 
-latest_prices_df = data_df[['token','chain','protocol','price_usd']][data_df['token_rank_desc'] ==1]
+latest_prices_df_raw = data_df[~data_df['price_usd'].isna()][['token','chain','price_usd']][data_df['token_rank_desc'] ==1]
+latest_prices_df = latest_prices_df_raw.groupby(['token','chain']).mean('price_usd')
+latest_prices_df = latest_prices_df.reset_index()
+
 latest_prices_df = latest_prices_df.rename(columns=
                                         {
                                             'price_usd':'latest_price_usd',
@@ -189,7 +192,7 @@ latest_prices_df = latest_prices_df.rename(columns=
                                             })
 # display(latest_prices_df)
 
-data_df = data_df.merge(latest_prices_df,on=['token','chain','protocol'], how='left')
+data_df = data_df.merge(latest_prices_df,on=['token','chain'], how='left')
 
 
 # display(data_df)
