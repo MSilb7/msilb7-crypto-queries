@@ -88,7 +88,10 @@ def get_range(protocols, chains = '', header = header, statuses = statuses):
         tasks = []
         for index,proto in protocols.iterrows():
                 prot = proto['slug']
-                prot_name = proto['name']
+                try:
+                        prot_name = proto['name']
+                except:
+                        prot_name = ''
                 try:
                         if og_chains == '':
                                 chains = proto['chainTvls']
