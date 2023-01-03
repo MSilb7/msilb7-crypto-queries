@@ -10,7 +10,7 @@ statuses = {x for x in range(100, 600)}
 statuses.remove(200)
 statuses.remove(429)
 
-async def get_tvl(apistring, header, statuses, chains, prot):
+async def get_tvl(apistring, header, statuses, chains, prot, prot_name):
         prod = []
         retry_client = RetryClient()
 
@@ -52,6 +52,7 @@ async def get_tvl(apistring, header, statuses, chains, prot):
                                         ad['protocol'] = prot
                                         ad['chain'] = ch
                                         ad['category'] = cats
+                                        ad['name'] = prot_name
                                 #         ad['start_date'] = pd.to_datetime(prot[1])
                                         # ad['date'] = ad['date'] - timedelta(days=1) #change to eod vs sod
                                         prod.append(ad)
@@ -87,6 +88,7 @@ def get_range(protocols, chains = '', header = header, statuses = statuses):
         tasks = []
         for index,proto in protocols.iterrows():
                 prot = proto['slug']
+                prot_name = proto['name']
                 try:
                         if og_chains == '':
                                 chains = proto['chainTvls']
@@ -97,7 +99,7 @@ def get_range(protocols, chains = '', header = header, statuses = statuses):
                 apic = api_str + prot
                 # print(chains)
                 #     time.sleep(0.1)
-                tasks.append( get_tvl(apic, header, statuses, chains, prot) )
+                tasks.append( get_tvl(apic, header, statuses, chains, prot, prot_name) )
         # print(tasks)
         data_dfs = loop.run_until_complete(asyncio.gather(*tasks, return_exceptions=True))
         # print(date_range)
@@ -264,7 +266,7 @@ def get_protocol_tvls(min_tvl = 0, excluded_cats = ['CEX','Chain']): #,excluded_
 
 def get_all_protocol_tvls_by_chain_and_token(min_tvl = 0, excluded_cats = ['CEX','Chain']):
         res = get_protocol_tvls(min_tvl)
-        protocols = res[['slug','chainTvls']]
+        protocols = res[['slug','name','chainTvls']]
         # re = res['chainTvls']
         protocols['chainTvls'] = protocols['chainTvls'].apply(lambda x: list(x.keys()) )
         df_df = get_range(protocols)
