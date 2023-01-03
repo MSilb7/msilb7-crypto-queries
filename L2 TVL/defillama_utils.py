@@ -269,7 +269,7 @@ def get_all_protocol_tvls_by_chain_and_token(min_tvl = 0, excluded_cats = ['CEX'
         protocols['chainTvls'] = protocols['chainTvls'].apply(lambda x: list(x.keys()) )
         df_df = get_range(protocols)
 
-        proto_info = res['name','is_doubelcount','is_liqstake']
+        proto_info = res[['name','is_doubelcount','is_liqstake']]
         df_df = df_df.merge(proto_info,on='name',how='left')
 
         return df_df
