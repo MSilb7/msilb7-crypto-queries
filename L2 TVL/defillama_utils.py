@@ -88,10 +88,12 @@ def get_range(protocols, chains = '', header = header, statuses = statuses):
         tasks = []
         for index,proto in protocols.iterrows():
                 prot = proto['slug']
+                ##
                 try:
                         prot_name = proto['name']
                 except:
                         prot_name = ''
+                ##
                 try:
                         if og_chains == '':
                                 chains = proto['chainTvls']
@@ -100,16 +102,10 @@ def get_range(protocols, chains = '', header = header, statuses = statuses):
                 except:
                         chains = og_chains
                 apic = api_str + prot
-                # print(chains)
-                #     time.sleep(0.1)
                 tasks.append( get_tvl(apic, header, statuses, chains, prot, prot_name) )
-        # print(tasks)
+
         data_dfs = loop.run_until_complete(asyncio.gather(*tasks, return_exceptions=True))
-        # print(date_range)
-        # loop.close()
-        # print(data_dfs)
-        # fee_df = pd.concat(data_dfs)
-        # return fee_df
+
         df_list = []
         for dat in data_dfs:
                 if isinstance(dat,list):
