@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[ ]:
+# In[1]:
 
 
 import pandas as pd
@@ -19,7 +19,7 @@ nest_asyncio.apply()
 header = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:71.0) Gecko/20100101 Firefox/71.0'}
 
 
-# In[ ]:
+# In[2]:
 
 
 #https://stackoverflow.com/questions/23267409/how-to-implement-retry-mechanism-into-python-requests-library
@@ -42,25 +42,26 @@ else:
     prepend = 'L2 TVL/'
 
 
-# In[ ]:
+# In[3]:
 
 
 # date ranges to build charts for
 drange = [0, 1, 7, 30, 90, 180, 365]
 # Do we count net flows marked at the lastest token price (1) or the price on each day (0)
 # By default, we opt to 1, so that price movement isn't accidentally counted as + or - flow remainder
-mark_at_latest_price = 1
+mark_at_latest_price = 0#1 #some errors with missing token prices we need to fix first (i.e. rage trade on arbi marks usdc as 0)
 
 trailing_num_days = max(drange)
 # print(trailing_num_days)
 
 start_date = date.today()-timedelta(days=trailing_num_days +1)
+print(start_date)
 
 # start_date = datetime.strptime('2022-07-13', '%Y-%m-%d').date()
 
 
 
-# In[ ]:
+# In[4]:
 
 
 #get all apps > 10 m tvl
@@ -69,14 +70,14 @@ min_tvl = 10_000_000
 df_df = dfl.get_all_protocol_tvls_by_chain_and_token(min_tvl)
 
 
-# In[ ]:
+# In[5]:
 
 
 # display(df_df)
 df_df_all = df_df.copy()
 
 
-# In[ ]:
+# In[6]:
 
 
 # display(df_df_all)
@@ -87,7 +88,7 @@ df_df_all2['usd_value'] = df_df_all2['usd_value'].astype('float64')
 # display(df_df_all2)
 
 
-# In[ ]:
+# In[7]:
 
 
 #create an extra day to handle for tokens dropping to 0
@@ -117,7 +118,7 @@ df_df_shift = []
 # display(df_df_all)
 
 
-# In[ ]:
+# In[8]:
 
 
 # df_df_all = pd.concat(df_df_all)
@@ -127,7 +128,7 @@ print("done api")
 # display(df_df_all)
 
 
-# In[ ]:
+# In[9]:
 
 
 #filter down a bit so we can do trailing comp w/o doing every row
@@ -139,13 +140,13 @@ df_df['last_token_value'] = df_df.groupby(['token','protocol','chain'])['token_v
 df_df = df_df[df_df['date'].dt.date >= start_date ]
 
 
-# In[ ]:
+# In[10]:
 
 
-# display(df_df[(df_df['chain'] == 'Moonriver') & (df_df['protocol'] == 'solarbeam')])
+# display(df_df[(df_df['chain'] == 'Arbitrum') & (df_df['protocol'] == 'rage-trade') & (df_df['date'] > '2022-12-01')])
 
 
-# In[ ]:
+# In[11]:
 
 
 # display(df_df)
@@ -155,7 +156,7 @@ df_df = df_df[df_df['date'].dt.date >= start_date ]
 # sample.to_csv('check_uni_error.csv')
 
 
-# In[ ]:
+# In[12]:
 
 
 data_df = df_df.copy()
@@ -174,7 +175,7 @@ data_df['price_usd'] = data_df[['price_usd','last_price_usd']].bfill(axis=1).ilo
 # display(data_df)
 
 
-# In[ ]:
+# In[13]:
 
 
 data_df['token_rank_desc'] = data_df.groupby(['protocol', 'chain','token'])['date'].\
@@ -194,7 +195,7 @@ data_df = data_df.merge(latest_prices_df,on=['token','chain','protocol'], how='l
 # display(data_df)
 
 
-# In[ ]:
+# In[14]:
 
 
 data_df.sort_values(by='date',inplace=True)
@@ -211,7 +212,14 @@ data_df = data_df[abs(data_df['net_dollar_flow']) < 50_000_000_000] #50 bil erro
 data_df = data_df[~data_df['net_dollar_flow'].isna()]
 
 
-# In[ ]:
+# In[15]:
+
+
+# data_df[(data_df['protocol']=='rage-trade') & (data_df['chain']=='Arbitrum') & (data_df['date'] > '2022-12-01')]
+
+
+
+# In[16]:
 
 
 netdf_df = data_df[['date','protocol','chain','net_dollar_flow','usd_value','net_dollar_flow_latest_price']]
@@ -237,14 +245,14 @@ netdf_df.drop(columns=['index'],inplace=True)
 
 
 
-# In[ ]:
+# In[17]:
 
 
-# netdf_df[(netdf_df['protocol']=='stargate') & (netdf_df['chain']=='Optimism')]
+# tmp = netdf_df[(netdf_df['protocol']=='rage-trade') & (netdf_df['chain']=='Arbitrum') & (netdf_df['date'] > '2022-12-01')]
+# tmp.to_csv('check.csv')
 
 
-
-# In[ ]:
+# In[18]:
 
 
 #get latest
@@ -268,7 +276,7 @@ netdf_df = netdf_df[  #( netdf_df['rank_desc'] == 1 ) &\
 # display(netdf_df[netdf_df['protocol']=='makerdao'])
 
 
-# In[ ]:
+# In[19]:
 
 
 summary_df = netdf_df.copy()
@@ -298,8 +306,7 @@ for i in drange:
                 # print(col_str)
                 summary_df[col_str] = summary_df[['protocol','chain','net_dollar_flow']]\
                                     .groupby(['protocol','chain'])['net_dollar_flow'].transform(lambda x: x.rolling(i, min_periods=1).sum() )
-                                #         .rolling(i, min_periods=1).sum()\ #This caused errors and mismatches
-                                #     .reset_index(level=0,drop=True)#.values
+
                 summary_df['flow_direction_' + str(i) + 'd'] = np.where(summary_df[col_str]>=0,1,-1)
                 summary_df['abs_cumul_net_dollar_flow_' + str(i) + 'd'] = abs(summary_df[col_str])
                 # display(summary_df)
@@ -308,13 +315,13 @@ for i in drange:
 # display(summary_df[(summary_df['chain'] == 'Optimism') & (summary_df['protocol'] == 'qidao')].iloc[-7: , :15] )
 # display(summary_df[(summary_df['protocol']=='stargate') & (summary_df['chain']=='Optimism')])
 summary_df['pct_of_tvl'] = 100* summary_df['net_dollar_flow'] / summary_df['usd_value']
-summary_df = summary_df[(summary_df['rank_desc'] == 1) & (summary_df['date'] >= pd.to_datetime("today") -timedelta(days=30))]
-summary_df = summary_df[summary_df['cumul_net_dollar_flow']< 1e20] #weird error handling
+final_summary_df = summary_df[(summary_df['rank_desc'] == 1) & (summary_df['date'] >= pd.to_datetime("today") -timedelta(days=30))]
+final_summary_df = final_summary_df[final_summary_df['cumul_net_dollar_flow']< 1e20] #weird error handling
 
 
 
 os.makedirs('exports', exist_ok=True)  
-summary_df.to_csv('exports/latest_tvl_app_trends.csv')  
+final_summary_df.to_csv('exports/latest_tvl_app_trends.csv')  
 
 # display(summary_df)
 for i in drange:
@@ -337,7 +344,7 @@ for i in drange:
         # print(cval)
         # print(titleval)
         # print(hval)
-        fig = px.treemap(summary_df[summary_df[yval] !=0], \
+        fig = px.treemap(final_summary_df[final_summary_df[yval] !=0], \
                  path=[px.Constant("all"), 'chain', 'protocol'], \
 #                  path=[px.Constant("all"), 'token', 'chain', 'protocol'], \
                  values=yval, color=cval
@@ -359,58 +366,27 @@ for i in drange:
 # fig.update_layout(tickprefix = '$')
 
 
-# In[ ]:
+# In[20]:
 
 
-# display(summary_df[summary_df['chain'] == 'Optimism'])
-# display(summary_df[summary_df['protocol']=='makerdao'].iloc[: , :15])
+# display( summary_df[(summary_df['chain'] == 'Arbitrum') & (summary_df['protocol'] == 'rage-trade') & (summary_df['rank_desc'] < 30)][['date','usd_value','protocol','net_dollar_flow','cumul_net_dollar_flow_30d']])
 
 
-# In[ ]:
+# In[21]:
 
 
-# summary_df['flow_direction'] = np.where(summary_df['cumul_net_dollar_flow']>=0,1,-1)
-# summary_df['flow_direction_7d'] = np.where(summary_df['cumul_net_dollar_flow_7d']>=0,1,-1)
-# summary_df['abs_cumul_net_dollar_flow'] = abs(summary_df['cumul_net_dollar_flow'])
-# summary_df['abs_cumul_net_dollar_flow_7d'] = abs(summary_df['cumul_net_dollar_flow_7d'])
+# test_df= netdf_df[(netdf_df['chain'] == 'Arbitrum') & (netdf_df['protocol'] == 'rage-trade')][['chain','protocol','date','net_dollar_flow','rank_desc']]
+# test_df = test_df.sort_values(by='date',ascending=True)
+# test_df['test'] = test_df[['protocol','chain','net_dollar_flow']]\
+#     .groupby(['protocol','chain'])['net_dollar_flow'].transform(lambda x: x.rolling(30, min_periods=1).sum() )
+# display(test_df[test_df['rank_desc'] < 45])
+# # display(summary_df[summary_df['protocol']=='makerdao'].iloc[: , :15])
 
-# display(summary_df)
-# print(summary_df[summary_df['chain']=='Arbitrum'])
-# print(summary_df[summary_df['chain']=='Optimism'])
-# display(summary_df)
-# fig = px.treemap(summary_df[summary_df['abs_cumul_net_dollar_flow'] !=0], \
-#                  path=[px.Constant("all"), 'chain', 'protocol'], \
-# #                  path=[px.Constant("all"), 'token', 'chain', 'protocol'], \
-#                  values='abs_cumul_net_dollar_flow', color='flow_direction'
-# #                 ,color_discrete_map={'-1':'red', '1':'green'})
-#                 ,color_continuous_scale='Spectral'
-#                      , title = "App Net Flows Change by App -> Chain - Last " + str(trailing_num_days) + \
-#                             " Days - (Apps with > $" + str(min_tvl/1e6) + "M TVL Shown)"
-                
-#                 ,hover_data=['cumul_net_dollar_flow']
-#                 )
-# # fig.data[0].textinfo = 'label+text+value'
-# fig.update_traces(root_color="lightgrey")
-# fig.update_layout(margin = dict(t=50, l=25, r=25, b=25))
-# # fig.update_layout(tickprefix = '$')
 
-# fig_7d = px.treemap(summary_df[summary_df['abs_cumul_net_dollar_flow_7d'] !=0], \
-#                  path=[px.Constant("all"), 'chain', 'protocol'], \
-# #                  path=[px.Constant("all"), 'token', 'chain', 'protocol'], \
-#                  values='abs_cumul_net_dollar_flow_7d', color='flow_direction_7d'
-# #                 ,color_discrete_map={'-1':'red', '1':'green'})
-#                 ,color_continuous_scale='Spectral'
-#                      , title = "App Net Flows Change by App -> Chain - Last " + str(7) + \
-#                             " Days - (Apps with > $" + str(min_tvl/1e6) + "M TVL Shown)"
-                
-#                 # ,hover_data=['cumul_net_dollar_flow_7d']
-#                 )
-# fig_7d.update_traces(root_color="lightgrey")
-# fig_7d.update_layout(margin = dict(t=50, l=25, r=25, b=25))
+# In[22]:
 
-# fig_7d.show()
 
-fig_app = px.treemap(summary_df[summary_df['abs_cumul_net_dollar_flow'] !=0], \
+fig_app = px.treemap(final_summary_df[final_summary_df['abs_cumul_net_dollar_flow'] !=0], \
                 #  path=[px.Constant("all"), 'chain', 'protocol'], \
 #                  path=[px.Constant("all"), 'token', 'chain', 'protocol'], \
                         path=[px.Constant("all"), 'protocol','chain'], \
@@ -427,7 +403,7 @@ fig_app.update_layout(margin = dict(t=50, l=25, r=25, b=25))
 fig.show()
 
 
-# In[ ]:
+# In[23]:
 
 
 # fig.write_image(prepend + "img_outputs/svg/net_app_flows.svg") #prepend + 
@@ -443,8 +419,15 @@ fig_app.write_image(prepend + "img_outputs/png/net_app_flows_by_app.png") #prepe
 fig_app.write_html(prepend + "img_outputs/net_app_flows_by_app.html", include_plotlyjs='cdn')
 
 
-# In[ ]:
+# In[24]:
 
 
 # ! jupyter nbconvert --to python total_app_net_flows_async.ipynb
+
+
+# In[26]:
+
+
+# summary_df[(summary_df['protocol']=='rage-trade') & (summary_df['chain']=='Arbitrum') ]
+
 
