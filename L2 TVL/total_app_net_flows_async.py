@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[1]:
+# In[ ]:
 
 
 import pandas as pd
@@ -19,7 +19,7 @@ nest_asyncio.apply()
 header = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:71.0) Gecko/20100101 Firefox/71.0'}
 
 
-# In[2]:
+# In[ ]:
 
 
 #https://stackoverflow.com/questions/23267409/how-to-implement-retry-mechanism-into-python-requests-library
@@ -42,7 +42,7 @@ else:
     prepend = 'L2 TVL/'
 
 
-# In[3]:
+# In[ ]:
 
 
 # date ranges to build charts for
@@ -61,7 +61,7 @@ print(start_date)
 
 
 
-# In[4]:
+# In[ ]:
 
 
 #get all apps > 10 m tvl
@@ -70,14 +70,14 @@ min_tvl = 10_000_000
 df_df = dfl.get_all_protocol_tvls_by_chain_and_token(min_tvl)
 
 
-# In[5]:
+# In[ ]:
 
 
 # display(df_df)
 df_df_all = df_df.copy()
 
 
-# In[6]:
+# In[ ]:
 
 
 # display(df_df_all)
@@ -88,7 +88,7 @@ df_df_all2['usd_value'] = df_df_all2['usd_value'].astype('float64')
 # display(df_df_all2)
 
 
-# In[7]:
+# In[ ]:
 
 
 #create an extra day to handle for tokens dropping to 0
@@ -118,7 +118,7 @@ df_df_shift = []
 # display(df_df_all)
 
 
-# In[8]:
+# In[ ]:
 
 
 # df_df_all = pd.concat(df_df_all)
@@ -128,7 +128,7 @@ print("done api")
 # display(df_df_all)
 
 
-# In[9]:
+# In[ ]:
 
 
 #filter down a bit so we can do trailing comp w/o doing every row
@@ -140,13 +140,13 @@ df_df['last_token_value'] = df_df.groupby(['token','protocol','chain'])['token_v
 df_df = df_df[df_df['date'].dt.date >= start_date ]
 
 
-# In[10]:
+# In[ ]:
 
 
 # display(df_df[(df_df['chain'] == 'Arbitrum') & (df_df['protocol'] == 'rage-trade') & (df_df['date'] > '2022-12-01')])
 
 
-# In[11]:
+# In[ ]:
 
 
 # display(df_df)
@@ -156,7 +156,7 @@ df_df = df_df[df_df['date'].dt.date >= start_date ]
 # sample.to_csv('check_uni_error.csv')
 
 
-# In[12]:
+# In[ ]:
 
 
 data_df = df_df.copy()
@@ -175,7 +175,7 @@ data_df['price_usd'] = data_df[['price_usd','last_price_usd']].bfill(axis=1).ilo
 # display(data_df)
 
 
-# In[13]:
+# In[ ]:
 
 
 data_df['token_rank_desc'] = data_df.groupby(['protocol', 'chain','token'])['date'].\
@@ -195,7 +195,7 @@ data_df = data_df.merge(latest_prices_df,on=['token','chain','protocol'], how='l
 # display(data_df)
 
 
-# In[14]:
+# In[ ]:
 
 
 data_df.sort_values(by='date',inplace=True)
@@ -212,14 +212,14 @@ data_df = data_df[abs(data_df['net_dollar_flow']) < 50_000_000_000] #50 bil erro
 data_df = data_df[~data_df['net_dollar_flow'].isna()]
 
 
-# In[15]:
+# In[ ]:
 
 
 # data_df[(data_df['protocol']=='rage-trade') & (data_df['chain']=='Arbitrum') & (data_df['date'] > '2022-12-01')]
 
 
 
-# In[16]:
+# In[ ]:
 
 
 netdf_df = data_df[['date','protocol','chain','net_dollar_flow','usd_value','net_dollar_flow_latest_price']]
@@ -245,14 +245,14 @@ netdf_df.drop(columns=['index'],inplace=True)
 
 
 
-# In[17]:
+# In[ ]:
 
 
 # tmp = netdf_df[(netdf_df['protocol']=='rage-trade') & (netdf_df['chain']=='Arbitrum') & (netdf_df['date'] > '2022-12-01')]
 # tmp.to_csv('check.csv')
 
 
-# In[18]:
+# In[ ]:
 
 
 #get latest
@@ -276,7 +276,7 @@ netdf_df = netdf_df[  #( netdf_df['rank_desc'] == 1 ) &\
 # display(netdf_df[netdf_df['protocol']=='makerdao'])
 
 
-# In[19]:
+# In[ ]:
 
 
 summary_df = netdf_df.copy()
@@ -366,13 +366,13 @@ for i in drange:
 # fig.update_layout(tickprefix = '$')
 
 
-# In[20]:
+# In[ ]:
 
 
 # display( summary_df[(summary_df['chain'] == 'Arbitrum') & (summary_df['protocol'] == 'rage-trade') & (summary_df['rank_desc'] < 30)][['date','usd_value','protocol','net_dollar_flow','cumul_net_dollar_flow_30d']])
 
 
-# In[21]:
+# In[ ]:
 
 
 # test_df= netdf_df[(netdf_df['chain'] == 'Arbitrum') & (netdf_df['protocol'] == 'rage-trade')][['chain','protocol','date','net_dollar_flow','rank_desc']]
@@ -383,7 +383,7 @@ for i in drange:
 # # display(summary_df[summary_df['protocol']=='makerdao'].iloc[: , :15])
 
 
-# In[22]:
+# In[ ]:
 
 
 fig_app = px.treemap(final_summary_df[final_summary_df['abs_cumul_net_dollar_flow'] !=0], \
@@ -403,7 +403,7 @@ fig_app.update_layout(margin = dict(t=50, l=25, r=25, b=25))
 fig.show()
 
 
-# In[23]:
+# In[ ]:
 
 
 # fig.write_image(prepend + "img_outputs/svg/net_app_flows.svg") #prepend + 
@@ -419,15 +419,8 @@ fig_app.write_image(prepend + "img_outputs/png/net_app_flows_by_app.png") #prepe
 fig_app.write_html(prepend + "img_outputs/net_app_flows_by_app.html", include_plotlyjs='cdn')
 
 
-# In[24]:
+# In[ ]:
 
 
 # ! jupyter nbconvert --to python total_app_net_flows_async.ipynb
-
-
-# In[26]:
-
-
-# summary_df[(summary_df['protocol']=='rage-trade') & (summary_df['chain']=='Arbitrum') ]
-
 
