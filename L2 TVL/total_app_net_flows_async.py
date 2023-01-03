@@ -406,14 +406,6 @@ fig.show()
 # In[ ]:
 
 
-# fig.write_image(prepend + "img_outputs/svg/net_app_flows.svg") #prepend + 
-# fig.write_image(prepend + "img_outputs/png/net_app_flows.png") #prepend + 
-# fig.write_html(prepend + "img_outputs/net_app_flows.html", include_plotlyjs='cdn')
-
-# fig_7d.write_image(prepend + "img_outputs/svg/net_app_flows_7d.svg") #prepend + 
-# fig_7d.write_image(prepend + "img_outputs/png/net_app_flows_7d.png") #prepend + 
-# fig_7d.write_html(prepend + "img_outputs/net_app_flows_7d.html", include_plotlyjs='cdn')
-
 fig_app.write_image(prepend + "img_outputs/svg/net_app_flows_by_app.svg") #prepend + 
 fig_app.write_image(prepend + "img_outputs/png/net_app_flows_by_app.png") #prepend + 
 fig_app.write_html(prepend + "img_outputs/net_app_flows_by_app.html", include_plotlyjs='cdn')
