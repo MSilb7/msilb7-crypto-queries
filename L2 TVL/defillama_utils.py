@@ -241,9 +241,10 @@ def get_protocols_by_chain(chain_name, exclude_cex = True, exclude_chain = True)
 
 def get_protocol_names_by_flag(check_flag):
         flag_str = '-' + check_flag
-        protocols = r.get('https://api.llama.fi/lite/protocols2', headers=header).json()['protocols']
-        protocols = [protocol for protocol in protocols if any(flag_str in key for key in protocol["chainTvls"])]
-        protocol_names = [element["name"] for element in protocols]
+        protocols = r.get('https://api.llama.fi/lite/protocols2', headers=header).json()
+        protocols = protocols['protocols']
+        protocols = [protocol for protocol in protocols if any(flag_str in key for key in protocol['chainTvls'])]
+        protocol_names = [element['name'] for element in protocols]
         return protocol_names
 
 

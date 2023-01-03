@@ -180,19 +180,36 @@ data_df['price_usd'] = data_df[['price_usd','last_price_usd']].bfill(axis=1).ilo
 
 data_df['token_rank_desc'] = data_df.groupby(['chain','token'])['date'].\
                             rank(method='dense',ascending=False).astype(int)
+data_df['token_rank_desc_prot'] = data_df.groupby(['chain','token','protocol'])['date'].\
+                            rank(method='dense',ascending=False).astype(int)
 
+# get latest price either by protocol or in aggregate
+# if we don't have a match by protocol, then select in aggregate.
+
+latest_prices_df_raw_prot = data_df[~data_df['price_usd'].isna()][['token','chain','protocol','price_usd']][data_df['token_rank_desc_prot'] ==1]
 latest_prices_df_raw = data_df[~data_df['price_usd'].isna()][['token','chain','price_usd']][data_df['token_rank_desc'] ==1]
-latest_prices_df = latest_prices_df_raw.groupby(['token','chain']).mean('price_usd')
+
+latest_prices_df_prot = latest_prices_df_raw_prot.groupby(['token','chain','protocol']).median('price_usd')
+latest_prices_df_prot = latest_prices_df_prot.rename(columns={'price_usd':'latest_price_usd_prot'})
+
+latest_prices_df = latest_prices_df_raw.groupby(['token','chain']).median('price_usd')
+latest_prices_df = latest_prices_df.rename(columns={'price_usd':'latest_price_usd_raw'})
+
+latest_prices_df_prot = latest_prices_df_prot.reset_index()
 latest_prices_df = latest_prices_df.reset_index()
 
-latest_prices_df = latest_prices_df.rename(columns=
-                                        {
-                                            'price_usd':'latest_price_usd',
-                                            'date':'latest_price_date'
-                                            })
-# display(latest_prices_df)
+prices_df = data_df[['chain','protocol','token']].drop_duplicates()
+prices_df = prices_df.merge(latest_prices_df_prot,on=['token','chain','protocol'], how='left')
+prices_df = prices_df.merge(latest_prices_df,on=['token','chain'], how='left')
+prices_df['latest_price_usd'] = prices_df['latest_price_usd_prot'].combine_first(prices_df['latest_price_usd_raw'])
 
-data_df = data_df.merge(latest_prices_df,on=['token','chain'], how='left')
+prices_df = prices_df[['chain','protocol','token','latest_price_usd']]
+
+
+prices_df = prices_df[~prices_df['latest_price_usd'].isna()]
+
+
+data_df = data_df.merge(prices_df,on=['token','chain','protocol'], how='left')
 
 
 # display(data_df)
@@ -218,7 +235,7 @@ data_df = data_df[~data_df['net_dollar_flow'].isna()]
 # In[ ]:
 
 
-# data_df[(data_df['protocol']=='rage-trade') & (data_df['chain']=='Arbitrum') & (data_df['date'] > '2022-12-01')]
+# data_df[(data_df['protocol']=='shibaswap') & (data_df['chain']=='Ethereum') & (data_df['date'] == '2022-12-09')].sort_values(by='net_dollar_flow_latest_price',ascending=False)
 
 
 
@@ -253,6 +270,8 @@ netdf_df.drop(columns=['index'],inplace=True)
 
 # tmp = netdf_df[(netdf_df['protocol']=='rage-trade') & (netdf_df['chain']=='Arbitrum') & (netdf_df['date'] > '2022-12-01')]
 # tmp.to_csv('check.csv')
+# netdf_df[(netdf_df['protocol']=='shibaswap') & (netdf_df['chain']=='Ethereum') & (netdf_df['date'] > '2022-12-01')]
+
 
 
 # In[ ]:
@@ -321,7 +340,7 @@ summary_df['pct_of_tvl'] = 100* summary_df['net_dollar_flow'] / summary_df['usd_
 final_summary_df = summary_df[(summary_df['rank_desc'] == 1) & (summary_df['date'] >= pd.to_datetime("today") -timedelta(days=30))]
 final_summary_df = final_summary_df[final_summary_df['cumul_net_dollar_flow']< 1e20] #weird error handling
 
-
+display ( summary_df[(summary_df['protocol']=='shibaswap') & (summary_df['chain']=='Ethereum') & (summary_df['date'] > '2022-12-01')] )
 
 os.makedirs('exports', exist_ok=True)  
 final_summary_df.to_csv('exports/latest_tvl_app_trends.csv')  
