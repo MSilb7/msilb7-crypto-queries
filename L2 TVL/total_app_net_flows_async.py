@@ -337,10 +337,9 @@ for i in drange:
 # display(summary_df[(summary_df['chain'] == 'Optimism') & (summary_df['protocol'] == 'qidao')].iloc[-7: , :15] )
 # display(summary_df[(summary_df['protocol']=='stargate') & (summary_df['chain']=='Optimism')])
 summary_df['pct_of_tvl'] = 100* summary_df['net_dollar_flow'] / summary_df['usd_value']
-final_summary_df = summary_df[(summary_df['rank_desc'] == 1) & (summary_df['date'] >= pd.to_datetime("today") -timedelta(days=30))]
+final_summary_df = summary_df[(summary_df['rank_desc'] == 1) & (summary_df['date'] >= pd.to_datetime("today") -timedelta(days=7))]
 final_summary_df = final_summary_df[final_summary_df['cumul_net_dollar_flow']< 1e20] #weird error handling
 
-display ( summary_df[(summary_df['protocol']=='shibaswap') & (summary_df['chain']=='Ethereum') & (summary_df['date'] > '2022-12-01')] )
 
 os.makedirs('exports', exist_ok=True)  
 final_summary_df.to_csv('exports/latest_tvl_app_trends.csv')  
