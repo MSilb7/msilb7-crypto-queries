@@ -237,3 +237,39 @@ def get_protocols_by_chain(chain_name, exclude_cex = True, exclude_chain = True)
         proto_list = proto_list.reset_index(drop=True)
         # boom
         return proto_list
+
+def get_protocol_names_by_flag(check_flag):
+        flag_str = '-' + check_flag
+        protocols = r.get('https://api.llama.fi/lite/protocols2', headers=header).json()['protocols']
+        protocols = [protocol for protocol in protocols if any(flag_str in key for key in protocol["chainTvls"])]
+        protocol_names = [element["name"] for element in protocols]
+        return protocol_names
+
+
+def get_protocol_tvls(min_tvl = 0, excluded_cats = ['CEX','Chain']): #,excluded_flags = ['staking','pool2']):
+        all_api = 'https://api.llama.fi/protocols'
+        resp = pd.DataFrame( r.get(all_api, headers=header).json() )
+        resp = resp[resp['tvl'] > min_tvl ] ##greater than X
+        if excluded_cats != []: #If we have cagtegories to exclude
+                resp = resp[~resp['category'].isin(excluded_cats)]
+        # Get Other Flags
+        doublecounts = get_protocol_names_by_flag('doublecounted')
+        liqstakes = get_protocol_names_by_flag('liquidstaking')
+        resp = resp.assign(is_doubelcount = resp['name'].isin(doublecounts))
+        resp = resp.assign(is_liqstake = resp['name'].isin(liqstakes))
+        # if excluded_flags != []: #If we have cagtegories to exclude
+        #         for flg in excluded_flags:
+        #                 resp = resp[resp[flg] != True]
+        return resp
+
+def get_all_protocol_tvls_by_chain_and_token(min_tvl = 0, excluded_cats = ['CEX','Chain']):
+        res = get_protocol_tvls(min_tvl)
+        protocols = res[['slug','chainTvls']]
+        # re = res['chainTvls']
+        protocols['chainTvls'] = protocols['chainTvls'].apply(lambda x: list(x.keys()) )
+        df_df = get_range(protocols)
+
+        proto_info = res['name','is_doubelcount','is_liqstake']
+        df_df = df_df.merge(proto_info,on='name',how='left')
+
+        return df_df
