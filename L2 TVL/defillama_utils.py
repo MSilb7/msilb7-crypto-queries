@@ -242,6 +242,7 @@ def get_protocols_by_chain(chain_name, exclude_cex = True, exclude_chain = True)
 def get_protocol_names_by_flag(check_flag):
         flag_str = '-' + check_flag
         protocols = r.get('https://api.llama.fi/lite/protocols2', headers=header).json()
+        print(protocols)
         protocols = protocols['protocols']
         protocols = [protocol for protocol in protocols if any(flag_str in key for key in protocol['chainTvls'])]
         protocol_names = [element['name'] for element in protocols]
@@ -254,11 +255,11 @@ def get_protocol_tvls(min_tvl = 0, excluded_cats = ['CEX','Chain']): #,excluded_
         resp = resp[resp['tvl'] > min_tvl ] ##greater than X
         if excluded_cats != []: #If we have cagtegories to exclude
                 resp = resp[~resp['category'].isin(excluded_cats)]
-        # Get Other Flags
-        doublecounts = get_protocol_names_by_flag('doublecounted')
-        liqstakes = get_protocol_names_by_flag('liquidstaking')
-        resp = resp.assign(is_doubelcount = resp['name'].isin(doublecounts))
-        resp = resp.assign(is_liqstake = resp['name'].isin(liqstakes))
+        # Get Other Flags -- not working right now?
+        # doublecounts = get_protocol_names_by_flag('doublecounted')
+        # liqstakes = get_protocol_names_by_flag('liquidstaking')
+        # resp = resp.assign(is_doubelcount = resp['name'].isin(doublecounts))
+        # resp = resp.assign(is_liqstake = resp['name'].isin(liqstakes))
         # if excluded_flags != []: #If we have cagtegories to exclude
         #         for flg in excluded_flags:
         #                 resp = resp[resp[flg] != True]
