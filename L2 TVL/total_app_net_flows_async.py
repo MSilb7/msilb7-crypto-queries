@@ -124,7 +124,7 @@ df_df_shift = []
 # df_df_all = pd.concat(df_df_all)
 # print(df_df_all[2])
 print("done api")
-# display(df_df_all)
+# display(df_df_all[df_df_all['protocol'] == 'velodrome'])
 # display(df_df_all)
 
 
@@ -138,6 +138,7 @@ df_df = df_df_all[df_df_all['date'].dt.date >= start_date-timedelta(days=1) ]
 df_df['last_token_value'] = df_df.groupby(['token','protocol','chain'])['token_value'].shift(1)
 #now actually filter
 df_df = df_df[df_df['date'].dt.date >= start_date ]
+# display(df_df[df_df['protocol'] == 'velodrome'])
 
 
 # In[ ]:
@@ -172,7 +173,7 @@ data_df['last_price_usd'] = data_df[['last_price_usd', 'price_usd']].bfill(axis=
 data_df['price_usd'] = data_df[['price_usd','last_price_usd']].bfill(axis=1).iloc[:, 0]
 
 
-# display(data_df)
+# display(data_df[data_df['protocol'] == 'velodrome'])
 
 
 # In[ ]:
@@ -212,7 +213,7 @@ prices_df = prices_df[~prices_df['latest_price_usd'].isna()]
 data_df = data_df.merge(prices_df,on=['token','chain','protocol'], how='left')
 
 
-# display(data_df)
+# display(data_df[data_df['protocol'] == 'velodrome'])
 
 
 # In[ ]:
@@ -237,6 +238,7 @@ data_df = data_df[~data_df['net_dollar_flow'].isna()]
 
 # data_df[(data_df['protocol']=='shibaswap') & (data_df['chain']=='Ethereum') & (data_df['date'] == '2022-12-09')].sort_values(by='net_dollar_flow_latest_price',ascending=False)
 
+# data_df[data_df['protocol'] == 'velodrome']
 
 
 # In[ ]:
@@ -272,6 +274,7 @@ netdf_df.drop(columns=['index'],inplace=True)
 # tmp.to_csv('check.csv')
 # netdf_df[(netdf_df['protocol']=='shibaswap') & (netdf_df['chain']=='Ethereum') & (netdf_df['date'] > '2022-12-01')]
 
+# netdf_df[netdf_df['protocol'] == 'velodrome'].groupby('protocol').sum()
 
 
 # In[ ]:
@@ -391,6 +394,8 @@ for i in drange:
 
 
 # display( summary_df[(summary_df['chain'] == 'Arbitrum') & (summary_df['protocol'] == 'rage-trade') & (summary_df['rank_desc'] < 30)][['date','usd_value','protocol','net_dollar_flow','cumul_net_dollar_flow_30d']])
+
+# summary_df[summary_df['protocol'] == 'velodrome']
 
 
 # In[ ]:
