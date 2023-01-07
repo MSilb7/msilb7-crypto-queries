@@ -66,6 +66,7 @@ protocols = pd.DataFrame(
             ,[1,'beefy',  650000*.5,              '2022-10-24',   '',   '', 'Gov Fund - Season 1', 'defillama',''] #Incenvitived VELO - Seems like Beefy boost started Oct 24? Unclear
             ,[1,'hundred-finance',    300000,    '2022-11-28',   '',   '', 'Gov Fund - Season 1', 'defillama','']
             ,[1,'dforce',    300000,    '2022-11-30',   '',   '', 'Gov Fund - Season 1', 'defillama','']
+            ,[1,'cbridge',    300000,    '2022-08-13',   '',   '', 'Gov Fund - Phase 0', 'defillama','']
             #Uniswap LM Program
             ,[0,'uniswap-v3', 150000,         '2022-10-26',   '2022-11-21',   'Uniswap LM - Phase 1', 'Gov Fund - Phase 0', 'defillama','']
             ,[1,'arrakis-finance',    50000,    '2022-10-26',   '2022-11-21',   'Uniswap LM - Phase 1', 'Gov Fund - Phase 0','defillama','']
