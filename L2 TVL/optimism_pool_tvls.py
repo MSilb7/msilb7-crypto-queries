@@ -13,6 +13,8 @@
 from subgrounds.subgrounds import Subgrounds
 from subgrounds.pagination import ShallowStrategy
 import pandas as pd
+import requests as r
+import defillama_utils as dfl
 
 sgs = pd.DataFrame(
         [
@@ -179,8 +181,28 @@ def get_curve_pool_tvl(pid, min_ts = 0, max_ts = 99999999999999):
 # In[ ]:
 
 
+def get_hop_pool_tvl(pid, min_ts = 0, max_ts = 99999999999999):
+    api_base_str = 'https://api.llama.fi/protocol/'
+    prot_str = 'hop-protocol'
+    hop = dfl.get_single_tvl(api_base_str, prot_str, ['Optimism'])
+    hop = hop[(hop['token'] == pid) & (~hop['token_value'].isna())]
+    hop = hop[['date','token','token_value','usd_value','protocol']]
+    hop['protocol'] = 'Hop' #rename to match func
+    hop.reset_index(inplace=True,drop=True)
+    return hop
+
+
+# In[ ]:
+
+
 # pdf = get_curve_pool_tvl('0x061b87122ed14b9526a813209c8a59a633257bab')
 # vdf = get_velodrome_pool_tvl('0xfc77e39de40e54f820e313039207dc850e4c9e60')
-
+# get_hop_pool_tvl('SNX')
 # display(vdf)
+
+
+# In[ ]:
+
+
+# ! jupyter nbconvert --to python optimism_pool_tvls.ipynb
 
