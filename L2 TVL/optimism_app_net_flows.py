@@ -66,15 +66,15 @@ protocols = pd.DataFrame(
             ,[1,'beefy',  650000*.5,              '2022-10-24',   '',   '', 'Gov Fund - Season 1', 'defillama',''] #Incenvitived VELO - Seems like Beefy boost started Oct 24? Unclear
             ,[1,'hundred-finance',    300000,    '2022-11-28',   '',   '', 'Gov Fund - Season 1', 'defillama','']
             ,[1,'dforce',    300000,    '2022-11-30',   '',   '', 'Gov Fund - Season 1', 'defillama','']
-            ,[1,'cbridge',    300000,    '2022-08-13',   '',   '', 'Gov Fund - Phase 0', 'defillama','']
+            ,[1,'cbridge',    300000,    '2022-08-13',   '',   'Celer', 'Gov Fund - Phase 0', 'defillama','']
             #Uniswap LM Program
             ,[0,'uniswap-v3', 150000,         '2022-10-26',   '2022-11-21',   'Uniswap LM - Phase 1', 'Gov Fund - Phase 0', 'defillama','']
             ,[1,'arrakis-finance',    50000,    '2022-10-26',   '2022-11-21',   'Uniswap LM - Phase 1', 'Gov Fund - Phase 0','defillama','']
             ,[1,'gamma',    50000,              '2022-10-26',   '2022-11-21',   'Uniswap LM - Phase 1', 'Gov Fund - Phase 0','defillama','']
             ,[1,'xtoken',    50000,             '2022-10-26',   '2022-11-21',   'Uniswap LM - Phase 1', 'Gov Fund - Phase 0','defillama','']
             # Other DEX Programs
-            ,[0,'synthetix',  9000000,    '2022-08-25',   '',   'All Synthetix Curve Pools', 'Gov Fund - Phase 0', 'pool-subgraph-curve',['0x7bc5728bc2b59b45a58d9a576e2ffc5f0505b35e','0x061b87122ed14b9526a813209c8a59a633257bab']] # susd/usd + seth/eth Curve incentives started
-            ,[1,'synthetix',  2*20000* (abs(pd.to_datetime("today")-pd.to_datetime('2022-08-25')).days / 7 ),    '2022-08-25',   '',   'sUSD-3Crv: Curve', 'Gov Fund - Phase 0', 'pool-subgraph-curve',['0x061b87122ed14b9526a813209c8a59a633257bab']] # susd/usd + seth/eth Curve incentives started
+            ,[0,'synthetix',  2*20000* (abs(pd.to_datetime("today")-pd.to_datetime('2022-08-25')).days / 7 ),    '2022-08-25',   '',   'All Synthetix Curve Pools', 'Gov Fund - Phase 0', 'pool-subgraph-curve',['0x7bc5728bc2b59b45a58d9a576e2ffc5f0505b35e','0x061b87122ed14b9526a813209c8a59a633257bab']] # susd/usd + seth/eth Curve incentives started
+            ,[1,'synthetix',  20000* (abs(pd.to_datetime("today")-pd.to_datetime('2022-08-25')).days / 7 ),    '2022-08-25',   '',   'sUSD-3Crv: Curve', 'Gov Fund - Phase 0', 'pool-subgraph-curve',['0x061b87122ed14b9526a813209c8a59a633257bab']] # susd/usd + seth/eth Curve incentives started
             ,[1,'synthetix',  20000* (abs(pd.to_datetime("today")-pd.to_datetime('2022-08-25')).days / 7 ),    '2022-08-25',   '',   'sETH-ETH: Curve', 'Gov Fund - Phase 0', 'pool-subgraph-curve',['0x7bc5728bc2b59b45a58d9a576e2ffc5f0505b35e']] # susd/usd + seth/eth Curve incentives started
             
             ,[0,'synthetix',  3*10000* (abs(pd.to_datetime("today")-pd.to_datetime('2022-09-27')).days / 7 ),    '2022-09-27',   '',   'All Synthetix Velo Pools', 'Gov Fund - Phase 0', 'pool-subgraph-velodrome',['0x9056eb7ca982a5dd65a584189994e6a27318067d' \
@@ -94,14 +94,29 @@ protocols = pd.DataFrame(
             ]
         , columns = ['include_in_summary','protocol','num_op','start_date', 'end_date','name', 'op_source', 'data_source','contracts']
     )
+
+protocol_name_mapping = pd.DataFrame(
+    [
+        ['aave-v3','aave'],
+        ['beefy','beefy finance'],
+        ['revert-compoundor','revert finance'],
+        ['cbridge','celer']
+    ]
+    ,columns=['protocol','app_name']
+)
+
+protocols = protocols.merge(protocol_name_mapping,on='protocol', how = 'left')
+protocols['app_name'] = protocols['app_name'].combine_first(protocols['protocol'])
+
 # print(protocols[0])
 protocols['id_format'] = protocols['protocol'].str.replace('-',' ').str.title()
+
+protocols['app_name'] = protocols['app_name'].str.replace('-',' ').str.title()
 
 date_cols = ['start_date', 'end_date']
 for d in date_cols:
     protocols[d] = pd.to_datetime( protocols[d] )
     
-protocols['id_format'] = protocols['protocol'].str.replace('-',' ').str.title()
 
 # protocols['program_name'] = np.where( protocols['name'] == '', protocols['id_format'], protocols['name'])
 protocols['coalesce'] = np.where( protocols['name'] == ''
@@ -122,7 +137,7 @@ protocols['program_name'] = np.where( ( (protocols['name'] == '') )#| (protocols
 
 protocols = protocols.sort_values(by='start_date', ascending=True)
                     
-# display(protocols)
+display(protocols)
 
 
 # In[ ]:
@@ -141,13 +156,14 @@ df_dfl = dfl.get_range(dfl_slugs[['slug']],['Optimism'])
 
 df_dfl = df_dfl.merge(dfl_protocols, on ='protocol')
 
-df_dfl = df_dfl[['date', 'token', 'token_value', 'usd_value', 'protocol', 'start_date','end_date','program_name']]
+df_dfl = df_dfl[['date', 'token', 'token_value', 'usd_value', 'protocol', 'start_date','end_date','program_name','app_name']]
 
 
 # In[ ]:
 
 
 subg_protocols = protocols[protocols['data_source'].str.contains('pool-')].copy()
+# subg_protocols['og_app_name'] = subg_protocols['app_name']
 subg_protocols['og_protocol'] = subg_protocols['protocol']
 subg_protocols['protocol'] = subg_protocols['data_source'].str.split('-').str[-1]
 # display(subg_protocols)
@@ -169,6 +185,7 @@ for index, program in subg_protocols.iterrows():
                 sdf['end_date'] = program['end_date']
                 sdf['program_name'] = program['program_name']
                 sdf['protocol'] = program['og_protocol']
+                sdf['app_name'] = program['app_name']
 
                 sdf['token_value'] = sdf['token_value'].fillna(0)
                 sdf['usd_value'] = sdf['usd_value'].fillna(0)
@@ -214,7 +231,7 @@ df_df['start_date'] = df_df['start_date'].fillna( pd.to_datetime("today").floor(
 #Generate End Date Column
 df_df['end_date_30'] = df_df['end_date'].fillna(pd.to_datetime("today")).dt.floor('d') + timedelta(days = 30)
 
-df_df = df_df.groupby(['date','token','protocol','start_date','end_date_30','program_name']).sum(numeric_only=True).reset_index()
+df_df = df_df.groupby(['date','token','protocol','start_date','end_date_30','program_name','app_name']).sum(numeric_only=True).reset_index()
 
 # display(
 #         df_df[(df_df['protocol']=='revert-compoundor') & (df_df['date'] == '2022-11-09')] 
@@ -297,14 +314,14 @@ data_df.to_csv(prepend + 'csv_outputs/' + 'tvl_flows_by_token.csv')
 # In[ ]:
 
 
-netdf_df = data_df[['date','protocol','program_name','net_dollar_flow','net_price_stock_change','last_price_net_dollar_flow','usd_value']]
+netdf_df = data_df[['date','protocol','program_name','net_dollar_flow','net_price_stock_change','last_price_net_dollar_flow','usd_value','app_name']]
 
-netdf_df = netdf_df.groupby(['date','protocol','program_name']).sum(['net_dollar_flow','net_price_stock_change','last_price_net_dollar_flow','usd_value'])
+netdf_df = netdf_df.groupby(['date','protocol','program_name','app_name']).sum(['net_dollar_flow','net_price_stock_change','last_price_net_dollar_flow','usd_value'])
 
 # reset & get program data
 netdf_df.reset_index(inplace=True)
 
-netdf_df['tvl_change'] = netdf_df['usd_value'] - netdf_df.groupby(['protocol', 'program_name'])['usd_value'].shift(1)
+netdf_df['tvl_change'] = netdf_df['usd_value'] - netdf_df.groupby(['protocol', 'program_name','app_name'])['usd_value'].shift(1)
 netdf_df['error'] = netdf_df['tvl_change'] - (netdf_df['net_dollar_flow'] + netdf_df['net_price_stock_change'])
 
 cumul_cols = ['net_dollar_flow','last_price_net_dollar_flow','net_price_stock_change']
@@ -314,9 +331,11 @@ for c in cumul_cols:
         # netdf_df['cumul_net_price_stock_change'] = netdf_df.groupby(['protocol', 'program_name'])['net_price_stock_change'].cumsum()
 
 # display(netdf_df)
+# print(protocols.columns)
+# print(netdf_df.columns)
 
 # Bring Program info Back In
-netdf_df = netdf_df.merge(protocols[['include_in_summary','program_name','protocol','op_source','start_date','end_date','num_op']], on=['program_name','protocol'])
+netdf_df = netdf_df.merge(protocols[['include_in_summary','program_name','app_name','protocol','op_source','start_date','end_date','num_op']], on=['program_name','protocol','app_name'])
 
 #For Summary
 if_ended_cols = ['net_dollar_flow','last_price_net_dollar_flow']
@@ -344,7 +363,7 @@ summary_cols = ['cumul_net_dollar_flow','cumul_last_price_net_dollar_flow','cumu
 #         netdf_df[sc] = netdf_df[sc].astype('int64')
 summary_cols = summary_cols + new_ended_cols
 # print(summary_cols)
-program_end_df = netdf_df[pd.to_datetime(netdf_df['date']) == pd.to_datetime(netdf_df['end_date'])].groupby(['protocol', 'program_name']).sum(numeric_only=True)
+program_end_df = netdf_df[pd.to_datetime(netdf_df['date']) == pd.to_datetime(netdf_df['end_date'])].groupby(['protocol', 'program_name','app_name']).sum(numeric_only=True)
 program_end_df.reset_index(inplace=True)
 # display(program_end_df)
 
@@ -371,7 +390,7 @@ netdf_df['program_rank_desc'] = netdf_df.groupby(['protocol', 'program_name'])['
 
 
 # netdf_df[(netdf_df['date'] >= '2022-10-06') & (netdf_df['date'] <= '2022-10-12')].tail(10)
-netdf_df.tail()
+# netdf_df.tail()
 
 
 # In[ ]:
@@ -429,7 +448,8 @@ season_summary.head()
 # In[ ]:
 
 
-
+print(latest_data_df.columns)
+print(season_summary.columns)
 
 
 # In[ ]:
@@ -461,7 +481,7 @@ for df in df_list:
 for df in df_list:
     #get df name
     col_list = [
-        'date','program_name', 'num_op','period','op_source','start_date','end_date'
+        'date','include_in_summary','program_name','app_name','num_op','period','op_source','start_date','end_date'
         ,'cumul_net_dollar_flow_at_program_end'
         ,'cumul_net_dollar_flow'
         ,'cumul_flows_per_op_at_program_end','cumul_last_price_net_dollar_flow_at_program_end'
@@ -469,7 +489,7 @@ for df in df_list:
         , 'last_price_net_dollar_flows_per_op_at_program_end','last_price_net_dollar_flows_per_op_latest'
         ,'flows_retention', 'last_price_net_dollar_flows_retention'
     ]
-    summary_exclude_list = ['date','program_name','period','start_date','end_date']
+    summary_exclude_list = ['date','program_name','app_name','period','start_date','end_date']
     sort_cols = ['Start','# OP']
 
     if df.name == 'latest_data_df':
