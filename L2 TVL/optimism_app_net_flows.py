@@ -520,10 +520,10 @@ for df in df_list:
         ,'period': 'Period','op_source': 'Source','start_date':'Start','end_date':'End'
         ,'cumul_net_dollar_flow_at_program_end':'Net Flows (at End Date)'
         ,'cumul_net_dollar_flow':'Net Flows (End + 30)'
-        ,'cumul_last_price_net_dollar_flow_at_program_end':'Net Flows @ Current Prices (End + 30)'
         ,'cumul_flows_per_op_at_program_end': 'Net Flows per OP (at End Date)'
         ,'cumul_flows_per_op_latest': 'Net Flows per OP (End + 30)'
         ##
+        ,'cumul_last_price_net_dollar_flow_at_program_end':'Net Flows @ Current Prices (at End Date)'
         ,'cumul_last_price_net_dollar_flow':'Net Flows @ Current Prices (End + 30)'
         ,'last_price_net_dollar_flows_per_op_at_program_end': 'Net Flows per OP @ Current Prices (at End Date)'
         ,'last_price_net_dollar_flows_per_op_latest': 'Net Flows per OP @ Current Prices (End + 30)'
