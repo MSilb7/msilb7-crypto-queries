@@ -101,7 +101,8 @@ protocol_name_mapping = pd.DataFrame(
         ['beefy','beefy finance'],
         ['revert-compoundor','revert finance'],
         ['cbridge','celer'],
-        ['pickle','pickle finance']
+        ['pickle','pickle finance'],
+        ['stargate','stargate finance']
     ]
     ,columns=['protocol','app_name']
 )
