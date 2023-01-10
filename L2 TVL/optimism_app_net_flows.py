@@ -464,7 +464,8 @@ for df in df_list:
         'date','program_name', 'num_op','period','op_source','start_date','end_date'
         ,'cumul_net_dollar_flow_at_program_end'
         ,'cumul_net_dollar_flow'
-        ,'cumul_flows_per_op_at_program_end','cumul_last_price_net_dollar_flow_at_program_end','cumul_flows_per_op_latest'
+        ,'cumul_flows_per_op_at_program_end','cumul_last_price_net_dollar_flow_at_program_end'
+        ,'cumul_flows_per_op_latest', 'cumul_last_price_net_dollar_flow'
         , 'last_price_net_dollar_flows_per_op_at_program_end','last_price_net_dollar_flows_per_op_latest'
         ,'flows_retention', 'last_price_net_dollar_flows_retention'
     ]
@@ -504,7 +505,8 @@ for df in df_list:
     format_cols = [
         'cumul_flows_per_op_at_program_end','cumul_flows_per_op_latest','last_price_net_dollar_flows_per_op_at_program_end','last_price_net_dollar_flows_per_op_latest']
     format_mil_cols = [
-        'cumul_net_dollar_flow', 'cumul_net_dollar_flow_at_program_end',
+        'cumul_net_dollar_flow', 'cumul_last_price_net_dollar_flow',
+        'cumul_net_dollar_flow_at_program_end',
         'cumul_last_price_net_dollar_flow_at_program_end'
     ]
     for f in format_cols:
@@ -521,6 +523,8 @@ for df in df_list:
         ,'cumul_last_price_net_dollar_flow_at_program_end':'Net Flows @ Current Prices (End + 30)'
         ,'cumul_flows_per_op_at_program_end': 'Net Flows per OP (at End Date)'
         ,'cumul_flows_per_op_latest': 'Net Flows per OP (End + 30)'
+        ##
+        ,'cumul_last_price_net_dollar_flow':'Net Flows @ Current Prices (End + 30)'
         ,'last_price_net_dollar_flows_per_op_at_program_end': 'Net Flows per OP @ Current Prices (at End Date)'
         ,'last_price_net_dollar_flows_per_op_latest': 'Net Flows per OP @ Current Prices (End + 30)'
         ,'flows_retention' : 'Net Flows Retained'
