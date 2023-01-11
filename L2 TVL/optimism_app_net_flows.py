@@ -38,7 +38,7 @@ else:
     prepend = 'L2 TVL/'
 
 
-# In[58]:
+# In[ ]:
 
 
 # Protocol Incentive Start Dates
@@ -63,7 +63,7 @@ protocols = pd.DataFrame(
             ,[1,'xtoken', 900000,             '2022-09-19',   '',   '', 'Gov Fund - Season 1', 'defillama','']
             ,[1,'hop-protocol',   1000000,       '2022-09-22',   '',   '', 'Gov Fund - Phase 0', 'defillama','']
             ,[1,'beethoven-x',    500000,        '2022-09-29',   '',   '', 'Gov Fund - Season 1', 'defillama','']
-            ,[1,'beefy',  650000*.5,              '2022-10-24',   '',   '', 'Gov Fund - Season 1', 'defillama',''] #Incenvitived VELO - Seems like Beefy boost started Oct 24? Unclear
+            ,[1,'beefy',  650000*0.5,              '2022-10-24',   '',   '', 'Gov Fund - Season 1', 'defillama','']
             ,[1,'hundred-finance',    300000,    '2022-11-28',   '',   '', 'Gov Fund - Season 1', 'defillama','']
             ,[1,'dforce',    300000,    '2022-11-30',   '',   '', 'Gov Fund - Season 1', 'defillama','']
             ,[1,'cbridge',    300000,    '2022-08-13',   '',   'Celer', 'Gov Fund - Phase 0', 'defillama','']
@@ -84,10 +84,10 @@ protocols = pd.DataFrame(
             ,[1,'synthetix',  10000* (abs(pd.to_datetime("today")-pd.to_datetime('2022-09-27')).days / 7 ),    '2022-09-27',   '',   'USDC/sUSD: Velo', 'Gov Fund - Phase 0', 'pool-subgraph-velodrome',['0xd16232ad60188b68076a235c65d692090caba155']] # Velo incentives started
             ,[1,'synthetix',  10000* (abs(pd.to_datetime("today")-pd.to_datetime('2022-09-27')).days / 7 ),    '2022-09-27',   '',   'ETH/sETH: Velo', 'Gov Fund - Phase 0', 'pool-subgraph-velodrome',['0xfd7fddfc0a729ecf45fb6b12fa3b71a575e1966f']] # Velo incentives started
 
-            ,[1,'synthetix',  18000* (abs(pd.to_datetime("today")-pd.to_datetime('2022-10-25')).days / 7*4 ),    '2022-10-25',   '',   'SNX Bridge: Hop', 'Gov Fund - Phase 0', 'pool-defillama-hop',['SNX']] # Hop incentives started
+            ,[1,'synthetix',  18000* (abs(pd.to_datetime("today")-pd.to_datetime('2022-10-25')).days / (7*4) ),    '2022-10-25',   '',   'SNX Bridge: Hop', 'Gov Fund - Phase 0', 'pool-defillama-hop',['SNX']] # Hop incentives started
             
             ,[1,'layer2dao',  300000,    '2022-07-20',   '2022-08-22',   'L2DAO/OP: Velodrome', 'Gov Fund - Phase 0', 'subgraph-velodrome',['0xfc77e39de40e54f820e313039207dc850e4c9e60']] # l2dao/op incentives - estimating end date based on last distribution to Velo gauge + 7 days
-            ,[1,'beefy',  650000*.35,    '2022-09-13',   '',   'BIFI/OP: Velodrome', 'Gov Fund - Phase 0', 'subgraph-velodrome',['0x81f638e5d063618fc5f6a976e48e9b803b3240c0']] # bifi/op incentives
+            ,[1,'beefy',  650000*0.35,    '2022-09-13',   '',   'BIFI/OP: Velodrome', 'Gov Fund - Phase 0', 'subgraph-velodrome',['0x81f638e5d063618fc5f6a976e48e9b803b3240c0']] # bifi/op incentives
             # Season 2
             ,[1,'velodrome',  4000000,  '2022-11-24',   '',   'Velodrome #2 (Tour de OP)', 'Gov Fund - Season 2', 'defillama','']
             ,[1,'revert-compoundor',  240000,  '2022-11-03',   '',   '', 'Gov Fund - Season 2', 'defillama','']
@@ -153,9 +153,10 @@ s = r.Session()
 dfl_protocols = protocols[protocols['data_source'] == 'defillama'].copy()
 
 dfl_slugs = dfl_protocols[['protocol']].drop_duplicates()
+# display(dfl_slugs)
 dfl_slugs = dfl_slugs.rename(columns={'protocol':'slug'})
 df_dfl = dfl.get_range(dfl_slugs[['slug']],['Optimism'])
-
+# display(df_dfl[df_dfl['protocol']=='beefy'])
 df_dfl = df_dfl.merge(dfl_protocols, on ='protocol')
 
 df_dfl = df_dfl[['date', 'token', 'token_value', 'usd_value', 'protocol', 'start_date','end_date','program_name','app_name']]
@@ -169,6 +170,12 @@ subg_protocols = protocols[protocols['data_source'].str.contains('pool-')].copy(
 subg_protocols['og_protocol'] = subg_protocols['protocol']
 subg_protocols['protocol'] = subg_protocols['data_source'].str.split('-').str[-1]
 # display(subg_protocols)
+
+
+# In[ ]:
+
+
+# display(subg.get_curve_pool_tvl('0x061b87122ed14b9526a813209c8a59a633257bab'))
 
 
 # In[ ]:
@@ -200,6 +207,7 @@ df_df_sub = pd.concat(dfs_sub)
 
 
 # display(df_df_sub.sort_values(by='date'))
+# display(df_dfl[df_dfl['protocol']=='beefy'])
 
 
 # In[ ]:
@@ -231,7 +239,7 @@ df_df = df_df[df_df['date'] <= pd.to_datetime("today") ]
 # Group - Exclude End Date since this is often null and overwritting could be weird, especially if we actually know an end date
 df_df['start_date'] = df_df['start_date'].fillna( pd.to_datetime("today").floor('d') )
 #Generate End Date Column
-df_df['end_date_30'] = df_df['end_date'].fillna(pd.to_datetime("today")).dt.floor('d') + timedelta(days = 30)
+df_df['end_date_30'] = df_df['end_date'].fillna(pd.to_datetime("today")).dt.floor('d') + timedelta(days = 365)
 
 df_df = df_df.groupby(['date','token','protocol','start_date','end_date_30','program_name','app_name']).sum(numeric_only=True).reset_index()
 
