@@ -75,6 +75,7 @@ df_df = dfl.get_all_protocol_tvls_by_chain_and_token(min_tvl)
 
 # display(df_df)
 df_df_all = df_df.copy()
+df_df_all[df_df_all['protocol'] == 'velodrome']
 
 
 # In[ ]:
@@ -304,6 +305,12 @@ netdf_df = netdf_df[  #( netdf_df['rank_desc'] == 1 ) &\
 # In[ ]:
 
 
+
+
+
+# In[ ]:
+
+
 summary_df = netdf_df.copy()
 
 summary_df = summary_df.sort_values(by='date',ascending=True)
@@ -330,9 +337,9 @@ for i in drange:
                 col_str = 'cumul_net_dollar_flow_' + str(i) + 'd'
                 # print(col_str)
                 summary_df[col_str] = summary_df[['protocol','chain','net_dollar_flow']]\
-                                    .groupby(['protocol','chain'])['net_dollar_flow'].transform(lambda x: x.rolling(i, min_periods=1).sum() )
+                                    .groupby(['protocol','chain'])['net_dollar_flow'].transform(lambda x: x.rolling(i, min_periods=0).sum() )
 
-                summary_df['flow_direction_' + str(i) + 'd'] = np.where(summary_df[col_str]>=0,1,-1)
+                summary_df['flow_direction_' + str(i) + 'd'] = np.where(summary_df[col_str]*1.0>=0,1,-1)
                 summary_df['abs_cumul_net_dollar_flow_' + str(i) + 'd'] = abs(summary_df[col_str])
                 # display(summary_df)
                 # display(summary_df[(summary_df['chain'] == 'Optimism') & (summary_df['protocol'] == 'yearn-finance')] )
@@ -385,8 +392,9 @@ for i in drange:
         fig.write_image(prepend + "img_outputs/svg/" + saveval + ".svg") #prepend + 
         fig.write_image(prepend + "img_outputs/png/" + saveval + ".png") #prepend + 
         fig.write_html(prepend + "img_outputs/" + saveval + ".html", include_plotlyjs='cdn')
+        if i == 30:
+                fig.show()
 # fig.data[0].textinfo = 'label+text+value'
-
 # fig.update_layout(tickprefix = '$')
 
 
@@ -395,7 +403,8 @@ for i in drange:
 
 # display( summary_df[(summary_df['chain'] == 'Arbitrum') & (summary_df['protocol'] == 'rage-trade') & (summary_df['rank_desc'] < 30)][['date','usd_value','protocol','net_dollar_flow','cumul_net_dollar_flow_30d']])
 
-# summary_df[summary_df['protocol'] == 'velodrome']
+#test sample
+summary_df[summary_df['protocol'] == 'velodrome']
 
 
 # In[ ]:
