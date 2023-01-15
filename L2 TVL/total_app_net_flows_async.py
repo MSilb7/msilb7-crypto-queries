@@ -75,7 +75,7 @@ df_df = dfl.get_all_protocol_tvls_by_chain_and_token(min_tvl)
 
 # display(df_df)
 df_df_all = df_df.copy()
-df_df_all[df_df_all['protocol'] == 'velodrome']
+df_df_all[df_df_all['protocol'] == 'concentrator']
 
 
 # In[ ]:
@@ -185,11 +185,16 @@ data_df['token_rank_desc'] = data_df.groupby(['chain','token'])['date'].\
 data_df['token_rank_desc_prot'] = data_df.groupby(['chain','token','protocol'])['date'].\
                             rank(method='dense',ascending=False).astype(int)
 
+data_df['token_rank_desc_prot_gt0'] = data_df.query('token_value > 0')\
+                                    .groupby(['chain', 'token', 'protocol'])['date']\
+                                    .rank(method='first', ascending=False)
+
 # get latest price either by protocol or in aggregate
 # if we don't have a match by protocol, then select in aggregate.
 
 latest_prices_df_raw_prot = data_df[~data_df['price_usd'].isna()][['token','chain','protocol','price_usd']][data_df['token_rank_desc_prot'] ==1]
 latest_prices_df_raw = data_df[~data_df['price_usd'].isna()][['token','chain','price_usd']][data_df['token_rank_desc'] ==1]
+latest_prices_df_raw_prot_gt0 = data_df[~data_df['price_usd'].isna()][['token','chain','price_usd','protocol']][data_df['token_rank_desc_prot_gt0'] ==1]
 
 latest_prices_df_prot = latest_prices_df_raw_prot.groupby(['token','chain','protocol']).median('price_usd')
 latest_prices_df_prot = latest_prices_df_prot.rename(columns={'price_usd':'latest_price_usd_prot'})
@@ -197,24 +202,44 @@ latest_prices_df_prot = latest_prices_df_prot.rename(columns={'price_usd':'lates
 latest_prices_df = latest_prices_df_raw.groupby(['token','chain']).median('price_usd')
 latest_prices_df = latest_prices_df.rename(columns={'price_usd':'latest_price_usd_raw'})
 
+latest_prices_df_prot_gt0 = latest_prices_df_raw_prot_gt0.groupby(['token','chain','protocol']).median('price_usd')
+latest_prices_df_prot_gt0 = latest_prices_df_prot_gt0.rename(columns={'price_usd':'latest_price_usd_prot_gt0'})
+
 latest_prices_df_prot = latest_prices_df_prot.reset_index()
 latest_prices_df = latest_prices_df.reset_index()
+latest_prices_df_prot_gt0 = latest_prices_df_prot_gt0.reset_index()
 
 prices_df = data_df[['chain','protocol','token']].drop_duplicates()
 prices_df = prices_df.merge(latest_prices_df_prot,on=['token','chain','protocol'], how='left')
 prices_df = prices_df.merge(latest_prices_df,on=['token','chain'], how='left')
-prices_df['latest_price_usd'] = prices_df['latest_price_usd_prot'].combine_first(prices_df['latest_price_usd_raw'])
+prices_df = prices_df.merge(latest_prices_df_prot_gt0,on=['token','chain','protocol'], how='left')
+prices_df['latest_price_usd'] = \
+        prices_df['latest_price_usd_prot'].where(prices_df['latest_price_usd_prot'] > 0, \
+        prices_df['latest_price_usd_raw'].where(prices_df['latest_price_usd_raw'] > 0, \
+        prices_df['latest_price_usd_prot_gt0']))
+    # prices_df.loc[prices_df[['latest_price_usd_prot', 'latest_price_usd_raw', 'latest_price_usd_prot_gt0']].first_valid_index()]
+# prices_df['latest_price_usd'] = prices_df['latest_price_usd_prot'].combine_first(prices_df['latest_price_usd_raw'])
 
-prices_df = prices_df[['chain','protocol','token','latest_price_usd']]
+prices_df = prices_df[['chain','protocol','token','latest_price_usd']]#,'latest_price_usd_prot','latest_price_usd_raw','latest_price_usd_prot_gt0']]
 
-
+display(prices_df)
 prices_df = prices_df[~prices_df['latest_price_usd'].isna()]
 
 
 data_df = data_df.merge(prices_df,on=['token','chain','protocol'], how='left')
 
 
-# display(data_df[data_df['protocol'] == 'velodrome'])
+# In[ ]:
+
+
+# data_df[(data_df['protocol'] == 'concentrator') & (data_df['token'] == 'FXS') ]
+# prices_df[(prices_df['protocol'] == 'concentrator') & (prices_df['token'] == 'FXS')]
+
+
+# In[ ]:
+
+
+# latest_prices_df_prot_gt0[latest_prices_df_prot_gt0['token'] == 'FXS']
 
 
 # In[ ]:
