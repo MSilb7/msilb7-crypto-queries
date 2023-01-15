@@ -222,7 +222,7 @@ prices_df['latest_price_usd'] = \
 
 prices_df = prices_df[['chain','protocol','token','latest_price_usd']]#,'latest_price_usd_prot','latest_price_usd_raw','latest_price_usd_prot_gt0']]
 
-display(prices_df)
+# display(prices_df)
 prices_df = prices_df[~prices_df['latest_price_usd'].isna()]
 
 
