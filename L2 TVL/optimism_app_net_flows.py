@@ -246,7 +246,7 @@ df_df = df_df[df_df['date'] <= pd.to_datetime("today") ]
 # Group - Exclude End Date since this is often null and overwritting could be weird, especially if we actually know an end date
 df_df['start_date'] = df_df['start_date'].fillna( pd.to_datetime("today").floor('d') )
 #Generate End Date Column
-df_df['end_date_30'] = df_df['end_date'].fillna(pd.to_datetime("today")).dt.floor('d') + timedelta(days = 365)
+df_df['end_date_30'] = df_df['end_date'].fillna(pd.to_datetime("today")).dt.floor('d') + timedelta(days = 30)
 
 df_df = df_df.groupby(['date','token','protocol','start_date','end_date_30','program_name','app_name']).sum(numeric_only=True).reset_index()
 
