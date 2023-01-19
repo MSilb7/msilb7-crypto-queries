@@ -75,6 +75,7 @@ df_df = dfl.get_all_protocol_tvls_by_chain_and_token(min_tvl)
 
 # display(df_df)
 df_df_all = df_df.copy()
+df_df_all.head()
 # df_df_all[df_df_all['protocol'] == 'concentrator']
 
 
@@ -111,7 +112,7 @@ print(df_df_all.dtypes)
 df_df_all = df_df_all[df_df_all['date'] <= pd.to_datetime("today") ]
 
 df_df_all['token_value'] = df_df_all['token_value'].fillna(0)
-df_df_all = df_df_all.groupby(['date','token','chain','protocol']).sum(['usd_value','token_value'])
+df_df_all = df_df_all.groupby(['date','token','chain','protocol','name','category','parent_protocol']).sum(['usd_value','token_value'])
 
 # display(df_df_all)
 df_df_all = df_df_all.reset_index()
@@ -173,7 +174,7 @@ data_df['last_price_usd'] = data_df[['last_price_usd', 'price_usd']].bfill(axis=
 #Forward fill if token drops off
 data_df['price_usd'] = data_df[['price_usd','last_price_usd']].bfill(axis=1).iloc[:, 0]
 
-
+data_df.head()
 # display(data_df[data_df['protocol'] == 'velodrome'])
 
 
