@@ -26,6 +26,8 @@ async def get_tvl(apistring, header, statuses, chains, prot, prot_name):
                         for ch in chains:
                                 ad = pd.json_normalize( prot_req[ch]['tokens'] )
                                 ad_usd = pd.json_normalize( prot_req[ch]['tokensInUsd'] )
+                                if ad.empty:
+                                        ad = pd.DataFrame( prot_req[ch]['tvl'] )
                                 try: #if there's generic tvl
                                         ad_tvl = pd.json_normalize( prot_req[ch]['tvl'] )
                                         ad_tvl = ad_tvl[['date','totalLiquidityUSD']]
@@ -53,6 +55,9 @@ async def get_tvl(apistring, header, statuses, chains, prot, prot_name):
                                                 ad['token'] = ad['token'].str.replace('tokens.','', regex=False)
                                         except:
                                                 continue
+                                        # if we have no token breakdown, take normal TVL 
+                                        ad['usd_value'] = np.where(ad['token'] == 'totalLiquidityUSD', ad['total_app_tvl'], ad['usd_value'])
+                                        #assign other cols
                                         ad['protocol'] = prot
                                         ad['chain'] = ch
                                         ad['category'] = cats
@@ -162,6 +167,7 @@ def get_chain_tvls(chain_list):
         chains = pd.concat(cl)
         return chains
 
+# Eventually figure out how to integrate this with get_tvls so that it's not duplicative
 def get_single_tvl(api_base, prot, chains, header = header, statuses = statuses):
         prod = []
         # retry_client = RetryClient()
@@ -175,6 +181,8 @@ def get_single_tvl(api_base, prot, chains, header = header, statuses = statuses)
                 for ch in chains:
                         ad = pd.json_normalize( prot_req[ch]['tokens'] )
                         ad_usd = pd.json_normalize( prot_req[ch]['tokensInUsd'] )
+                        if ad.empty:
+                                ad = pd.DataFrame( prot_req[ch]['tvl'] )
                         try: #if there's generic tvl
                                 ad_tvl = pd.json_normalize( prot_req[ch]['tvl'] )
                                 ad_tvl = ad_tvl[['date','totalLiquidityUSD']]
@@ -202,6 +210,9 @@ def get_single_tvl(api_base, prot, chains, header = header, statuses = statuses)
                                         ad['token'] = ad['token'].str.replace('tokens.','', regex=False)
                                 except:
                                         continue
+                                # if we have no token breakdown, take normal TVL 
+                                ad['usd_value'] = np.where(ad['token'] == 'totalLiquidityUSD', ad['total_app_tvl'], ad['usd_value'])
+                                #assign other cols
                                 ad['protocol'] = prot
                                 ad['chain'] = ch
                                 ad['category'] = cats
