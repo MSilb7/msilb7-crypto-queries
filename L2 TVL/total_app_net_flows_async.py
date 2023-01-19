@@ -366,7 +366,7 @@ for i in drange:
                 summary_df[col_str] = summary_df[['protocol','chain','net_dollar_flow']]\
                                     .groupby(['protocol','chain'])['net_dollar_flow'].transform(lambda x: x.rolling(i, min_periods=0).sum() )
                 summary_df[tvl_str] = summary_df[['protocol','chain','usd_value']]\
-                                    .groupby(['protocol','chain'])['usd_value'].transform(lambda x: x.rolling(i, min_periods=0).sum() )
+                                    .groupby(['protocol','chain'])['usd_value'].transform(lambda x: x.rolling(i, min_periods=0).mean() )
                 summary_df['flow_direction_' + str(i) + 'd'] = np.where(summary_df[col_str]*1.0>=0,1,-1)
                 summary_df['abs_cumul_net_dollar_flow_' + str(i) + 'd'] = abs(summary_df[col_str])
                 # display(summary_df)
