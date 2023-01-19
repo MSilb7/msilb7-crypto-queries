@@ -75,7 +75,7 @@ df_df = dfl.get_all_protocol_tvls_by_chain_and_token(min_tvl)
 
 # display(df_df)
 df_df_all = df_df.copy()
-df_df_all[df_df_all['protocol'] == 'concentrator']
+# df_df_all[df_df_all['protocol'] == 'concentrator']
 
 
 # In[ ]:
@@ -330,7 +330,7 @@ netdf_df = netdf_df[  #( netdf_df['rank_desc'] == 1 ) &\
 # In[ ]:
 
 
-
+# display(netdf_df)
 
 
 # In[ ]:
@@ -360,10 +360,12 @@ for i in drange:
                 # display(summary_df)
         else:
                 col_str = 'cumul_net_dollar_flow_' + str(i) + 'd'
+                tvl_str = 'daily_avg_tvl_' + str(i) + 'd'
                 # print(col_str)
                 summary_df[col_str] = summary_df[['protocol','chain','net_dollar_flow']]\
                                     .groupby(['protocol','chain'])['net_dollar_flow'].transform(lambda x: x.rolling(i, min_periods=0).sum() )
-
+                summary_df[tvl_str] = summary_df[['protocol','chain','usd_value']]\
+                                    .groupby(['protocol','chain'])['usd_value'].transform(lambda x: x.rolling(i, min_periods=0).sum() )
                 summary_df['flow_direction_' + str(i) + 'd'] = np.where(summary_df[col_str]*1.0>=0,1,-1)
                 summary_df['abs_cumul_net_dollar_flow_' + str(i) + 'd'] = abs(summary_df[col_str])
                 # display(summary_df)

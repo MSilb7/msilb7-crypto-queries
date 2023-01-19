@@ -18,6 +18,10 @@ async def get_tvl(apistring, header, statuses, chains, prot, prot_name):
                 try:
                         prot_req = await response.json()
                         cats = prot_req['category']
+                        try: # if parent protocol exists
+                                parent_prot_name = prot_req['parentProtocol']
+                        except: # if not, then use the name
+                                parent_prot_name = prot_name 
                         prot_req = prot_req['chainTvls']
                         for ch in chains:
                                 ad = pd.json_normalize( prot_req[ch]['tokens'] )
@@ -53,6 +57,7 @@ async def get_tvl(apistring, header, statuses, chains, prot, prot_name):
                                         ad['chain'] = ch
                                         ad['category'] = cats
                                         ad['name'] = prot_name
+                                        ad['parent_protocol'] = parent_prot_name
                                 #         ad['start_date'] = pd.to_datetime(prot[1])
                                         # ad['date'] = ad['date'] - timedelta(days=1) #change to eod vs sod
                                         prod.append(ad)
@@ -222,7 +227,8 @@ def get_protocols_by_chain(chain_name, exclude_cex = True, exclude_chain = True)
 
         s = r.Session()
         #get all protocols
-        resp = pd.DataFrame( s.get(protos).json() )[['category','slug','chainTvls']]
+        resp = pd.DataFrame( s.get(protos).json() )[['category','name','parentProtocol','slug','chainTvls']]
+        resp['parentProtocol'] = resp['parentProtocol'].combine_first(resp['name'])
         # extract the chain names
         resp['chainTvls'] = resp['chainTvls'].apply(lambda x: list(x.keys()) )
         # set a true/false if the array contains the chain we want
@@ -267,7 +273,8 @@ def get_protocol_tvls(min_tvl = 0, excluded_cats = ['CEX','Chain']): #,excluded_
 
 def get_all_protocol_tvls_by_chain_and_token(min_tvl = 0, excluded_cats = ['CEX','Chain']):
         res = get_protocol_tvls(min_tvl)
-        protocols = res[['slug','name','chainTvls']]
+        protocols = res[['slug','name','category','parentProtocol','chainTvls']]
+        protocols['parentProtocol'] = protocols['parentProtocol'].combine_first(protocols['name'])
         # re = res['chainTvls']
         protocols['chainTvls'] = protocols['chainTvls'].apply(lambda x: list(x.keys()) )
         df_df = get_range(protocols)
