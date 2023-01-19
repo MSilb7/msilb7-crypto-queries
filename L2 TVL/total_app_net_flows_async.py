@@ -271,13 +271,13 @@ data_df = data_df[~data_df['net_dollar_flow'].isna()]
 # In[ ]:
 
 
-netdf_df = data_df[['date','protocol','chain','net_dollar_flow','usd_value','net_dollar_flow_latest_price']]
+netdf_df = data_df[['date','protocol','chain','name','category','parent_protocol','net_dollar_flow','usd_value','net_dollar_flow_latest_price']]
 netdf_df = netdf_df.fillna(0)
 netdf_df = netdf_df.sort_values(by='date',ascending=True)
-netdf_df = netdf_df.groupby(['date','protocol','chain']).sum(['net_dollar_flow','usd_value','net_dollar_flow_latest_price']) ##agg by app
+netdf_df = netdf_df.groupby(['date','protocol','chain','name','category','parent_protocol']).sum(['net_dollar_flow','usd_value','net_dollar_flow_latest_price']) ##agg by app
 
 #usd_value is the TVL on a given day
-netdf_df = netdf_df.groupby(['date','protocol','chain','usd_value']).sum(['net_dollar_flow','net_dollar_flow_latest_price'])
+netdf_df = netdf_df.groupby(['date','protocol','chain','usd_value','name','category','parent_protocol']).sum(['net_dollar_flow','net_dollar_flow_latest_price'])
 netdf_df.reset_index(inplace=True)
 
 # netdf_df['cumul_net_dollar_flow'] = netdf_df[['protocol','chain','net_dollar_flow']]\
