@@ -214,7 +214,7 @@ df_df_sub = pd.concat(dfs_sub)
 
 
 # display(df_df_sub.sort_values(by='date'))
-# display(df_dfl[df_dfl['protocol']=='beefy'])
+# display(df_dfl[df_dfl['protocol']=='defiedge'])
 
 
 # In[ ]:
