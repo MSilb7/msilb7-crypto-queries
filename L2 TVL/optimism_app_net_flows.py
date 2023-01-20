@@ -37,6 +37,9 @@ if 'L2 TVL' in pwd:
 else:
     prepend = 'L2 TVL/'
 
+# if TVL by token is not available, do we fallback on raw TVL (sensitive to token prices)?
+do_fallback_on_raw_tvl = True
+
 
 # In[ ]:
 
@@ -162,7 +165,7 @@ dfl_protocols = protocols[protocols['data_source'] == 'defillama'].copy()
 dfl_slugs = dfl_protocols[['protocol']].drop_duplicates()
 # display(dfl_slugs)
 dfl_slugs = dfl_slugs.rename(columns={'protocol':'slug'})
-df_dfl = dfl.get_range(dfl_slugs[['slug']],['Optimism'])
+df_dfl = dfl.get_range(dfl_slugs[['slug']],['Optimism'], do_fallback_on_raw_tvl)
 # display(df_dfl[df_dfl['protocol']=='beefy'])
 df_dfl = df_dfl.merge(dfl_protocols, on ='protocol')
 
