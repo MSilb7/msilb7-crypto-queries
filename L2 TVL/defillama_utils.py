@@ -10,7 +10,7 @@ statuses = {x for x in range(100, 600)}
 statuses.remove(200)
 statuses.remove(429)
 
-async def get_tvl(apistring, header, statuses, chains, prot, prot_name):
+async def get_tvl(apistring, header, statuses, chains, prot, prot_name, fallback_on_raw_tvl = False):
         prod = []
         retry_client = RetryClient()
 
@@ -26,7 +26,7 @@ async def get_tvl(apistring, header, statuses, chains, prot, prot_name):
                         for ch in chains:
                                 ad = pd.json_normalize( prot_req[ch]['tokens'] )
                                 ad_usd = pd.json_normalize( prot_req[ch]['tokensInUsd'] )
-                                if ad.empty:
+                                if (ad.empty) & (fallback_on_raw_tvl == True):
                                         ad = pd.DataFrame( prot_req[ch]['tvl'] )
                                 try: #if there's generic tvl
                                         ad_tvl = pd.json_normalize( prot_req[ch]['tvl'] )
@@ -73,7 +73,7 @@ async def get_tvl(apistring, header, statuses, chains, prot, prot_name):
         # print(prod)
         return prod
 
-def get_range(protocols, chains = '', header = header, statuses = statuses):
+def get_range(protocols, chains = '', fallback_on_raw_tvl = False, header = header, statuses = statuses):
         data_dfs = []
         fee_df = []
         if isinstance(chains, list):
@@ -112,7 +112,7 @@ def get_range(protocols, chains = '', header = header, statuses = statuses):
                 except:
                         chains = og_chains
                 apic = api_str + prot
-                tasks.append( get_tvl(apic, header, statuses, chains, prot, prot_name) )
+                tasks.append( get_tvl(apic, header, statuses, chains, prot, prot_name, fallback_on_raw_tvl) )
 
         data_dfs = loop.run_until_complete(asyncio.gather(*tasks, return_exceptions=True))
 
@@ -168,7 +168,7 @@ def get_chain_tvls(chain_list):
         return chains
 
 # Eventually figure out how to integrate this with get_tvls so that it's not duplicative
-def get_single_tvl(api_base, prot, chains, header = header, statuses = statuses):
+def get_single_tvl(api_base, prot, chains, header = header, statuses = statuses, fallback_on_raw_tvl = False):
         prod = []
         # retry_client = RetryClient()
         apistring = api_base + prot
@@ -181,7 +181,7 @@ def get_single_tvl(api_base, prot, chains, header = header, statuses = statuses)
                 for ch in chains:
                         ad = pd.json_normalize( prot_req[ch]['tokens'] )
                         ad_usd = pd.json_normalize( prot_req[ch]['tokensInUsd'] )
-                        if ad.empty:
+                        if (ad.empty) & (fallback_on_raw_tvl == False):
                                 ad = pd.DataFrame( prot_req[ch]['tvl'] )
                         try: #if there's generic tvl
                                 ad_tvl = pd.json_normalize( prot_req[ch]['tvl'] )
@@ -282,13 +282,13 @@ def get_protocol_tvls(min_tvl = 0, excluded_cats = ['CEX','Chain']): #,excluded_
         #                 resp = resp[resp[flg] != True]
         return resp
 
-def get_all_protocol_tvls_by_chain_and_token(min_tvl = 0, excluded_cats = ['CEX','Chain']):
+def get_all_protocol_tvls_by_chain_and_token(min_tvl = 0, fallback_on_raw_tvl = False, excluded_cats = ['CEX','Chain']):
         res = get_protocol_tvls(min_tvl)
         protocols = res[['slug','name','category','parentProtocol','chainTvls']]
         protocols['parentProtocol'] = protocols['parentProtocol'].combine_first(protocols['name'])
         # re = res['chainTvls']
         protocols['chainTvls'] = protocols['chainTvls'].apply(lambda x: list(x.keys()) )
-        df_df = get_range(protocols)
+        df_df = get_range(protocols, '', fallback_on_raw_tvl)
 
         # Get Other Flags -- not working right now?
         # proto_info = res[['name','is_doubelcount','is_liqstake']]
