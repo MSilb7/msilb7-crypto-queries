@@ -67,7 +67,10 @@ print(start_date)
 #get all apps > 10 m tvl
 min_tvl = 10_000_000
 
-df_df = dfl.get_all_protocol_tvls_by_chain_and_token(min_tvl)
+# if TVL by token is not available, do we fallback on raw TVL (sensitive to token prices)?
+is_fallback_on_raw_tvl = False
+
+df_df = dfl.get_all_protocol_tvls_by_chain_and_token(min_tvl, is_fallback_on_raw_tvl)
 
 
 # In[ ]:
