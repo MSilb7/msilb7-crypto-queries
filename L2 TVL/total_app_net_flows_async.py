@@ -398,14 +398,14 @@ for i in drange:
                 hval = 'cumul_net_dollar_flow'
                 cval = 'flow_direction'
                 saveval = 'net_app_flows'
-                titleval = "App Net Flows Change by App -> Chain - Last " + str(trailing_num_days) + \
+                titleval = "App Net Flows Change by Chain -> App - Last " + str(trailing_num_days) + \
                             " Days - (Apps with > $" + str(min_tvl/1e6) + "M TVL Shown)" + titleval_append
         else:
                 yval = 'abs_cumul_net_dollar_flow_' + str(i) +'d'
                 hval = 'cumul_net_dollar_flow_' + str(i) +'d'
                 cval = 'flow_direction_' + str(i) +'d'
                 saveval = 'net_app_flows_' + str(i) +'d'
-                titleval = "App Net Flows Change by App -> Chain - Last " + str(i) + \
+                titleval = "App Net Flows Change by Chain -> App - Last " + str(i) + \
                             " Days - (Apps with > $" + str(min_tvl/1e6) + "M TVL Shown)" + titleval_append
         # print(yval)
         # print(cval)
