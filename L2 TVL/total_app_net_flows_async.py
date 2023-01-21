@@ -177,7 +177,7 @@ data_df['last_price_usd'] = data_df[['last_price_usd', 'price_usd']].bfill(axis=
 #Forward fill if token drops off
 data_df['price_usd'] = data_df[['price_usd','last_price_usd']].bfill(axis=1).iloc[:, 0]
 
-data_df.head()
+data_df.sample(20)
 # display(data_df[data_df['protocol'] == 'velodrome'])
 
 
@@ -357,7 +357,7 @@ for i in drange:
         if i == 0:
                 summary_df['cumul_net_dollar_flow'] = summary_df[['protocol','chain','net_dollar_flow']]\
                                     .groupby(['protocol','chain']).cumsum()
-                summary_df['flow_direction'] = np.where(summary_df['cumul_net_dollar_flow']>=0,1,-1)
+                summary_df['flow_direction'] = np.where(summary_df['cumul_net_dollar_flow']*1.0 >= 0, 1,-1)
                 summary_df['abs_cumul_net_dollar_flow'] = abs(summary_df['cumul_net_dollar_flow'])
                 #latest price
                 
@@ -366,11 +366,16 @@ for i in drange:
                 col_str = 'cumul_net_dollar_flow_' + str(i) + 'd'
                 tvl_str = 'daily_avg_tvl_' + str(i) + 'd'
                 # print(col_str)
-                summary_df[col_str] = summary_df[['protocol','chain','net_dollar_flow']]\
-                                    .groupby(['protocol','chain'])['net_dollar_flow'].transform(lambda x: x.rolling(i, min_periods=0).sum() )
+                # summary_df[col_str] = summary_df[['protocol','chain','net_dollar_flow']]\
+                #                     .groupby(['protocol','chain'])['net_dollar_flow'].transform(lambda x: x.rolling(i, min_periods=1).sum() )
+                #chatgpt version
+                summary_df[col_str] = summary_df.groupby(['protocol','chain'])['net_dollar_flow']\
+                                        .apply(lambda x: x.rolling(i, min_periods=1).sum())
+
                 summary_df[tvl_str] = summary_df[['protocol','chain','usd_value']]\
-                                    .groupby(['protocol','chain'])['usd_value'].transform(lambda x: x.rolling(i, min_periods=0).mean() )
-                summary_df['flow_direction_' + str(i) + 'd'] = np.where(summary_df[col_str]*1.0>=0,1,-1)
+                                    .groupby(['protocol','chain'])['usd_value'].transform(lambda x: x.rolling(i, min_periods=1).mean() )
+                
+                summary_df['flow_direction_' + str(i) + 'd'] = np.where(summary_df[col_str]*1.0 >= 0, 1, -1)
                 summary_df['abs_cumul_net_dollar_flow_' + str(i) + 'd'] = abs(summary_df[col_str])
                 # display(summary_df)
                 # display(summary_df[(summary_df['chain'] == 'Optimism') & (summary_df['protocol'] == 'yearn-finance')] )
