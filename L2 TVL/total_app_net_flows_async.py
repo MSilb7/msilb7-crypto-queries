@@ -398,15 +398,21 @@ for i in drange:
                 hval = 'cumul_net_dollar_flow'
                 cval = 'flow_direction'
                 saveval = 'net_app_flows'
+                saveval_app = 'net_app_flows_by_app'
                 titleval = "App Net Flows Change by Chain -> App - Last " + str(trailing_num_days) + \
+                            " Days - (Apps with > $" + str(min_tvl/1e6) + "M TVL Shown)" + titleval_append
+                titleval_app = "App Net Flows Change by App -> Chain - Last " + str(trailing_num_days) + \
                             " Days - (Apps with > $" + str(min_tvl/1e6) + "M TVL Shown)" + titleval_append
         else:
                 yval = 'abs_cumul_net_dollar_flow_' + str(i) +'d'
                 hval = 'cumul_net_dollar_flow_' + str(i) +'d'
                 cval = 'flow_direction_' + str(i) +'d'
                 saveval = 'net_app_flows_' + str(i) +'d'
+                saveval_app = 'net_app_flows_by_app_' + str(i) +'d'
                 titleval = "App Net Flows Change by Chain -> App - Last " + str(i) + \
                             " Days - (Apps with > $" + str(min_tvl/1e6) + "M TVL Shown)" + titleval_append
+                titleval_app = "App Net Flows Change by App -> Chain - Last " + str(i) + \
+                                " Days - (Apps with > $" + str(min_tvl/1e6) + "M TVL Shown)" + titleval_append
         # print(yval)
         # print(cval)
         # print(titleval)
@@ -422,12 +428,30 @@ for i in drange:
                 , hover_data = [hval]
                 )
         
+        fig_app = px.treemap(final_summary_df[final_summary_df[yval] !=0], \
+                 path=[px.Constant("all"), 'protocol','chain'], \
+#                  path=[px.Constant("all"), 'token', 'chain', 'protocol'], \
+                 values=yval, color=cval
+#                 ,color_discrete_map={'-1':'red', '1':'green'})
+                ,color_continuous_scale='Spectral'
+                     , title = titleval_app
+                
+                , hover_data = [hval]
+                )
+        
         fig.update_traces(root_color="lightgrey")
         fig.update_layout(margin = dict(t=50, l=25, r=25, b=25))
+        fig_app.update_traces(root_color="lightgrey")
+        fig_app.update_layout(margin = dict(t=50, l=25, r=25, b=25))
 
         fig.write_image(prepend + "img_outputs/svg/" + saveval + ".svg") #prepend + 
         fig.write_image(prepend + "img_outputs/png/" + saveval + ".png") #prepend + 
         fig.write_html(prepend + "img_outputs/" + saveval + ".html", include_plotlyjs='cdn')
+
+        fig_app.write_image(prepend + "img_outputs/svg/" + saveval_app + ".svg") #prepend + 
+        fig_app.write_image(prepend + "img_outputs/png/" + saveval_app + ".png") #prepend + 
+        fig_app.write_html(prepend + "img_outputs/" + saveval_app + ".html", include_plotlyjs='cdn')
+
         if i == 30:
                 fig.show()
 # fig.data[0].textinfo = 'label+text+value'
@@ -457,29 +481,29 @@ summary_df[summary_df['protocol'] == 'velodrome']
 # In[ ]:
 
 
-fig_app = px.treemap(final_summary_df[final_summary_df['abs_cumul_net_dollar_flow'] !=0], \
-                #  path=[px.Constant("all"), 'chain', 'protocol'], \
-#                  path=[px.Constant("all"), 'token', 'chain', 'protocol'], \
-                        path=[px.Constant("all"), 'protocol','chain'], \
-                 values='abs_cumul_net_dollar_flow', color='flow_direction'
-#                 ,color_discrete_map={'-1':'red', '1':'green'})
-                ,color_continuous_scale='Spectral'
-                , title = "App Net Flows Change by Chain -> App - Last " + str(trailing_num_days) + \
-                            " Days - (Apps with > $" + str(min_tvl/1e6) + "M TVL Shown)"
-                ,hover_data=['cumul_net_dollar_flow']
-                )
-# fig.data[0].textinfo = 'label+text+value'
-fig_app.update_traces(root_color="lightgrey")
-fig_app.update_layout(margin = dict(t=50, l=25, r=25, b=25))
-fig.show()
+# fig_app = px.treemap(final_summary_df[final_summary_df['abs_cumul_net_dollar_flow'] !=0], \
+#                 #  path=[px.Constant("all"), 'chain', 'protocol'], \
+# #                  path=[px.Constant("all"), 'token', 'chain', 'protocol'], \
+#                         path=[px.Constant("all"), 'protocol','chain'], \
+#                  values='abs_cumul_net_dollar_flow', color='flow_direction'
+# #                 ,color_discrete_map={'-1':'red', '1':'green'})
+#                 ,color_continuous_scale='Spectral'
+#                 , title = "App Net Flows Change by Chain -> App - Last " + str(trailing_num_days) + \
+#                             " Days - (Apps with > $" + str(min_tvl/1e6) + "M TVL Shown)"
+#                 ,hover_data=['cumul_net_dollar_flow']
+#                 )
+# # fig.data[0].textinfo = 'label+text+value'
+# fig_app.update_traces(root_color="lightgrey")
+# fig_app.update_layout(margin = dict(t=50, l=25, r=25, b=25))
+# fig.show()
 
 
 # In[ ]:
 
 
-fig_app.write_image(prepend + "img_outputs/svg/net_app_flows_by_app.svg") #prepend + 
-fig_app.write_image(prepend + "img_outputs/png/net_app_flows_by_app.png") #prepend + 
-fig_app.write_html(prepend + "img_outputs/net_app_flows_by_app.html", include_plotlyjs='cdn')
+# fig_app.write_image(prepend + "img_outputs/svg/net_app_flows_by_app.svg") #prepend + 
+# fig_app.write_image(prepend + "img_outputs/png/net_app_flows_by_app.png") #prepend + 
+# fig_app.write_html(prepend + "img_outputs/net_app_flows_by_app.html", include_plotlyjs='cdn')
 
 
 # In[ ]:
