@@ -28,6 +28,9 @@ async def get_tvl(apistring, header, statuses, chains, prot, prot_name, fallback
                                 ad_usd = pd.json_normalize( prot_req[ch]['tokensInUsd'] )
                                 if (ad.empty) & (fallback_on_raw_tvl == True):
                                         ad = pd.DataFrame( prot_req[ch]['tvl'] )
+                                        prot_map = prot + '*'
+                                else:
+                                        prot_map = prot
                                 try: #if there's generic tvl
                                         ad_tvl = pd.json_normalize( prot_req[ch]['tvl'] )
                                         ad_tvl = ad_tvl[['date','totalLiquidityUSD']]
@@ -58,7 +61,7 @@ async def get_tvl(apistring, header, statuses, chains, prot, prot_name, fallback
                                         # if we have no token breakdown, take normal TVL 
                                         ad['usd_value'] = np.where(ad['token'] == 'totalLiquidityUSD', ad['total_app_tvl'], ad['usd_value'])
                                         #assign other cols
-                                        ad['protocol'] = prot
+                                        ad['protocol'] = prot_map
                                         ad['chain'] = ch
                                         ad['category'] = cats
                                         ad['name'] = prot_name
