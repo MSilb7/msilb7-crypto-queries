@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[29]:
+# In[ ]:
 
 
 import pandas as pd
@@ -19,7 +19,7 @@ nest_asyncio.apply()
 header = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:71.0) Gecko/20100101 Firefox/71.0'}
 
 
-# In[30]:
+# In[ ]:
 
 
 #https://stackoverflow.com/questions/23267409/how-to-implement-retry-mechanism-into-python-requests-library
@@ -42,7 +42,7 @@ else:
     prepend = 'L2 TVL/'
 
 
-# In[31]:
+# In[ ]:
 
 
 # date ranges to build charts for
@@ -61,11 +61,11 @@ print(start_date)
 
 
 
-# In[32]:
+# In[ ]:
 
 
-#get all apps > 10 m tvl
-min_tvl = 10_000_000
+#get all apps > 5 m tvl
+min_tvl = 5_000_000
 
 # if TVL by token is not available, do we fallback on raw TVL (sensitive to token prices)?
 is_fallback_on_raw_tvl = True#False
@@ -73,7 +73,7 @@ is_fallback_on_raw_tvl = True#False
 df_df = dfl.get_all_protocol_tvls_by_chain_and_token(min_tvl, is_fallback_on_raw_tvl)
 
 
-# In[33]:
+# In[ ]:
 
 
 # display(df_df)
@@ -82,7 +82,7 @@ df_df_all.head()
 # df_df_all[df_df_all['protocol'] == 'velodrome']
 
 
-# In[34]:
+# In[ ]:
 
 
 # display(df_df_all)
@@ -93,7 +93,7 @@ df_df_all2['usd_value'] = df_df_all2['usd_value'].astype('float64')
 # display(df_df_all2)
 
 
-# In[35]:
+# In[ ]:
 
 
 #create an extra day to handle for tokens dropping to 0
@@ -123,7 +123,7 @@ df_df_shift = []
 # display(df_df_all)
 
 
-# In[36]:
+# In[ ]:
 
 
 # df_df_all = pd.concat(df_df_all)
@@ -133,7 +133,7 @@ print("done api")
 # display(df_df_all)
 
 
-# In[37]:
+# In[ ]:
 
 
 #filter down a bit so we can do trailing comp w/o doing every row
@@ -146,13 +146,13 @@ df_df = df_df[df_df['date'].dt.date >= start_date ]
 # display(df_df[df_df['protocol'] == 'velodrome'])
 
 
-# In[38]:
+# In[ ]:
 
 
 # display(df_df[(df_df['chain'] == 'Arbitrum') & (df_df['protocol'] == 'rage-trade') & (df_df['date'] > '2022-12-01')])
 
 
-# In[39]:
+# In[ ]:
 
 
 # display(df_df)
@@ -162,7 +162,7 @@ df_df = df_df[df_df['date'].dt.date >= start_date ]
 # sample.to_csv('check_uni_error.csv')
 
 
-# In[40]:
+# In[ ]:
 
 
 data_df = df_df.copy()
@@ -181,7 +181,7 @@ data_df.sample(20)
 # display(data_df[data_df['protocol'] == 'velodrome'])
 
 
-# In[41]:
+# In[ ]:
 
 
 data_df['token_rank_desc'] = data_df.groupby(['chain','token'])['date'].\
@@ -233,20 +233,20 @@ prices_df = prices_df[~prices_df['latest_price_usd'].isna()]
 data_df = data_df.merge(prices_df,on=['token','chain','protocol'], how='left')
 
 
-# In[42]:
+# In[ ]:
 
 
 # data_df[(data_df['protocol'] == 'concentrator') & (data_df['token'] == 'FXS') ]
 # prices_df[(prices_df['protocol'] == 'concentrator') & (prices_df['token'] == 'FXS')]
 
 
-# In[43]:
+# In[ ]:
 
 
 # latest_prices_df_prot_gt0[latest_prices_df_prot_gt0['token'] == 'FXS']
 
 
-# In[44]:
+# In[ ]:
 
 
 data_df.sort_values(by='date',inplace=True)
@@ -263,7 +263,7 @@ data_df = data_df[abs(data_df['net_dollar_flow']) < 50_000_000_000] #50 bil erro
 data_df = data_df[~data_df['net_dollar_flow'].isna()]
 
 
-# In[45]:
+# In[ ]:
 
 
 # data_df[(data_df['protocol']=='shibaswap') & (data_df['chain']=='Ethereum') & (data_df['date'] == '2022-12-09')].sort_values(by='net_dollar_flow_latest_price',ascending=False)
@@ -271,7 +271,7 @@ data_df = data_df[~data_df['net_dollar_flow'].isna()]
 # data_df[data_df['protocol'] == 'velodrome']
 
 
-# In[46]:
+# In[ ]:
 
 
 netdf_df = data_df[['date','protocol','chain','name','category','parent_protocol','net_dollar_flow','usd_value','net_dollar_flow_latest_price']]
@@ -297,7 +297,7 @@ netdf_df.drop(columns=['index'],inplace=True)
 
 
 
-# In[47]:
+# In[ ]:
 
 
 # tmp = netdf_df[(netdf_df['protocol']=='rage-trade') & (netdf_df['chain']=='Arbitrum') & (netdf_df['date'] > '2022-12-01')]
@@ -307,7 +307,7 @@ netdf_df.drop(columns=['index'],inplace=True)
 # netdf_df[netdf_df['protocol'] == 'velodrome'].groupby('protocol').sum()
 
 
-# In[48]:
+# In[ ]:
 
 
 #get latest
@@ -331,13 +331,13 @@ netdf_df = netdf_df[  #( netdf_df['rank_desc'] == 1 ) &\
 # display(netdf_df[netdf_df['protocol']=='makerdao'])
 
 
-# In[49]:
+# In[ ]:
 
 
 # display(netdf_df)
 
 
-# In[51]:
+# In[ ]:
 
 
 summary_df = netdf_df.copy()
@@ -462,7 +462,7 @@ for i in drange:
 # fig.update_layout(tickprefix = '$')
 
 
-# In[57]:
+# In[ ]:
 
 
 # display( summary_df[(summary_df['chain'] == 'Arbitrum') & (summary_df['protocol'] == 'rage-trade') & (summary_df['rank_desc'] < 30)][['date','usd_value','protocol','net_dollar_flow','cumul_net_dollar_flow_30d']])
@@ -472,7 +472,7 @@ summary_df[summary_df['protocol'] == 'velodrome']
 # summary_df[summary_df['protocol'] == 'velodrome*']
 
 
-# In[53]:
+# In[ ]:
 
 
 # test_df= netdf_df[(netdf_df['chain'] == 'Arbitrum') & (netdf_df['protocol'] == 'rage-trade')][['chain','protocol','date','net_dollar_flow','rank_desc']]
@@ -483,7 +483,7 @@ summary_df[summary_df['protocol'] == 'velodrome']
 # # display(summary_df[summary_df['protocol']=='makerdao'].iloc[: , :15])
 
 
-# In[54]:
+# In[ ]:
 
 
 # fig_app = px.treemap(final_summary_df[final_summary_df['abs_cumul_net_dollar_flow'] !=0], \
@@ -503,7 +503,7 @@ summary_df[summary_df['protocol'] == 'velodrome']
 # fig.show()
 
 
-# In[55]:
+# In[ ]:
 
 
 # fig_app.write_image(prepend + "img_outputs/svg/net_app_flows_by_app.svg") #prepend + 
@@ -511,7 +511,7 @@ summary_df[summary_df['protocol'] == 'velodrome']
 # fig_app.write_html(prepend + "img_outputs/net_app_flows_by_app.html", include_plotlyjs='cdn')
 
 
-# In[56]:
+# In[ ]:
 
 
 # ! jupyter nbconvert --to python total_app_net_flows_async.ipynb
