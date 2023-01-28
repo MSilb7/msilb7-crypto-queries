@@ -16,3 +16,4 @@ L2 TVL/ignore/
 dune_exports/dune.env
 *.env
 dune_exports/
+op_attestation_data/*.csv
