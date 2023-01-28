@@ -28,6 +28,6 @@ All attestations are stored as key : value pairs ([see the code](https://communi
 - **origin_to_address:** The contract (to) address of the transaction where the attestation was made.
 
 ## Other References
-- AttestationStation Contract Address: `[0xEE36eaaD94d1Cc1d0eccaDb55C38bFfB6Be06C77]`(https://optimistic.etherscan.io/address/0xEE36eaaD94d1Cc1d0eccaDb55C38bFfB6Be06C77)
+- AttestationStation Contract Address: [`0xEE36eaaD94d1Cc1d0eccaDb55C38bFfB6Be06C77`](https://optimistic.etherscan.io/address/0xEE36eaaD94d1Cc1d0eccaDb55C38bFfB6Be06C77)
 - [Flipside SDK Docs](https://docs.flipsidecrypto.com/shroomdk-sdk/get-started)
 - [Flipside SDK Examples](https://github.com/FlipsideCrypto/sdk)
