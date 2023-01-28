@@ -4,6 +4,7 @@
 Learn more about the vision behind the AttestationStation and Optimism's approach to on-chain identity in the [Optimistic Dev Blog: Making Blockchains Human-friendly](https://dev.optimism.io/making-blockchains-human-friendly/)
 ![image](https://user-images.githubusercontent.com/4006780/215288256-e2634b90-6328-48e8-a546-966936a46505.png){: width="50%"}
 *Image from the Optimistic Dev Blog*
+<img src="[https://your-image-url.type](https://user-images.githubusercontent.com/4006780/215288256-e2634b90-6328-48e8-a546-966936a46505.png)" width="50%" height="50%">
 
 # How to Pull All Attestation Station Data
 Once you have a ShroomDK API Key (requires NFT mint), store in your .env as:
