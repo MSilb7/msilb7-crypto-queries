@@ -2,8 +2,8 @@
 `pull_attestations_shroomdk.ipynb` uses Flipside Crypto data and Flipside's [ShroomDK (SDK)](https://sdk.flipsidecrypto.xyz/shroomdk) to query all on-chain attestations made on the [AttestationStation](https://community.optimism.io/docs/governance/attestation-station/) deployed on [Optimism](https://www.optimism.io/).
 
 Learn more about the vision behind the AttestationStation and Optimism's approach to on-chain identity in the [Optimistic Dev Blog: Making Blockchains Human-friendly](https://dev.optimism.io/making-blockchains-human-friendly/)
-![image](https://user-images.githubusercontent.com/4006780/215288256-e2634b90-6328-48e8-a546-966936a46505.png)
-* Image from the Optimistic Dev Blog*
+![image](https://user-images.githubusercontent.com/4006780/215288256-e2634b90-6328-48e8-a546-966936a46505.png){: width="50%"}
+*Image from the Optimistic Dev Blog*
 
 # How to Pull All Attestation Station Data
 Once you have a ShroomDK API Key (requires NFT mint), store in your .env as:
