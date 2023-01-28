@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[ ]:
+# In[1]:
 
 
 # ! pip install pandas
@@ -12,7 +12,7 @@
 # ! pip freeze = requirements.txt
 
 
-# In[ ]:
+# In[2]:
 
 
 import pandas as pd
@@ -28,7 +28,7 @@ import defillama_utils as dfl
 import pandas_utils as pu
 
 
-# In[ ]:
+# In[3]:
 
 
 pwd = os.getcwd()
@@ -41,7 +41,7 @@ else:
 do_fallback_on_raw_tvl = True
 
 
-# In[ ]:
+# In[4]:
 
 
 # Protocol Incentive Start Dates
@@ -72,10 +72,10 @@ protocols = pd.DataFrame(
             ,[1,'cbridge',    300000,    '2022-08-13',   '',   'Celer', 'Gov Fund - Phase 0', 'defillama','']
             ,[1,'clipper',    300000,    '2023-01-23',   '',   '', 'Gov Fund - Phase 0', 'defillama','']
             #Uniswap LM Program - Phase 1
-            ,[0,'uniswap-v3', 150000,         '2022-10-26',   '2022-11-21',   'Uniswap LM - Phase 1', 'Gov Fund - Phase 0', 'defillama','']
-            ,[1,'arrakis-finance',    50000,    '2022-10-26',   '2022-11-21',   'Uniswap LM - Phase 1', 'Gov Fund - Phase 0','defillama','']
-            ,[1,'gamma',    50000,              '2022-10-26',   '2022-11-21',   'Uniswap LM - Phase 1', 'Gov Fund - Phase 0','defillama','']
-            ,[1,'xtoken',    50000,             '2022-10-26',   '2022-11-21',   'Uniswap LM - Phase 1', 'Gov Fund - Phase 0','defillama','']
+            ,[0,'uniswap-v3', 50000,         '2022-10-26',   '2022-11-21',   'Uniswap LM - Phase 1', 'Gov Fund - Phase 0', 'defillama','']
+            ,[1,'arrakis-finance',    50000/3,    '2022-10-26',   '2022-11-21',   'Uniswap LM - Phase 1', 'Gov Fund - Phase 0','defillama','']
+            ,[1,'gamma',    50000/3,              '2022-10-26',   '2022-11-21',   'Uniswap LM - Phase 1', 'Gov Fund - Phase 0','defillama','']
+            ,[1,'xtoken',    50000/3,             '2022-10-26',   '2022-11-21',   'Uniswap LM - Phase 1', 'Gov Fund - Phase 0','defillama','']
             #Uniswap LM Program - Phase 2 - https://gov.uniswap.org/t/rfc-phase-2-optimism-uniswap-protocol-liquidity-mining-program/19803/12
             ,[0,'uniswap-v3', 100000,         '2023-01-16',   '2023-02-08',   'Uniswap LM - Phase 2', 'Gov Fund - Phase 0', 'defillama','']
             ,[1,'arrakis-finance',    100000/4,    '2023-01-16',   '2023-02-08',   'Uniswap LM - Phase 2', 'Gov Fund - Phase 0','defillama','']
@@ -153,7 +153,7 @@ protocols = protocols.sort_values(by='start_date', ascending=True)
 # display(protocols)
 
 
-# In[ ]:
+# In[5]:
 
 
 api_str = 'https://api.llama.fi/protocol/'
@@ -173,7 +173,7 @@ df_dfl = df_dfl.merge(dfl_protocols, on ='protocol')
 df_dfl = df_dfl[['date', 'token', 'token_value', 'usd_value', 'protocol', 'start_date','end_date','program_name','app_name']]
 
 
-# In[ ]:
+# In[6]:
 
 
 subg_protocols = protocols[protocols['data_source'].str.contains('pool-')].copy()
@@ -183,13 +183,13 @@ subg_protocols['protocol'] = subg_protocols['data_source'].str.split('-').str[-1
 # display(subg_protocols)
 
 
-# In[ ]:
+# In[7]:
 
 
 # display(subg.get_curve_pool_tvl('0x061b87122ed14b9526a813209c8a59a633257bab'))
 
 
-# In[ ]:
+# In[8]:
 
 
 dfs_sub = []
