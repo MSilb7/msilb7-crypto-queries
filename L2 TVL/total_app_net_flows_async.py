@@ -79,7 +79,7 @@ df_df = dfl.get_all_protocol_tvls_by_chain_and_token(min_tvl, is_fallback_on_raw
 # display(df_df)
 df_df_all = df_df.copy()
 df_df_all.head()
-# df_df_all[df_df_all['protocol'] == 'velodrome']
+# df_df_all[(df_df_all['protocol'] == 'magpie') & (df_df_all['date'] == '2023-01-27')]
 
 
 # In[ ]:
@@ -266,8 +266,12 @@ data_df = data_df[~data_df['net_dollar_flow'].isna()]
 # In[ ]:
 
 
-# data_df[(data_df['protocol']=='shibaswap') & (data_df['chain']=='Ethereum') & (data_df['date'] == '2022-12-09')].sort_values(by='net_dollar_flow_latest_price',ascending=False)
+# Handle for errors where a token price went to zero (i.e. magpie ANKRBNB 2023-01-27)
+data_df['net_dollar_flow_latest_price'] = np.where(
+    data_df['net_dollar_flow'] == 0, 0, data_df['net_dollar_flow_latest_price']
+)
 
+# data_df[(data_df['protocol'] == 'magpie') & (data_df['date'] >= '2023-01-27') ]
 # data_df[data_df['protocol'] == 'velodrome']
 
 
@@ -468,8 +472,8 @@ for i in drange:
 # display( summary_df[(summary_df['chain'] == 'Arbitrum') & (summary_df['protocol'] == 'rage-trade') & (summary_df['rank_desc'] < 30)][['date','usd_value','protocol','net_dollar_flow','cumul_net_dollar_flow_30d']])
 
 #test sample
-summary_df[summary_df['protocol'] == 'velodrome']
-# summary_df[summary_df['protocol'] == 'velodrome*']
+# summary_df[summary_df['protocol'] == 'magpie']
+summary_df[summary_df['protocol'] == 'velodrome*']
 
 
 # In[ ]:
