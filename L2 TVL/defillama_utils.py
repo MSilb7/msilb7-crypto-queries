@@ -28,7 +28,7 @@ async def get_tvl(apistring, header, statuses, chains, prot, prot_name, fallback
                                 ad_usd = pd.json_normalize( prot_req[ch]['tokensInUsd'] )
                                 if (ad.empty) & (fallback_on_raw_tvl == True):
                                         ad = pd.DataFrame( prot_req[ch]['tvl'] )
-                                        prot_map = prot + '*'
+                                        prot_map = prot #+ '*'
                                 else:
                                         prot_map = prot
                                 try: #if there's generic tvl
