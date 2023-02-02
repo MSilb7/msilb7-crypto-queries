@@ -446,6 +446,8 @@ latest_data_df['days_since_program_end'] = \
         pd.to_datetime(latest_data_df['date']) \
         - pd.to_datetime(latest_data_df['start_date']) \
         )
+latest_data_df = latest_data_df.sort_values(by='start_date', ascending=False)
+# display(latest_data_df)
 
 
 # In[ ]:
@@ -462,13 +464,17 @@ season_summary_s0_no_perp['op_source'] = 'Gov Fund - Phase 0 (Excl. Perp)'
 season_summary = pd.concat([season_summary_raw, season_summary_s0_no_perp])
 
 season_summary = season_summary_raw.groupby('op_source').sum()
+# display(season_summary.head())
+season_summary.reset_index()
 # create a row with total values
-season_summary_total = pd.DataFrame(season_summary_raw.sum(), columns=['totals']).T
-# print(season_summary_total)
+season_summary_total_raw = season_summary_raw.copy()
+season_summary_total_raw['op_source'] = 'totals'
+season_summary_total = pd.DataFrame(season_summary_total_raw.groupby('op_source').sum())
+
 # concatenate the aggregated grouped data with the total row
 season_summary = pd.concat([season_summary, season_summary_total])
 season_summary.reset_index(inplace=True)
-# season_summary.head()
+season_summary.head()
 
 
 # In[ ]:
