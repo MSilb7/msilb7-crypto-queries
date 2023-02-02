@@ -74,10 +74,13 @@ def format_num(x, prefix=''):
     elif x >= 1e3:
         return f'{x / 1e3:,.1f}k'
     if x < -1e6:
-        return f'-{prefix}{-x / 1e6:,.1f}M'
+        return f'-{prefix}{abs(x) / 1e6:,.1f}M'
     elif x < -1e3:
-        return f'-{prefix}{-x / 1e3:,.1f}k'
+        return f'-{prefix}{abs(x) / 1e3:,.1f}k'
     elif x < 0:
-        return f'-{prefix}{-x:,.1f}'
+        return f'-{prefix}{x:,.1f}'
     
     return f'{prefix}{x:,.1f}'
+def format_pct(x):
+    return f'{x*100:,.1f}%'
+    
