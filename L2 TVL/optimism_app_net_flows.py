@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[1]:
+# In[ ]:
 
 
 # ! pip install pandas
@@ -12,7 +12,7 @@
 # ! pip freeze = requirements.txt
 
 
-# In[2]:
+# In[ ]:
 
 
 import pandas as pd
@@ -28,7 +28,7 @@ import defillama_utils as dfl
 import pandas_utils as pu
 
 
-# In[3]:
+# In[ ]:
 
 
 pwd = os.getcwd()
@@ -41,7 +41,7 @@ else:
 do_fallback_on_raw_tvl = True
 
 
-# In[4]:
+# In[ ]:
 
 
 # Protocol Incentive Start Dates
@@ -153,7 +153,7 @@ protocols = protocols.sort_values(by='start_date', ascending=True)
 # display(protocols)
 
 
-# In[5]:
+# In[ ]:
 
 
 api_str = 'https://api.llama.fi/protocol/'
@@ -173,7 +173,7 @@ df_dfl = df_dfl.merge(dfl_protocols, on ='protocol')
 df_dfl = df_dfl[['date', 'token', 'token_value', 'usd_value', 'protocol', 'start_date','end_date','program_name','app_name']]
 
 
-# In[6]:
+# In[ ]:
 
 
 subg_protocols = protocols[protocols['data_source'].str.contains('pool-')].copy()
@@ -183,13 +183,13 @@ subg_protocols['protocol'] = subg_protocols['data_source'].str.split('-').str[-1
 # display(subg_protocols)
 
 
-# In[7]:
+# In[ ]:
 
 
 # display(subg.get_curve_pool_tvl('0x061b87122ed14b9526a813209c8a59a633257bab'))
 
 
-# In[8]:
+# In[ ]:
 
 
 dfs_sub = []
@@ -214,14 +214,14 @@ df_df_sub = pd.concat(dfs_sub)
 # display(df_df_sub[df_df_sub['program_name'].str.contains('Velo')])
 
 
-# In[9]:
+# In[ ]:
 
 
 # display(df_df_sub.sort_values(by='date'))
 # display(df_dfl[df_dfl['protocol']=='defiedge'])
 
 
-# In[10]:
+# In[ ]:
 
 
 df_df_comb = pd.concat([df_dfl, df_df_sub])
@@ -259,7 +259,7 @@ df_df = df_df.groupby(['date','token','protocol','start_date','end_date_30','pro
 #         )
 
 
-# In[11]:
+# In[ ]:
 
 
 data_df = df_df.copy()#merge(cg_df, on=['date','token'],how='inner')
@@ -281,7 +281,7 @@ last_df = last_df[['token','protocol','program_name','last_price_usd']]
 # display(last_df)
 
 
-# In[12]:
+# In[ ]:
 
 
 data_df = data_df.merge(last_df, on=['token','protocol','program_name'], how='left')
@@ -309,7 +309,7 @@ data_df['net_price_stock_change'] = data_df['last_token_value'] * data_df['net_p
 # display(data_df)
 
 
-# In[13]:
+# In[ ]:
 
 
 #filter before start date
@@ -323,7 +323,7 @@ if not os.path.exists(prepend + "csv_outputs"):
 data_df.to_csv(prepend + 'csv_outputs/' + 'tvl_flows_by_token.csv')
 
 
-# In[14]:
+# In[ ]:
 
 
 # data_df[data_df['protocol']=='perpetual-protocol'].sort_values(by='date')
@@ -332,7 +332,7 @@ data_df.to_csv(prepend + 'csv_outputs/' + 'tvl_flows_by_token.csv')
 # data_df[(data_df['protocol'] == 'pooltogether') & (data_df['date'] >= '2022-10-06') & (data_df['date'] <= '2022-10-12')].tail(10)
 
 
-# In[15]:
+# In[ ]:
 
 
 netdf_df = data_df[['date','protocol','program_name','net_dollar_flow','net_price_stock_change','last_price_net_dollar_flow','usd_value','app_name']]
@@ -375,7 +375,7 @@ for d in date_cols:
 # display(program_end_df)
 
 
-# In[16]:
+# In[ ]:
 
 
 summary_cols = ['cumul_net_dollar_flow','cumul_last_price_net_dollar_flow','cumul_net_price_stock_change','num_op']
@@ -407,14 +407,14 @@ netdf_df['program_rank_desc'] = netdf_df.groupby(['protocol', 'program_name'])['
 # display(netdf_df[netdf_df['protocol'] == 'hundred-finance'].sort_values(by='program_rank_desc'))
 
 
-# In[17]:
+# In[ ]:
 
 
 # netdf_df[(netdf_df['date'] >= '2022-10-06') & (netdf_df['date'] <= '2022-10-12')].tail(10)
 # netdf_df.tail()
 
 
-# In[18]:
+# In[ ]:
 
 
 during_str = 'During Program'
@@ -428,7 +428,7 @@ if not os.path.exists(prepend + "csv_outputs"):
 netdf_df.to_csv(prepend + 'csv_outputs/op_summer_daily_stats.csv', index=False)
 
 
-# In[19]:
+# In[ ]:
 
 
 latest_data_df = netdf_df[netdf_df['program_rank_desc'] == 1]
@@ -448,32 +448,37 @@ latest_data_df['days_since_program_end'] = \
         )
 
 
-# In[20]:
+# In[ ]:
 
 
 # Generate agg summary df
-season_summary = latest_data_df[latest_data_df['include_in_summary'] == 1].copy()
+season_summary_raw = latest_data_df[latest_data_df['include_in_summary'] == 1].copy()
 
-season_summary_s0_no_perp = season_summary[(season_summary['op_source'] == 'Gov Fund - Phase 0') \
-                                                & (season_summary['protocol'] != 'perpetual-protocol')]
+season_summary_s0_no_perp = season_summary_raw[(season_summary_raw['op_source'] == 'Gov Fund - Phase 0') \
+                                                & (season_summary_raw['protocol'] != 'perpetual-protocol')]
 
 season_summary_s0_no_perp['op_source'] = 'Gov Fund - Phase 0 (Excl. Perp)'
 
-season_summary = pd.concat([season_summary, season_summary_s0_no_perp])
+season_summary = pd.concat([season_summary_raw, season_summary_s0_no_perp])
 
-season_summary = season_summary.groupby('op_source').sum()
+season_summary = season_summary_raw.groupby('op_source').sum()
+# create a row with total values
+season_summary_total = pd.DataFrame(season_summary_raw.sum(), columns=['totals']).T
+# print(season_summary_total)
+# concatenate the aggregated grouped data with the total row
+season_summary = pd.concat([season_summary, season_summary_total])
 season_summary.reset_index(inplace=True)
-season_summary.head()
+# season_summary.head()
 
 
-# In[21]:
+# In[ ]:
 
 
-print(latest_data_df.columns)
-print(season_summary.columns)
+# print(latest_data_df.columns)
+# print(season_summary.columns)
 
 
-# In[22]:
+# In[ ]:
 
 
 df_list = [latest_data_df, season_summary]
@@ -481,8 +486,14 @@ latest_data_df.name = 'latest_data_df'
 season_summary.name = 'season_summary'
 
 for df in df_list:
+        # Fix 0 columns
+        for col in df.columns:
+                if "_at_program_end" in col:
+                        df[col] = df[col].astype(float)
+                        df[col] = np.where(df[col] == 0, np.NaN, df[col])
 
         df['cumul_flows_per_op_at_program_end'] = df['cumul_net_dollar_flow_at_program_end'] / df['num_op_at_program_end']
+        
         df['cumul_flows_per_op_latest'] = df['cumul_net_dollar_flow'] / df['num_op']
 
         df['last_price_net_dollar_flows_per_op_at_program_end'] = df['cumul_last_price_net_dollar_flow_at_program_end'] / df['num_op_at_program_end']
@@ -496,10 +507,11 @@ for df in df_list:
                         * np.where(df['cumul_last_price_net_dollar_flow'] < 0, -1, 1)
 
 
-# In[24]:
+# In[ ]:
 
 
 for df in df_list:
+    # display(df)
     #get df name
     col_list = [
         'date','include_in_summary','program_name','app_name','num_op','period','op_source','start_date','end_date'
@@ -572,7 +584,7 @@ for df in df_list:
         ,'flows_retention' : 'Net Flows Retained'
         ,'last_price_net_dollar_flows_retention' : 'Net Flows Retained @ Current Prices'
     })
-    format_mil_cols_clean = [
+    format_mil_cols_clean = [ 'Net Flows (at End Date)'
         'Net Flows (End + 30)', 'Net Flows @ Current Prices (End + 30)',
         'Net Flows @ Current Prices (at End Date)',
         'Net Flows @ Current Prices (at End Date)'
@@ -590,7 +602,7 @@ for df in df_list:
     # display(df_format[format_mil_cols_clean])
     # fig_tbl = px.table(df_format[df_col_list], sortable=True)
     # fig_tbl.show()
-
+    
     #chatgpt goat?
     header = dict(values=df_col_list, fill_color='darkgray', align='left')#, sort_action='native')
 

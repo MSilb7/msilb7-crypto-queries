@@ -66,6 +66,9 @@ def format_num(x, prepend):
         return x
     
 def format_num(x, prefix=''):
+    if x == '': #if null, make it 0
+        x=0
+    x = float(x)
     if x >= 1e6:
         return f'{prefix}{x / 1e6:,.1f}M'
     if x >= 1e3:
