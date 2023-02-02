@@ -1,8 +1,8 @@
 
 ### Aggregate Stats
 *These tables look very bad, and sorting doesn't really work. idk how to make them pretty, but will try eventually.*
-- [OP Summer Latest Stats](https://hi.msilb7.com/msilb7-crypto-queries/L2%20TVL/img_outputs/app/op_summer_latest_stats.html)
-- [OP Summer Season Summary](https://hi.msilb7.com/msilb7-crypto-queries/L2%20TVL/img_outputs/app/season_summary_stats.html)
+- [OP Summer Latest Stats](https://hi.msilb7.com/msilb7-crypto-queries/L2%20TVL/img_outputs/app/html/op_summer_latest_stats.html)
+- [OP Summer Season Summary](https://hi.msilb7.com/msilb7-crypto-queries/L2%20TVL/img_outputs/app/html/season_summary_stats.html)
 
 ### Charts
 - OP Incentives Net Flows: *Choose to either mark flows at the most recent token price, or the price on each day*

@@ -579,8 +579,8 @@ for df in df_list:
     #     prepend + "img_outputs/app/" + html_name + ".html",
     #     classes='table table-stripped')
 
-    df_col_list = df_format.columns
-    df_col_list = df_col_list.remove('include_in_summary')
+    df_col_list = list(df_format.columns)
+    df_col_list.remove('include_in_summary')
     pd_html = pu.generate_html(df_format[df_col_list])
     open(prepend + "img_outputs/app/html/" + html_name + ".html", "w").write(pd_html)
 
@@ -740,5 +740,5 @@ print("yay")
 # In[ ]:
 
 
-# ! jupyter nbconvert --to python optimism_app_net_flows.ipynb
+get_ipython().system(' jupyter nbconvert --to python optimism_app_net_flows.ipynb')
 

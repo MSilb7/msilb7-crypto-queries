@@ -1,0 +1,116 @@
+
+    <html>
+    <header>
+        <link href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css" rel="stylesheet">
+    </header>
+    <body>
+    <table border="1" class="dataframe" id="table">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th># OP</th>
+      <th>Source</th>
+      <th>Net Flows (at End Date)</th>
+      <th>Net Flows (End + 30)</th>
+      <th>Net Flows per OP (at End Date)</th>
+      <th>Net Flows @ Current Prices (at End Date)</th>
+      <th>Net Flows per OP (End + 30)</th>
+      <th>Net Flows @ Current Prices (End + 30)</th>
+      <th>Net Flows per OP @ Current Prices (at End Date)</th>
+      <th>Net Flows per OP @ Current Prices (End + 30)</th>
+      <th>Net Flows Retained</th>
+      <th>Net Flows Retained @ Current Prices</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>21,182,857</td>
+      <td>Gov Fund - Phase 0</td>
+      <td>$2.76M</td>
+      <td>$128.21M</td>
+      <td>$2.63</td>
+      <td>$2.88M</td>
+      <td>$6.05</td>
+      <td>$129.05M</td>
+      <td>$2.75</td>
+      <td>$6.09</td>
+      <td>686.2%</td>
+      <td>677.8%</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>12,182,857</td>
+      <td>Gov Fund - Phase 0 (Excl. Perp)</td>
+      <td>$2.76M</td>
+      <td>$139.46M</td>
+      <td>$2.63</td>
+      <td>$2.88M</td>
+      <td>$11.45</td>
+      <td>$140.27M</td>
+      <td>$2.75</td>
+      <td>$11.51</td>
+      <td>686.2%</td>
+      <td>677.8%</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>2,525,000</td>
+      <td>Gov Fund - Season 1</td>
+      <td>$0.00M</td>
+      <td>$63.74M</td>
+      <td></td>
+      <td>$0.00M</td>
+      <td>$25.25</td>
+      <td>$63.94M</td>
+      <td></td>
+      <td>$25.32</td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>4,590,000</td>
+      <td>Gov Fund - Season 2</td>
+      <td>$0.00M</td>
+      <td>$88.95M</td>
+      <td></td>
+      <td>$0.00M</td>
+      <td>$19.38</td>
+      <td>$89.75M</td>
+      <td></td>
+      <td>$19.55</td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>8,450,000</td>
+      <td>Partner Fund</td>
+      <td>$306.50M</td>
+      <td>$158.94M</td>
+      <td>$38.31</td>
+      <td>$304.63M</td>
+      <td>$18.81</td>
+      <td>$157.78M</td>
+      <td>$38.08</td>
+      <td>$18.67</td>
+      <td>41.1%</td>
+      <td>41.0%</td>
+    </tr>
+  </tbody>
+</table>
+    <script src="https://code.jquery.com/jquery-3.6.0.slim.min.js" integrity="sha256-u7e5khyithlIdTpu22PHhENmPcRdFiHRjhAuHcs05RI=" crossorigin="anonymous"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <script>
+        $(document).ready( function () {
+            $('#table').DataTable({
+                // paging: false,    
+                // scrollY: 400,
+                pageLength: 25
+            });
+        });
+    </script>
+    </body>
+    </html>
+    
