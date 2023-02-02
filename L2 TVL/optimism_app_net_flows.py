@@ -621,7 +621,8 @@ for df in df_list:
     df_col_list.remove('include_in_summary')
 
     format_mil_cols_clean = [x for x in df_col_list
-                             if 'Flows' in x]
+                             if ('Flows' in x) & ('Retained' not in x)]
+    print(format_mil_cols_clean)
     format_pct_cols_clean = [x for x in df_col_list
                              if 'Retained' in x]
 
@@ -819,8 +820,8 @@ cumul_fig.show()
 print("yay")
 
 
-# In[ ]:
+# In[27]:
 
 
-# ! jupyter nbconvert --to python optimism_app_net_flows.ipynb
+get_ipython().system(' jupyter nbconvert --to python optimism_app_net_flows.ipynb')
 
