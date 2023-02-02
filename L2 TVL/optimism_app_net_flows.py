@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[122]:
+# In[ ]:
 
 
 # ! pip install pandas
@@ -12,7 +12,7 @@
 # ! pip freeze = requirements.txt
 
 
-# In[123]:
+# In[ ]:
 
 
 import pandas as pd
@@ -28,7 +28,7 @@ import defillama_utils as dfl
 import pandas_utils as pu
 
 
-# In[124]:
+# In[ ]:
 
 
 pwd = os.getcwd()
@@ -41,7 +41,7 @@ else:
 do_fallback_on_raw_tvl = True
 
 
-# In[125]:
+# In[ ]:
 
 
 # Protocol Incentive Start Dates
@@ -153,7 +153,7 @@ protocols = protocols.sort_values(by='start_date', ascending=True)
 # display(protocols)
 
 
-# In[126]:
+# In[ ]:
 
 
 api_str = 'https://api.llama.fi/protocol/'
@@ -173,7 +173,7 @@ df_dfl = df_dfl.merge(dfl_protocols, on ='protocol')
 df_dfl = df_dfl[['date', 'token', 'token_value', 'usd_value', 'protocol', 'start_date','end_date','program_name','app_name']]
 
 
-# In[127]:
+# In[ ]:
 
 
 subg_protocols = protocols[protocols['data_source'].str.contains('pool-')].copy()
@@ -183,13 +183,13 @@ subg_protocols['protocol'] = subg_protocols['data_source'].str.split('-').str[-1
 # display(subg_protocols)
 
 
-# In[128]:
+# In[ ]:
 
 
 # display(subg.get_curve_pool_tvl('0x061b87122ed14b9526a813209c8a59a633257bab'))
 
 
-# In[129]:
+# In[ ]:
 
 
 dfs_sub = []
@@ -514,7 +514,7 @@ season_summary_completed.reset_index(inplace=True)
 
 
 df_list = [latest_data_df, season_summary, season_summary_completed]
-latest_data_df.name = 'latest_data_df'
+latest_data_df.name = 'op_summer_latest'
 season_summary.name = 'season_summary'
 season_summary_completed.name = 'season_summary_completed'
 
@@ -558,7 +558,7 @@ for df in df_list:
     summary_exclude_list = ['date','program_name','app_name','period','start_date','end_date']
     sort_cols = ['Start','# OP']
 
-    if df.name == 'latest_data_df':
+    if df.name == 'op_summer_latest':
         html_name = df.name + '_stats'
         sort_order = [False, False]
     elif 'season_summary' in df.name:
