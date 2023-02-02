@@ -636,7 +636,7 @@ for df in df_list:
     # ]
     df_format = df_format.fillna('')
     df_format = df_format.reset_index(drop=True)
-    df_format = df_format.sort_values(by=sort_cols, ascending = [True,False])
+    df_format = df_format.sort_values(by=sort_cols, ascending = [False,False])
 
     # df_format.to_html(
     #     prepend + "img_outputs/app/" + html_name + ".html",
@@ -646,7 +646,7 @@ for df in df_list:
     # fig_tbl.show()
     
     #chatgpt goat?
-    header = dict(values=df_col_list, fill_color='darkgray', align='left')#, sort_action='native')
+    header = dict(values=df_col_list, fill_color='darkgray', align='center')#, sort_action='native')
 
     # format the numbers in mil_columns and store the result in a list of lists
     values = [[pu.format_num(x,'$') if col in format_mil_cols_clean else 
@@ -654,7 +654,7 @@ for df in df_list:
            pu.format_pct(x) if col in format_pct_cols_clean else x 
            for x in df_format[col]] for col in df_col_list]
 
-    cells = dict(values=values, fill_color=['white', 'lightgray'] * (len(df_format)//2+1), align='left')#, line_break=True)
+    cells = dict(values=values, fill_color=['white', 'lightgray'] * (len(df_format)//2+1), align='right')#, line_break=True)
 
     data = [go.Table(header=header, cells=cells)]
 
