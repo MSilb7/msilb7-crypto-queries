@@ -380,11 +380,17 @@ for d in date_cols:
 
 summary_cols = ['cumul_net_dollar_flow','cumul_last_price_net_dollar_flow','cumul_net_price_stock_change','num_op']
 
+netdf_df['program_rank_desc'] = netdf_df.groupby(['protocol', 'program_name'])['date'].\
+                            rank(method='dense',ascending=False).astype(int)
+
 # for sc in summary_cols:
 #         netdf_df[sc] = netdf_df[sc].astype('int64')
 summary_cols = summary_cols + new_ended_cols
 # print(summary_cols)
-program_end_df = netdf_df[pd.to_datetime(netdf_df['date']) == pd.to_datetime(netdf_df['end_date'])].groupby(['protocol', 'program_name','app_name']).sum(numeric_only=True)
+program_end_df = netdf_df[
+        (pd.to_datetime(netdf_df['date']) == pd.to_datetime(netdf_df['end_date']) ) # is at end date
+        | (netdf_df['program_rank_desc'] ==1)# or is latest date
+                        ].groupby(['protocol', 'program_name','app_name']).sum(numeric_only=True)
 program_end_df.reset_index(inplace=True)
 # display(program_end_df)
 
@@ -397,9 +403,6 @@ for s in summary_cols:
 # netdf_df['cumul_net_dollar_flow_at_program_end'] = netdf_df[is_program_end].groupby(['protocol', 'program_name']).sum(['cumul_net_dollar_flow'])
 # netdf_df['cumul_last_price_net_dollar_flow_at_program_end'] = netdf_df[netdf_df['date'] == netdf_df['end_date']]['last_price_net_dollar_flow'].groupby(['protocol', 'program_name']).cumsum()
 # netdf_df['cumul_net_price_stock_change_at_program_end'] = netdf_df[netdf_df['date'] == netdf_df['end_date']]['net_price_stock_change'].groupby(['protocol', 'program_name']).cumsum()
-
-netdf_df['program_rank_desc'] = netdf_df.groupby(['protocol', 'program_name'])['date'].\
-                            rank(method='dense',ascending=False).astype(int)
 
 # netdf_df.loc[ netdf_df['end_date'] == pd.to_datetime("2000-01-01"), 'end_date' ] == pd.to_datetime("1900-01-01")
 
@@ -454,15 +457,23 @@ latest_data_df = latest_data_df.sort_values(by='start_date', ascending=False)
 
 
 # Generate agg summary df
-season_summary_raw = latest_data_df[latest_data_df['include_in_summary'] == 1].copy()
+season_summary_pds = latest_data_df[latest_data_df['include_in_summary'] == 1].copy()
 
-season_summary_s0_no_perp = season_summary_raw[(season_summary_raw['op_source'] == 'Gov Fund - Phase 0') \
-                                                & (season_summary_raw['protocol'] != 'perpetual-protocol')]
+season_summary_s0_no_perp = season_summary_pds[(season_summary_pds['op_source'] == 'Gov Fund - Phase 0') \
+                                                & (season_summary_pds['protocol'] != 'perpetual-protocol')]
 
 season_summary_s0_no_perp['op_source'] = 'Gov Fund - Phase 0 (Excl. Perp)'
 
-season_summary = pd.concat([season_summary_raw, season_summary_s0_no_perp])
+season_summary_raw = pd.concat([season_summary_pds, season_summary_s0_no_perp])
 
+season_summary_completed_raw = season_summary_pds[season_summary_pds['end_date'] < pd.to_datetime("today")] #only ended summaries
+
+
+
+# In[ ]:
+
+
+# SEASON SUMMARY
 season_summary = season_summary_raw.groupby('op_source').sum()
 # display(season_summary.head())
 season_summary.reset_index()
@@ -474,7 +485,22 @@ season_summary_total = pd.DataFrame(season_summary_total_raw.groupby('op_source'
 # concatenate the aggregated grouped data with the total row
 season_summary = pd.concat([season_summary, season_summary_total])
 season_summary.reset_index(inplace=True)
-season_summary.head()
+# season_summary.head()
+
+# SEASON SUMMARY IF COMPLETED - loops were weird, so doing it this way
+
+season_summary_completed = season_summary_completed_raw.groupby('op_source').sum()
+# display(season_summary.head())
+season_summary_completed.reset_index()
+# create a row with total values
+season_summary_completed_total_raw = season_summary_completed_raw.copy()
+season_summary_completed_total_raw['op_source'] = 'totals'
+season_summary_completed_total = pd.DataFrame(season_summary_completed_total_raw.groupby('op_source').sum())
+
+# concatenate the aggregated grouped data with the total row
+season_summary_completed = pd.concat([season_summary_completed, season_summary_completed_total])
+season_summary_completed.reset_index(inplace=True)
+# season_summary.head()
 
 
 # In[ ]:
@@ -594,8 +620,10 @@ for df in df_list:
     df_col_list = list(df_format.columns)
     df_col_list.remove('include_in_summary')
 
-    format_mil_cols_clean = [x for x in format_mil_cols_clean
+    format_mil_cols_clean = [x for x in df_col_list
                              if 'Flows' in x]
+    format_pct_cols_clean = [x for x in df_col_list
+                             if 'Retained' in x]
 
     format_op_cols_clean = ['# OP']
     # [
@@ -620,7 +648,8 @@ for df in df_list:
 
     # format the numbers in mil_columns and store the result in a list of lists
     values = [[pu.format_num(x,'$') if col in format_mil_cols_clean else 
-           pu.format_num(x) if col in format_op_cols_clean else x 
+           pu.format_num(x) if col in format_op_cols_clean else 
+           pu.format_pct(x) if col in format_pct_cols_clean else x 
            for x in df_format[col]] for col in df_col_list]
 
     cells = dict(values=values, fill_color=['white', 'lightgray'] * (len(df_format)//2+1), align='left')#, line_break=True)
