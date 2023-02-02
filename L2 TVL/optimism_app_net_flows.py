@@ -560,9 +560,11 @@ for df in df_list:
 
     if df.name == 'latest_data_df':
         html_name = df.name + '_stats'
+        sort_order = [False, False]
     elif 'season_summary' in df.name:
         html_name = df.name + '_stats'
         sort_cols = ['Source','# OP']
+        sort_order = [True, False]
         col_list = [x for x in col_list if x not in summary_exclude_list]
     else:
         html_name = 'other'
@@ -623,7 +625,7 @@ for df in df_list:
 
     format_mil_cols_clean = [x for x in df_col_list
                              if ('Flows' in x) & ('Retained' not in x)]
-    print(format_mil_cols_clean)
+    # print(format_mil_cols_clean)
     format_pct_cols_clean = [x for x in df_col_list
                              if 'Retained' in x]
 
@@ -636,7 +638,7 @@ for df in df_list:
     # ]
     df_format = df_format.fillna('')
     df_format = df_format.reset_index(drop=True)
-    df_format = df_format.sort_values(by=sort_cols, ascending = [False,False])
+    df_format = df_format.sort_values(by=sort_cols, ascending = sort_order)
 
     # df_format.to_html(
     #     prepend + "img_outputs/app/" + html_name + ".html",
