@@ -82,8 +82,9 @@ def format_num(x, prefix=''):
     
     return f'{prefix}{x:,.1f}'
 def format_pct(x):
-    if x == '': #if null, make it 0
-        x=0
-    x = float(x) #just cast for safety
-    return '{:.1%}'.format(x)
+    if x == '': #if null, return it
+        return x
+    else:
+        x = float(x) #just cast for safety
+        return '{:.1%}'.format(x)
     
