@@ -68,7 +68,7 @@ def format_num(x, prepend):
 def format_num(x, prefix=''):
     if x == '': #if null, make it 0
         x=0
-    x = float(x)
+    x = float(x) #just cast for safety
     if x >= 1e6:
         return f'{prefix}{x / 1e6:,.1f}M'
     elif x >= 1e3:
@@ -82,5 +82,8 @@ def format_num(x, prefix=''):
     
     return f'{prefix}{x:,.1f}'
 def format_pct(x):
-    return f'{x*100:,.1f}%'
+    if x == '': #if null, make it 0
+        x=0
+    x = float(x) #just cast for safety
+    return '{:.1%}'.format(x)
     

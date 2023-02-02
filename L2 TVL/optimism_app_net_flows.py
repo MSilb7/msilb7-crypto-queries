@@ -513,9 +513,10 @@ season_summary_completed.reset_index(inplace=True)
 # In[ ]:
 
 
-df_list = [latest_data_df, season_summary]
+df_list = [latest_data_df, season_summary, season_summary_completed]
 latest_data_df.name = 'latest_data_df'
 season_summary.name = 'season_summary'
+season_summary_completed.name = 'season_summary_completed'
 
 for df in df_list:
         # Fix 0 columns
@@ -558,9 +559,9 @@ for df in df_list:
     sort_cols = ['Start','# OP']
 
     if df.name == 'latest_data_df':
-        html_name = 'op_summer_latest_stats'
-    elif df.name == 'season_summary':
-        html_name = 'season_summary_stats'
+        html_name = df.name + '_stats'
+    elif 'season_summary' in df.name:
+        html_name = df.name + '_stats'
         sort_cols = ['Source','# OP']
         col_list = [x for x in col_list if x not in summary_exclude_list]
     else:
@@ -820,8 +821,8 @@ cumul_fig.show()
 print("yay")
 
 
-# In[27]:
+# In[ ]:
 
 
-get_ipython().system(' jupyter nbconvert --to python optimism_app_net_flows.ipynb')
+# ! jupyter nbconvert --to python optimism_app_net_flows.ipynb
 
