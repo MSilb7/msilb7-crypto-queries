@@ -479,7 +479,7 @@ season_summary = season_summary_raw.groupby('op_source').sum()
 season_summary.reset_index()
 # create a row with total values
 season_summary_total_raw = season_summary_raw.copy()
-season_summary_total_raw['op_source'] = 'totals'
+season_summary_total_raw['op_source'] = '- TOTAL -'
 season_summary_total = pd.DataFrame(season_summary_total_raw.groupby('op_source').sum())
 
 # concatenate the aggregated grouped data with the total row
