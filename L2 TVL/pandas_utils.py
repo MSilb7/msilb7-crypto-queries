@@ -28,3 +28,24 @@ def generate_html(dataframe: pd.DataFrame):
     """
     # return the html
     return html
+
+# https://nbviewer.org/gist/alubbock/e5d915397179b9626ae63a55244f510d
+import uuid
+import numpy
+
+def DataTable(df):
+    """ Prints a pandas.DataFrame using jQuery DataTable plugin """
+    from IPython.display import HTML
+    output = """<div id="datatable-%(uuid)s">%(html)s
+            <script type="text/javascript">
+                $(document).ready(function() {
+                    require(['dataTables'], function() {
+                        $('#datatable-%(uuid)s').find('table.datatable').dataTable({
+                        columnDefs: [{ targets: %(sci_cols)s, type: 'scientific' }]});
+                    });
+                });
+            </script>
+        </div>
+    """ % {'uuid': uuid.uuid1(), 'html': df.to_html(classes="datatable display"),
+          'sci_cols': '[%s]' % ",".join([str(i) for i, _ in enumerate(df.dtypes == numpy.float64)])}
+    return HTML(output)

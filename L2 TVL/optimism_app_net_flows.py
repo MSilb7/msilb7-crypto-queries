@@ -551,9 +551,10 @@ for df in df_list:
         'cumul_last_price_net_dollar_flow_at_program_end'
     ]
     for f in format_cols:
-        df_format[f] = df_format[f].apply(lambda x: '${0:,.2f}'.format(x) if not pd.isna(x) else x )
-    for fm in format_mil_cols:
-        df_format[fm] = df_format[fm].apply(lambda x: '${0:,.2f}M'.format(x/1e6) if not pd.isna(x) else x )
+        # df_format[f] = df_format[f].apply(lambda x: '${0:,.2f}'.format(x) if not pd.isna(x) else x )
+        df_format[f] = df_format[f].apply(lambda x: round(x,1) if not pd.isna(x) else x )
+    # for fm in format_mil_cols:
+    #     df_format[fm] = df_format[fm].apply(lambda x: '${0:,.2f}M'.format(x/1e6) if not pd.isna(x) else x )
 
 
     df_format = df_format.rename(columns={
@@ -581,7 +582,9 @@ for df in df_list:
 
     df_col_list = list(df_format.columns)
     df_col_list.remove('include_in_summary')
-    pd_html = pu.generate_html(df_format[df_col_list])
+    # pd_html = pu.generate_html(df_format[df_col_list])
+    pd_html = pu.DataTable(df_format[df_col_list]).data
+    # print(type(pd_html))
     open(prepend + "img_outputs/app/html/" + html_name + ".html", "w").write(pd_html)
 
 
@@ -740,5 +743,5 @@ print("yay")
 # In[ ]:
 
 
-get_ipython().system(' jupyter nbconvert --to python optimism_app_net_flows.ipynb')
+# ! jupyter nbconvert --to python optimism_app_net_flows.ipynb
 

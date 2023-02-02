@@ -1,10 +1,4 @@
-
-    <html>
-    <header>
-        <link href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css" rel="stylesheet">
-    </header>
-    <body>
-    <table border="1" class="dataframe" id="table">
+<div id="datatable-cbb19ffa-a30a-11ed-a1e0-0ee269140c29"><table border="1" class="dataframe datatable display">
   <thead>
     <tr style="text-align: right;">
       <th></th>
@@ -27,14 +21,14 @@
       <th>0</th>
       <td>21,182,857</td>
       <td>Gov Fund - Phase 0</td>
-      <td>$2.76M</td>
-      <td>$128.21M</td>
-      <td>$2.63</td>
-      <td>$2.88M</td>
-      <td>$6.05</td>
-      <td>$129.05M</td>
-      <td>$2.75</td>
-      <td>$6.09</td>
+      <td>2.763806e+06</td>
+      <td>1.282122e+08</td>
+      <td>2.6</td>
+      <td>2.883368e+06</td>
+      <td>6.1</td>
+      <td>1.290467e+08</td>
+      <td>2.7</td>
+      <td>6.1</td>
       <td>686.2%</td>
       <td>677.8%</td>
     </tr>
@@ -42,14 +36,14 @@
       <th>1</th>
       <td>12,182,857</td>
       <td>Gov Fund - Phase 0 (Excl. Perp)</td>
-      <td>$2.76M</td>
-      <td>$139.46M</td>
-      <td>$2.63</td>
-      <td>$2.88M</td>
-      <td>$11.45</td>
-      <td>$140.27M</td>
-      <td>$2.75</td>
-      <td>$11.51</td>
+      <td>2.763806e+06</td>
+      <td>1.394616e+08</td>
+      <td>2.6</td>
+      <td>2.883368e+06</td>
+      <td>11.4</td>
+      <td>1.402700e+08</td>
+      <td>2.7</td>
+      <td>11.5</td>
       <td>686.2%</td>
       <td>677.8%</td>
     </tr>
@@ -57,14 +51,14 @@
       <th>2</th>
       <td>2,525,000</td>
       <td>Gov Fund - Season 1</td>
-      <td>$0.00M</td>
-      <td>$63.74M</td>
+      <td>0.000000e+00</td>
+      <td>6.374407e+07</td>
       <td></td>
-      <td>$0.00M</td>
-      <td>$25.25</td>
-      <td>$63.94M</td>
+      <td>0.000000e+00</td>
+      <td>25.2</td>
+      <td>6.393998e+07</td>
       <td></td>
-      <td>$25.32</td>
+      <td>25.3</td>
       <td></td>
       <td></td>
     </tr>
@@ -72,14 +66,14 @@
       <th>3</th>
       <td>4,590,000</td>
       <td>Gov Fund - Season 2</td>
-      <td>$0.00M</td>
-      <td>$88.95M</td>
+      <td>0.000000e+00</td>
+      <td>8.894878e+07</td>
       <td></td>
-      <td>$0.00M</td>
-      <td>$19.38</td>
-      <td>$89.75M</td>
+      <td>0.000000e+00</td>
+      <td>19.4</td>
+      <td>8.975096e+07</td>
       <td></td>
-      <td>$19.55</td>
+      <td>19.6</td>
       <td></td>
       <td></td>
     </tr>
@@ -87,30 +81,26 @@
       <th>4</th>
       <td>8,450,000</td>
       <td>Partner Fund</td>
-      <td>$306.50M</td>
-      <td>$158.94M</td>
-      <td>$38.31</td>
-      <td>$304.63M</td>
-      <td>$18.81</td>
-      <td>$157.78M</td>
-      <td>$38.08</td>
-      <td>$18.67</td>
+      <td>3.064971e+08</td>
+      <td>1.589418e+08</td>
+      <td>38.3</td>
+      <td>3.046261e+08</td>
+      <td>18.8</td>
+      <td>1.577828e+08</td>
+      <td>38.1</td>
+      <td>18.7</td>
       <td>41.1%</td>
       <td>41.0%</td>
     </tr>
   </tbody>
 </table>
-    <script src="https://code.jquery.com/jquery-3.6.0.slim.min.js" integrity="sha256-u7e5khyithlIdTpu22PHhENmPcRdFiHRjhAuHcs05RI=" crossorigin="anonymous"></script>
-    <script type="text/javascript" src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
-    <script>
-        $(document).ready( function () {
-            $('#table').DataTable({
-                // paging: false,    
-                // scrollY: 400,
-                pageLength: 25
-            });
-        });
-    </script>
-    </body>
-    </html>
+            <script type="text/javascript">
+                $(document).ready(function() {
+                    require(['dataTables'], function() {
+                        $('#datatable-cbb19ffa-a30a-11ed-a1e0-0ee269140c29').find('table.datatable').dataTable({
+                        columnDefs: [{ targets: [0,1,2,3,4,5,6,7,8,9,10,11], type: 'scientific' }]});
+                    });
+                });
+            </script>
+        </div>
     
