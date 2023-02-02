@@ -64,3 +64,16 @@ def format_num(x, prepend):
             return x
     except:
         return x
+    
+def format_num(x, prefix=''):
+    if x >= 1e6:
+        return f'{prefix}{x / 1e6:,.1f}M'
+    if x >= 1e3:
+        return f'{x / 1e3:,.1f}k'
+    if x < 0:
+        return f'-{prefix}{-x:,.1f}'
+    if x < 1e3:
+        return f'-{prefix}{-x / 1e3:,.1f}k'
+    if x < 1e6:
+        return f'-{prefix}{-x / 1e6:,.1f}M'
+    return f'{prefix}{x:,.1f}'

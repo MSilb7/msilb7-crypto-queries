@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[ ]:
+# In[1]:
 
 
 # ! pip install pandas
@@ -12,7 +12,7 @@
 # ! pip freeze = requirements.txt
 
 
-# In[ ]:
+# In[2]:
 
 
 import pandas as pd
@@ -28,7 +28,7 @@ import defillama_utils as dfl
 import pandas_utils as pu
 
 
-# In[ ]:
+# In[3]:
 
 
 pwd = os.getcwd()
@@ -41,7 +41,7 @@ else:
 do_fallback_on_raw_tvl = True
 
 
-# In[ ]:
+# In[4]:
 
 
 # Protocol Incentive Start Dates
@@ -153,7 +153,7 @@ protocols = protocols.sort_values(by='start_date', ascending=True)
 # display(protocols)
 
 
-# In[ ]:
+# In[5]:
 
 
 api_str = 'https://api.llama.fi/protocol/'
@@ -173,7 +173,7 @@ df_dfl = df_dfl.merge(dfl_protocols, on ='protocol')
 df_dfl = df_dfl[['date', 'token', 'token_value', 'usd_value', 'protocol', 'start_date','end_date','program_name','app_name']]
 
 
-# In[ ]:
+# In[6]:
 
 
 subg_protocols = protocols[protocols['data_source'].str.contains('pool-')].copy()
@@ -183,13 +183,13 @@ subg_protocols['protocol'] = subg_protocols['data_source'].str.split('-').str[-1
 # display(subg_protocols)
 
 
-# In[ ]:
+# In[7]:
 
 
 # display(subg.get_curve_pool_tvl('0x061b87122ed14b9526a813209c8a59a633257bab'))
 
 
-# In[ ]:
+# In[8]:
 
 
 dfs_sub = []
@@ -214,14 +214,14 @@ df_df_sub = pd.concat(dfs_sub)
 # display(df_df_sub[df_df_sub['program_name'].str.contains('Velo')])
 
 
-# In[ ]:
+# In[9]:
 
 
 # display(df_df_sub.sort_values(by='date'))
 # display(df_dfl[df_dfl['protocol']=='defiedge'])
 
 
-# In[ ]:
+# In[10]:
 
 
 df_df_comb = pd.concat([df_dfl, df_df_sub])
@@ -259,7 +259,7 @@ df_df = df_df.groupby(['date','token','protocol','start_date','end_date_30','pro
 #         )
 
 
-# In[ ]:
+# In[11]:
 
 
 data_df = df_df.copy()#merge(cg_df, on=['date','token'],how='inner')
@@ -281,7 +281,7 @@ last_df = last_df[['token','protocol','program_name','last_price_usd']]
 # display(last_df)
 
 
-# In[ ]:
+# In[12]:
 
 
 data_df = data_df.merge(last_df, on=['token','protocol','program_name'], how='left')
@@ -309,7 +309,7 @@ data_df['net_price_stock_change'] = data_df['last_token_value'] * data_df['net_p
 # display(data_df)
 
 
-# In[ ]:
+# In[13]:
 
 
 #filter before start date
@@ -323,7 +323,7 @@ if not os.path.exists(prepend + "csv_outputs"):
 data_df.to_csv(prepend + 'csv_outputs/' + 'tvl_flows_by_token.csv')
 
 
-# In[ ]:
+# In[14]:
 
 
 # data_df[data_df['protocol']=='perpetual-protocol'].sort_values(by='date')
@@ -332,7 +332,7 @@ data_df.to_csv(prepend + 'csv_outputs/' + 'tvl_flows_by_token.csv')
 # data_df[(data_df['protocol'] == 'pooltogether') & (data_df['date'] >= '2022-10-06') & (data_df['date'] <= '2022-10-12')].tail(10)
 
 
-# In[ ]:
+# In[15]:
 
 
 netdf_df = data_df[['date','protocol','program_name','net_dollar_flow','net_price_stock_change','last_price_net_dollar_flow','usd_value','app_name']]
@@ -375,7 +375,7 @@ for d in date_cols:
 # display(program_end_df)
 
 
-# In[ ]:
+# In[16]:
 
 
 summary_cols = ['cumul_net_dollar_flow','cumul_last_price_net_dollar_flow','cumul_net_price_stock_change','num_op']
@@ -407,14 +407,14 @@ netdf_df['program_rank_desc'] = netdf_df.groupby(['protocol', 'program_name'])['
 # display(netdf_df[netdf_df['protocol'] == 'hundred-finance'].sort_values(by='program_rank_desc'))
 
 
-# In[ ]:
+# In[17]:
 
 
 # netdf_df[(netdf_df['date'] >= '2022-10-06') & (netdf_df['date'] <= '2022-10-12')].tail(10)
 # netdf_df.tail()
 
 
-# In[ ]:
+# In[18]:
 
 
 during_str = 'During Program'
@@ -428,7 +428,7 @@ if not os.path.exists(prepend + "csv_outputs"):
 netdf_df.to_csv(prepend + 'csv_outputs/op_summer_daily_stats.csv', index=False)
 
 
-# In[ ]:
+# In[19]:
 
 
 latest_data_df = netdf_df[netdf_df['program_rank_desc'] == 1]
@@ -448,7 +448,7 @@ latest_data_df['days_since_program_end'] = \
         )
 
 
-# In[ ]:
+# In[20]:
 
 
 # Generate agg summary df
@@ -466,14 +466,14 @@ season_summary.reset_index(inplace=True)
 season_summary.head()
 
 
-# In[ ]:
+# In[21]:
 
 
 print(latest_data_df.columns)
 print(season_summary.columns)
 
 
-# In[ ]:
+# In[22]:
 
 
 df_list = [latest_data_df, season_summary]
@@ -496,7 +496,7 @@ for df in df_list:
                         * np.where(df['cumul_last_price_net_dollar_flow'] < 0, -1, 1)
 
 
-# In[ ]:
+# In[24]:
 
 
 for df in df_list:
@@ -532,9 +532,9 @@ for df in df_list:
     # print(new_cols)
     df_format = df_format[new_cols]
 
-    df_format['num_op'] = df_format['num_op'].apply(lambda x: '{0:,.0f}'.format(x) if not pd.isna(x) else x )
-    df_format['flows_retention'] = df_format['flows_retention'].apply(lambda x: '{:,.1%}'.format(x) if not pd.isna(x) else x )
-    df_format['last_price_net_dollar_flows_retention'] = df_format['last_price_net_dollar_flows_retention'].apply(lambda x: '{:,.1%}'.format(x) if not pd.isna(x) else x )
+    # df_format['num_op'] = df_format['num_op'].apply(lambda x: '{0:,.0f}'.format(x) if not pd.isna(x) else x )
+    # df_format['flows_retention'] = df_format['flows_retention'].apply(lambda x: '{:,.1%}'.format(x) if not pd.isna(x) else x )
+    # df_format['last_price_net_dollar_flows_retention'] = df_format['last_price_net_dollar_flows_retention'].apply(lambda x: '{:,.1%}'.format(x) if not pd.isna(x) else x )
 
     df_format = df_format[col_list]
     df_format = df_format.reset_index(drop=True)
@@ -550,9 +550,9 @@ for df in df_list:
         'cumul_net_dollar_flow_at_program_end',
         'cumul_last_price_net_dollar_flow_at_program_end'
     ]
-    for f in format_cols:
+    # for f in format_cols:
         # df_format[f] = df_format[f].apply(lambda x: '${0:,.2f}'.format(x) if not pd.isna(x) else x )
-        df_format[f] = df_format[f].apply(lambda x: round(x,1) if not pd.isna(x) else x )
+        # df_format[f] = df_format[f].apply(lambda x: round(x,1) if not pd.isna(x) else x )
     # for fm in format_mil_cols:
     #     df_format[fm] = df_format[fm].apply(lambda x: '${0:,.2f}M'.format(x/1e6) if not pd.isna(x) else x )
 
@@ -592,17 +592,16 @@ for df in df_list:
     # fig_tbl.show()
 
     #chatgpt goat?
-    header = dict(values=df_col_list, fill_color='darkgray', align='left')
+    header = dict(values=df_col_list, fill_color='darkgray', align='left')#, sort_action='native')
 
     # format the numbers in mil_columns and store the result in a list of lists
     values = [[pu.format_num(x,'$') if col in format_mil_cols_clean else x for x in df_format[col]] for col in df_col_list]
 
-    cells = dict(values=[df_format[col] for col in df_col_list],
-                fill_color=['white', 'lightgray'] * (len(df_format)//2+1), align='left')
+    cells = dict(values=values, fill_color=['white', 'lightgray'] * (len(df_format)//2+1), align='left')#, line_break=True)
 
     data = [go.Table(header=header, cells=cells)]
 
-    layout = go.Layout(title='Table')
+    layout = go.Layout(title='TVL & Flows Stats')#, width='100%')
 
     fig_tbl = go.Figure(data=data, layout=layout)
     # fig_tbl.show()
