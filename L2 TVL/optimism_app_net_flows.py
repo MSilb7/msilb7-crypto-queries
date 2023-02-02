@@ -590,11 +590,20 @@ for df in df_list:
         ,'flows_retention' : 'Net Flows Retained'
         ,'last_price_net_dollar_flows_retention' : 'Net Flows Retained @ Current Prices'
     })
-    format_mil_cols_clean = [ 'Net Flows (at End Date)'
-        'Net Flows (End + 30)', 'Net Flows @ Current Prices (End + 30)',
-        'Net Flows @ Current Prices (at End Date)',
-        'Net Flows @ Current Prices (at End Date)'
-    ]
+
+    df_col_list = list(df_format.columns)
+    df_col_list.remove('include_in_summary')
+
+    format_mil_cols_clean = [x for x in format_mil_cols_clean
+                             if 'Flows' in x]
+
+    format_op_cols_clean = ['# OP']
+    # [
+    #     '# OP','Net Flows (at End Date)',
+    #     'Net Flows (End + 30)', 'Net Flows @ Current Prices (End + 30)',
+    #     'Net Flows @ Current Prices (at End Date)',
+    #     'Net Flows @ Current Prices (at End Date)'
+    # ]
     df_format = df_format.fillna('')
     df_format = df_format.reset_index(drop=True)
     df_format = df_format.sort_values(by=sort_cols, ascending = [True,False])
@@ -602,9 +611,6 @@ for df in df_list:
     # df_format.to_html(
     #     prepend + "img_outputs/app/" + html_name + ".html",
     #     classes='table table-stripped')
-
-    df_col_list = list(df_format.columns)
-    df_col_list.remove('include_in_summary')
     # display(df_format[format_mil_cols_clean])
     # fig_tbl = px.table(df_format[df_col_list], sortable=True)
     # fig_tbl.show()
@@ -613,7 +619,9 @@ for df in df_list:
     header = dict(values=df_col_list, fill_color='darkgray', align='left')#, sort_action='native')
 
     # format the numbers in mil_columns and store the result in a list of lists
-    values = [[pu.format_num(x,'$') if col in format_mil_cols_clean else x for x in df_format[col]] for col in df_col_list]
+    values = [[pu.format_num(x,'$') if col in format_mil_cols_clean else 
+           pu.format_num(x) if col in format_op_cols_clean else x 
+           for x in df_format[col]] for col in df_col_list]
 
     cells = dict(values=values, fill_color=['white', 'lightgray'] * (len(df_format)//2+1), align='left')#, line_break=True)
 
