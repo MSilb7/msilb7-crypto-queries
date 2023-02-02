@@ -572,6 +572,11 @@ for df in df_list:
         ,'flows_retention' : 'Net Flows Retained'
         ,'last_price_net_dollar_flows_retention' : 'Net Flows Retained @ Current Prices'
     })
+    format_mil_cols_clean = [
+        'Net Flows (End + 30)', 'Net Flows @ Current Prices (End + 30)',
+        'Net Flows @ Current Prices (at End Date)',
+        'Net Flows @ Current Prices (at End Date)'
+    ]
     df_format = df_format.fillna('')
     df_format = df_format.reset_index(drop=True)
     df_format = df_format.sort_values(by=sort_cols, ascending = [True,False])
@@ -582,10 +587,15 @@ for df in df_list:
 
     df_col_list = list(df_format.columns)
     df_col_list.remove('include_in_summary')
+    # display(df_format[format_mil_cols_clean])
     # fig_tbl = px.table(df_format[df_col_list], sortable=True)
     # fig_tbl.show()
+
     #chatgpt goat?
     header = dict(values=df_col_list, fill_color='darkgray', align='left')
+
+    # format the numbers in mil_columns and store the result in a list of lists
+    values = [[pu.format_num(x,'$') if col in format_mil_cols_clean else x for x in df_format[col]] for col in df_col_list]
 
     cells = dict(values=[df_format[col] for col in df_col_list],
                 fill_color=['white', 'lightgray'] * (len(df_format)//2+1), align='left')
