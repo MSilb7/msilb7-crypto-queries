@@ -29,6 +29,7 @@ def generate_html(dataframe: pd.DataFrame):
     # return the html
     return html
 
+
 # https://nbviewer.org/gist/alubbock/e5d915397179b9626ae63a55244f510d
 import uuid
 import numpy
