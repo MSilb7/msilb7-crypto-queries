@@ -582,13 +582,28 @@ for df in df_list:
 
     df_col_list = list(df_format.columns)
     df_col_list.remove('include_in_summary')
+    # fig_tbl = px.table(df_format[df_col_list], sortable=True)
+    # fig_tbl.show()
+    #chatgpt goat?
+    header = dict(values=df_col_list, fill_color='darkgray', align='left')
+
+    cells = dict(values=[df_format[col] for col in df_col_list],
+                fill_color=['white', 'lightgray'] * (len(df_format)//2+1), align='left')
+
+    data = [go.Table(header=header, cells=cells)]
+
+    layout = go.Layout(title='Table')
+
+    fig_tbl = go.Figure(data=data, layout=layout)
+    # fig_tbl.show()
     # pd_html = pu.generate_html(df_format[df_col_list])
-    pd_html = pu.DataTable(df_format[df_col_list]).data
+    # pd_html = pu.DataTable(df_format[df_col_list]).data
+
     # print(type(pd_html))
-    open(prepend + "img_outputs/app/html/" + html_name + ".html", "w").write(pd_html)
+    # open(prepend + "img_outputs/app/html/" + html_name + ".html", "w").write(pd_html)
 
 
-# latest_data_df_format.to_html('op_summer_latest_stats.html')
+    fig_tbl.write_html(prepend+'img_outputs/app/html/'+html_name+'.html', include_plotlyjs='cdn')
 
 
 # In[ ]:
