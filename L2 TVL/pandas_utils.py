@@ -50,3 +50,17 @@ def DataTable(df):
     """ % {'uuid': uuid.uuid1(), 'html': df.to_html(classes="datatable display"),
           'sci_cols': '[%s]' % ",".join([str(i) for i, _ in enumerate(df.dtypes == numpy.float64)])}
     return HTML(output)
+
+def format_num(x, prepend):
+    try:
+        x = float(x)
+        if x >= 1e6:
+            mil_format = prepend + '{:.1f}M'
+            return mil_format.format(x / 1e6)
+        elif x >= 1e3:
+            k_format = prepend + '{:.1f}k'
+            return k_format.format(x / 1e3)
+        else:
+            return x
+    except:
+        return x
