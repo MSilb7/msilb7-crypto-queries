@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[1]:
+# In[ ]:
 
 
 # ! pip install pandas
@@ -12,7 +12,7 @@
 # ! pip freeze = requirements.txt
 
 
-# In[2]:
+# In[ ]:
 
 
 import pandas as pd
@@ -28,7 +28,7 @@ import defillama_utils as dfl
 import pandas_utils as pu
 
 
-# In[3]:
+# In[ ]:
 
 
 pwd = os.getcwd()
@@ -41,7 +41,7 @@ else:
 do_fallback_on_raw_tvl = True
 
 
-# In[4]:
+# In[ ]:
 
 
 # Protocol Incentive Start Dates
@@ -153,7 +153,7 @@ protocols = protocols.sort_values(by='start_date', ascending=True)
 # display(protocols)
 
 
-# In[5]:
+# In[ ]:
 
 
 api_str = 'https://api.llama.fi/protocol/'
@@ -173,7 +173,7 @@ df_dfl = df_dfl.merge(dfl_protocols, on ='protocol')
 df_dfl = df_dfl[['date', 'token', 'token_value', 'usd_value', 'protocol', 'start_date','end_date','program_name','app_name']]
 
 
-# In[6]:
+# In[ ]:
 
 
 subg_protocols = protocols[protocols['data_source'].str.contains('pool-')].copy()
@@ -183,13 +183,13 @@ subg_protocols['protocol'] = subg_protocols['data_source'].str.split('-').str[-1
 # display(subg_protocols)
 
 
-# In[7]:
+# In[ ]:
 
 
 # display(subg.get_curve_pool_tvl('0x061b87122ed14b9526a813209c8a59a633257bab'))
 
 
-# In[8]:
+# In[ ]:
 
 
 dfs_sub = []
@@ -731,7 +731,7 @@ cumul_fig.show()
 print("yay")
 
 
-# In[ ]:
+# In[1]:
 
 
 # ! jupyter nbconvert --to python optimism_app_net_flows.ipynb
