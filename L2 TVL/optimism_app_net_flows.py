@@ -72,10 +72,10 @@ protocols = pd.DataFrame(
             ,[1,'cbridge',    300000,    '2022-08-13',   '',   'Celer', 'Gov Fund - Phase 0', 'defillama','']
             ,[1,'clipper',    300000,    '2023-01-23',   '',   '', 'Gov Fund - Phase 0', 'defillama','']
             #Uniswap LM Program - Phase 1
-            ,[0,'uniswap-v3', 50000,         '2022-10-26',   '2022-11-21',   'Uniswap LM - Phase 1', 'Gov Fund - Phase 0', 'defillama','']
-            ,[1,'arrakis-finance',    50000/3,    '2022-10-26',   '2022-11-21',   'Uniswap LM - Phase 1', 'Gov Fund - Phase 0','defillama','']
-            ,[1,'gamma',    50000/3,              '2022-10-26',   '2022-11-21',   'Uniswap LM - Phase 1', 'Gov Fund - Phase 0','defillama','']
-            ,[1,'xtoken',    50000/3,             '2022-10-26',   '2022-11-21',   'Uniswap LM - Phase 1', 'Gov Fund - Phase 0','defillama','']
+            ,[0,'uniswap-v3', 150000,         '2022-10-26',   '2022-11-21',   'Uniswap LM - Phase 1', 'Gov Fund - Phase 0', 'defillama','']
+            ,[1,'arrakis-finance',    50000,    '2022-10-26',   '2022-11-21',   'Uniswap LM - Phase 1', 'Gov Fund - Phase 0','defillama','']
+            ,[1,'gamma',    50000,              '2022-10-26',   '2022-11-21',   'Uniswap LM - Phase 1', 'Gov Fund - Phase 0','defillama','']
+            ,[1,'xtoken',    50000,             '2022-10-26',   '2022-11-21',   'Uniswap LM - Phase 1', 'Gov Fund - Phase 0','defillama','']
             #Uniswap LM Program - Phase 2 - https://gov.uniswap.org/t/rfc-phase-2-optimism-uniswap-protocol-liquidity-mining-program/19803/12
             ,[0,'uniswap-v3', 100000,         '2023-01-16',   '2023-02-08',   'Uniswap LM - Phase 2', 'Gov Fund - Phase 0', 'defillama','']
             ,[1,'arrakis-finance',    100000/4,    '2023-01-16',   '2023-02-08',   'Uniswap LM - Phase 2', 'Gov Fund - Phase 0','defillama','']
@@ -575,8 +575,14 @@ for df in df_list:
     df_format = df_format.reset_index(drop=True)
     df_format = df_format.sort_values(by=sort_cols, ascending = [True,False])
 
-    pd_html = pu.generate_html(df_format)
-    open(prepend + "img_outputs/app/" + html_name + ".html", "w").write(pd_html)
+    # df_format.to_html(
+    #     prepend + "img_outputs/app/" + html_name + ".html",
+    #     classes='table table-stripped')
+
+    df_col_list = df_format.columns
+    df_col_list = df_col_list.remove('include_in_summary')
+    pd_html = pu.generate_html(df_format[df_col_list])
+    open(prepend + "img_outputs/app/html/" + html_name + ".html", "w").write(pd_html)
 
 
 # latest_data_df_format.to_html('op_summer_latest_stats.html')
