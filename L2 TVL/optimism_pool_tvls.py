@@ -11,7 +11,7 @@
 
 
 from subgrounds.subgrounds import Subgrounds
-from subgrounds.pagination import ShallowStrategy
+from subgrounds.pagination import ShallowStrategy, LegacyStrategy
 import pandas as pd
 import requests as r
 import defillama_utils as dfl
@@ -43,7 +43,7 @@ def get_velodrome_pool_tvl(pid, min_ts = 0, max_ts = 99999999999999):
         velo = create_sg('https://api.thegraph.com/subgraphs/name/messari/velodrome-optimism')
         q1 = velo.Query.liquidityPoolDailySnapshots(
         orderDirection='desc',
-        first=1000,
+        first=max_ts*max_ts, #arbitrarily large number so we pull everything
                 where=[
                 velo.Query.liquidityPoolDailySnapshot.pool == pid,
                 velo.Query.liquidityPoolDailySnapshot.timestamp > min_ts,
@@ -111,8 +111,9 @@ def get_velodrome_pool_tvl(pid, min_ts = 0, max_ts = 99999999999999):
 def get_curve_pool_tvl(pid, min_ts = 0, max_ts = 99999999999999):
         curve = create_sg('https://api.thegraph.com/subgraphs/name/convex-community/volume-optimism')
         q1 = curve.Query.dailyPoolSnapshots(
+        orderBy=curve.Query.dailyPoolSnapshot.timestamp,
         orderDirection='desc',
-        first=1000,
+        first=max_ts*max_ts, #arbitrarily large number so we pull everything
                 where=[
                 curve.Query.dailyPoolSnapshot.pool == pid,
                 curve.Query.dailyPoolSnapshot.timestamp > min_ts,
@@ -206,8 +207,9 @@ def get_messari_sg_pool_snapshots(slug, chains = ['optimism'], min_ts = 0, max_t
                         curve = create_sg('https://api.thegraph.com/subgraphs/name/messari/' + slug + '-' + c)
                         # Get Query
                         q1 = curve.Query.liquidityPoolDailySnapshots(
+                        orderBy=curve.Query.liquidityPoolDailySnapshot.timestamp,
                         orderDirection='desc',
-                        first=1000,
+                        first=10000,#max_ts*max_ts, #arbitrarily large number so we pull everything
                                 where=[
                                 curve.Query.liquidityPoolDailySnapshot.timestamp > min_ts,
                                 curve.Query.liquidityPoolDailySnapshot.timestamp <= max_ts,
@@ -244,7 +246,7 @@ def get_messari_sg_pool_snapshots(slug, chains = ['optimism'], min_ts = 0, max_t
         #fix up column names
 
         msr_daily.columns = msr_daily.columns.str.replace('liquidityPoolDailySnapshots_', '')
-
+        
         col_list = msr_daily.columns.to_list()
         col_list.remove('pool_inputTokens_id') # we want to group by everything else 
 
@@ -258,7 +260,8 @@ def get_messari_sg_pool_snapshots(slug, chains = ['optimism'], min_ts = 0, max_t
         msr_daily['timestamp'] = pd.to_datetime(msr_daily['timestamp'],unit='s')
         msr_daily['date'] = msr_daily['timestamp'].dt.floor('d')
         msr_daily['id_rank'] = msr_daily.groupby(['id']).cumcount()+1
-        
+        msr_daily = msr_daily[msr_daily['pool_id'] != 0] #weird....
+
         return pd.DataFrame(msr_daily)
 
 
@@ -276,8 +279,9 @@ def get_messari_sg_pool_snapshots(slug, chains = ['optimism'], min_ts = 0, max_t
 
 # pd.
 
-# msr = get_messari_sg_pool_snapshots('curve-finance')
+# msr = get_messari_sg_pool_snapshots('curve-finance',['polygon'])
 # display(msr)
+# 
 
 
 # In[ ]:

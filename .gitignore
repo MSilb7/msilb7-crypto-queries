@@ -13,6 +13,7 @@ Covalent API Testing.ipynb
 L2 TVL/Oracles/Get Oracle Data.ipynb
 L2 TVL/velo_app_net_flows.ipynb
 L2 TVL/ignore/
+L2 TVL/Curve/csv_outputs/*.csv
 dune_exports/dune.env
 *.env
 dune_exports/
