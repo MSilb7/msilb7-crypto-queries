@@ -3,6 +3,7 @@ import asyncio, aiohttp, nest_asyncio
 from aiohttp_retry import RetryClient, ExponentialRetry
 import requests as r
 import numpy as np
+import time
 nest_asyncio.apply()
 
 header = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:71.0) Gecko/20100101 Firefox/71.0'}
@@ -10,7 +11,7 @@ statuses = {x for x in range(100, 600)}
 statuses.remove(200)
 statuses.remove(429)
 
-async def get_tvl(apistring, header, statuses, chains, prot, prot_name, fallback_on_raw_tvl = False):
+async def get_tvl(apistring, header, statuses, chains, prot, prot_name, fallback_on_raw_tvl = False, fallback_indicator = '*'):
         prod = []
         retry_client = RetryClient()
 
@@ -28,7 +29,7 @@ async def get_tvl(apistring, header, statuses, chains, prot, prot_name, fallback
                                 ad_usd = pd.json_normalize( prot_req[ch]['tokensInUsd'] )
                                 if (ad.empty) & (fallback_on_raw_tvl == True):
                                         ad = pd.DataFrame( prot_req[ch]['tvl'] )
-                                        prot_map = prot #+ '*'
+                                        prot_map = prot + str(fallback_indicator)
                                 else:
                                         prot_map = prot
                                 try: #if there's generic tvl
@@ -62,6 +63,7 @@ async def get_tvl(apistring, header, statuses, chains, prot, prot_name, fallback
                                         ad['usd_value'] = np.where(ad['token'] == 'totalLiquidityUSD', ad['total_app_tvl'], ad['usd_value'])
                                         #assign other cols
                                         ad['protocol'] = prot_map
+                                        ad['slug'] = prot
                                         ad['chain'] = ch
                                         ad['category'] = cats
                                         ad['name'] = prot_name
@@ -76,7 +78,7 @@ async def get_tvl(apistring, header, statuses, chains, prot, prot_name, fallback
         # print(prod)
         return prod
 
-def get_range(protocols, chains = '', fallback_on_raw_tvl = False, header = header, statuses = statuses):
+def get_range(protocols, chains = '', fallback_on_raw_tvl = False, fallback_indicator = '*', header = header, statuses = statuses):
         data_dfs = []
         fee_df = []
         if isinstance(chains, list):
@@ -115,7 +117,7 @@ def get_range(protocols, chains = '', fallback_on_raw_tvl = False, header = head
                 except:
                         chains = og_chains
                 apic = api_str + prot
-                tasks.append( get_tvl(apic, header, statuses, chains, prot, prot_name, fallback_on_raw_tvl) )
+                tasks.append( get_tvl(apic, header, statuses, chains, prot, prot_name, fallback_on_raw_tvl, fallback_indicator) )
 
         data_dfs = loop.run_until_complete(asyncio.gather(*tasks, return_exceptions=True))
 
@@ -285,16 +287,60 @@ def get_protocol_tvls(min_tvl = 0, excluded_cats = ['CEX','Chain']): #,excluded_
         #                 resp = resp[resp[flg] != True]
         return resp
 
-def get_all_protocol_tvls_by_chain_and_token(min_tvl = 0, fallback_on_raw_tvl = False, excluded_cats = ['CEX','Chain']):
+def get_all_protocol_tvls_by_chain_and_token(min_tvl = 0, fallback_on_raw_tvl = False, fallback_indicator='*', excluded_cats = ['CEX','Chain']):
         res = get_protocol_tvls(min_tvl)
         protocols = res[['slug','name','category','parentProtocol','chainTvls']]
         protocols['parentProtocol'] = protocols['parentProtocol'].combine_first(protocols['name'])
         # re = res['chainTvls']
         protocols['chainTvls'] = protocols['chainTvls'].apply(lambda x: list(x.keys()) )
-        df_df = get_range(protocols, '', fallback_on_raw_tvl)
+        df_df = get_range(protocols, '', fallback_on_raw_tvl, fallback_indicator)
 
         # Get Other Flags -- not working right now?
         # proto_info = res[['name','is_doubelcount','is_liqstake']]
         # df_df = df_df.merge(proto_info,on='name',how='left')
 
         return df_df
+
+def get_latest_defillama_prices(token_list, chain = 'optimism'):
+
+        token_list = ','.join([f"{chain}:{token}" for token in token_list])
+
+        llama_api = 'https://coins.llama.fi/prices/current/' + token_list + '?searchWidth=4h'
+        prices = pd.DataFrame(r.get(llama_api,headers=header).json()['coins']).T.reset_index()
+
+        prices = prices.rename(columns={'index':'token_address'})
+
+        prices[['chain', 'token_address']] = prices['token_address'].str.split(':', expand=True)
+
+        return prices
+
+def get_historical_defillama_prices(token_list_api, chain = 'optimism', min_ts = 0):
+        
+        token_list_api = ','.join([f"{chain}:{token}" for token in token_list_api])
+
+        llama_api = 'https://coins.llama.fi/chart/' + token_list_api \
+                        + '?start=' + str(min_ts) \
+                        + '&span=600&period=1d&searchWidth=300'
+        print(llama_api)
+
+        # prices = pd.DataFrame(r.get(llama_api,headers=header).json()['coins']).T.reset_index()
+        prices = r.get(llama_api,headers=header).json()
+        prices = pd.DataFrame(prices['coins']).T
+        prices.reset_index(inplace=True)
+        prices = prices.rename(columns={'index':'token_address'})
+
+        prices = prices.loc[:, ['token_address', 'symbol', 'decimals', 'prices']]
+
+        result = pd.DataFrame()
+        for i, prices_ in enumerate(prices['prices']):
+                data = [{'timestamp': x['timestamp'], 'price': x['price']} for x in prices_]
+                new_df = pd.concat([prices.iloc[i, :].drop(columns=['prices']).to_frame().T.assign(**price) for price in data], axis=0, ignore_index=True)
+                result = pd.concat([result, new_df], axis=0, ignore_index=True)
+
+        result.drop(columns=['prices'], inplace=True)
+
+        result['dt'] = pd.to_datetime(result['timestamp'], unit='s').dt.date
+
+        result[['chain', 'token_address']] = result['token_address'].str.split(':', expand=True)
+
+        return result

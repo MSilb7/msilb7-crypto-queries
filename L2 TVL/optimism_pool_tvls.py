@@ -16,6 +16,7 @@ import pandas as pd
 import requests as r
 import defillama_utils as dfl
 
+header = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:71.0) Gecko/20100101 Firefox/71.0'}
 sgs = pd.DataFrame(
         [
                  ['l2dao-velodrome','https://api.thegraph.com/subgraphs/name/messari/velodrome-optimism','']
@@ -182,6 +183,98 @@ def get_curve_pool_tvl(pid, min_ts = 0, max_ts = 99999999999999):
 # In[ ]:
 
 
+def get_messari_format_pool_tvl(slug, pool_id, chain = 'optimism', min_ts = 0, max_ts = 99999999999999):
+        msr_dfs = []
+        # print(slug)
+        sg_query = create_sg('https://api.thegraph.com/subgraphs/name/messari/' + slug + '-' + chain).Query
+        # Get Query
+        pool_info = sg_query.liquidityPools(
+        # orderBy=sg_query.liquidityPools.timestamp,
+        # orderDirection='desc',
+        first=10000,#max_ts*max_ts, #arbitrarily large number so we pull everything
+                where=[
+                # sg_query.liquidityPools.timestamp > min_ts,
+                # sg_query.liquidityPools.timestamp <= max_ts,
+                sg_query.liquidityPools.id == pool_id
+                ]
+        )
+        snapshots = sg_query.liquidityPoolDailySnapshots(
+        orderBy= sg_query.liquidityPoolDailySnapshots.timestamp,
+        orderDirection='desc',
+        first=10000,#max_ts*max_ts, #arbitrarily large number so we pull everything
+                where=[
+                sg_query.liquidityPoolDailySnapshots.timestamp > min_ts,
+                sg_query.liquidityPoolDailySnapshots.timestamp <= max_ts,
+                sg_query.liquidityPoolDailySnapshots.pool == pool_id
+                ]
+        )
+        # Pull Fields
+        pool_lst = sg.query_df([
+                pool_info.id,
+                pool_info.inputTokens.id,
+                pool_info.inputTokens.symbol,
+                pool_info.inputTokens.decimals,
+                pool_info.inputTokens.lastPriceUSD
+        ]
+        , pagination_strategy=ShallowStrategy)
+        #Snapshots
+        snap_lst = sg.query_df([
+                snapshots.id,
+                snapshots.timestamp,
+                #input tokens
+                snapshots.inputTokenBalances,
+                # q1.inputTokenBalances ,
+                # #pull all pool info
+                # q1.pool.name,
+                # q1.pool.symbol,
+                # q1.pool.inputTokens.id
+        ])
+        # print(msr_daily)
+        # msr_daily = pd.concat(snap_lst)
+        #fix up column names
+        
+        snap_lst.columns = snap_lst.columns.str.replace('liquidityPoolDailySnapshots_', '')
+        snap_lst = snap_lst.rename(columns={'id':'pool_date_id'})
+        
+        pool_lst.columns = pool_lst.columns.str.replace('liquidityPools_', '')
+        pool_lst = pool_lst.rename(columns={'id':'pool_id'})
+
+        # GET TOKEN PRICES FROM LLAMA
+        token_list = pool_lst['inputTokens_id'].drop_duplicates().to_list()
+
+        prices = dfl.get_historical_defillama_prices(token_list, chain, min_ts)
+        prices = prices.rename(columns={'token_address':'inputTokens_id'})
+
+        pool_lst = pool_lst[['pool_id','inputTokens_id','inputTokens_lastPriceUSD','inputTokens_symbol','inputTokens_decimals']]
+
+
+        snap_lst['token_order'] = snap_lst.groupby('pool_date_id')['pool_date_id'].cumcount() + 1
+        pool_lst['token_order'] = pool_lst.groupby('pool_id')['pool_id'].cumcount() + 1
+
+        snap_lst['dt'] = pd.to_datetime(snap_lst['timestamp'], unit='s').dt.date
+
+        data_df = snap_lst.merge(pool_lst,on='token_order',how='left')
+        data_df = data_df.merge(prices,on=['inputTokens_id','dt'],how='left')
+        data_df['token_price'] = data_df['price'].combine_first(data_df['inputTokens_lastPriceUSD']) #prefer defillama's 'price'
+
+        data_df['token_balance'] = data_df['inputTokenBalances'] / 10**data_df['inputTokens_decimals']
+        data_df['usd_balance'] = data_df['token_balance'] * data_df['token_price']
+
+        data_df = data_df.rename(columns={
+                'dt':'date',
+                'symbol':'token',
+                'token_balance':'token_value',
+                'usd_balance':'usd_value'
+        })
+
+        data_df = data_df[['date','token','token_value','usd_value']]
+
+        return data_df
+
+
+# In[ ]:
+
+
 def get_hop_pool_tvl(pid, min_ts = 0, max_ts = 99999999999999):
     api_base_str = 'https://api.llama.fi/protocol/'
     prot_str = 'hop-protocol'
@@ -249,8 +342,6 @@ def get_messari_sg_pool_snapshots(slug, chains = ['optimism'], min_ts = 0, max_t
         
         col_list = msr_daily.columns.to_list()
         col_list.remove('pool_inputTokens_id') # we want to group by everything else 
-
-        print(col_list)
         
         msr_daily = msr_daily.fillna(0)
 
@@ -261,7 +352,7 @@ def get_messari_sg_pool_snapshots(slug, chains = ['optimism'], min_ts = 0, max_t
         msr_daily['date'] = msr_daily['timestamp'].dt.floor('d')
         msr_daily['id_rank'] = msr_daily.groupby(['id']).cumcount()+1
         msr_daily = msr_daily[msr_daily['pool_id'] != 0] #weird....
-
+        # display(msr_daily[msr_daily['id']=='0x445fe580ef8d70ff569ab36e80c647af338db351-19258'])
         return pd.DataFrame(msr_daily)
 
 
@@ -282,6 +373,12 @@ def get_messari_sg_pool_snapshots(slug, chains = ['optimism'], min_ts = 0, max_t
 # msr = get_messari_sg_pool_snapshots('curve-finance',['polygon'])
 # display(msr)
 # 
+
+
+# In[ ]:
+
+
+# get_messari_format_pool_tvl('beethoven-x', '0x4fd63966879300cafafbb35d157dc5229278ed23')
 
 
 # In[ ]:

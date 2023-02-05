@@ -39,6 +39,7 @@ else:
 
 # if TVL by token is not available, do we fallback on raw TVL (sensitive to token prices)?
 do_fallback_on_raw_tvl = True
+str_fallback_indicator = '' #Dont append any indicator yet, since it screws up joins
 
 
 # In[ ]:
@@ -48,62 +49,64 @@ do_fallback_on_raw_tvl = True
 # Eventually, move this to its own file / csv
 protocols = pd.DataFrame(
     [
-        # name, incentive start date
+        # ['include_in_summary','protocol','num_op','start_date', 'end_date','name', 'op_source', 'data_source','contracts']
             # General Programs
-             [1,'velodrome',  3000000,          '2022-07-13',   '2022-11-17',   '', 'Partner Fund', 'defillama','']
-            ,[1,'pooltogether',   450000, '2022-07-22',   '', '', 'Partner Fund', 'defillama','']
-            ,[1,'lyra',   3000000,               '2022-08-02',   '',   '', 'Gov Fund - Phase 0', 'defillama','']
-            ,[1,'rubicon',    900000,            '2022-07-15',   '',   '', 'Gov Fund - Phase 0', 'defillama','']
-            ,[1,'perpetual-protocol', 9000000, '2022-07-14',   '',   '', 'Gov Fund - Phase 0', 'defillama','']
-            ,[1,'thales', 900000,             '2022-07-15',   '',   '', 'Gov Fund - Phase 0', 'defillama',''] #TVL not relevant
-            ,[1,'aave-v3',    5000000,            '2022-08-04',   '2022-11-04',   'Aave - Liquidity Mining', 'Partner Fund', 'defillama','']
-            ,[1,'wepiggy',    300000,            '2022-08-03',   '',   '', 'Gov Fund - Phase 0', 'defillama','']
-            ,[1,'stargate',   1000000,           '2022-08-05',   '',   '', 'Gov Fund - Phase 0', 'defillama','']
-            ,[1,'pika-protocol',  900000,      '2022-08-29',   '',   '', 'Gov Fund - Phase 0', 'defillama','']
-            ,[1,'pickle', 200000,             '2022-09-09',   '',   'Pickle Finance', 'Gov Fund - Season 1', 'defillama','']
-            ,[1,'aelin',  900000,              '2022-09-12',   '2022-09-14',   '', 'Gov Fund - Phase 0', 'defillama','']
-            ,[1,'polynomial-protocol',    900000, '2022-09-14',   '',   '', 'Gov Fund - Phase 0', 'defillama','']
-            ,[1,'xtoken', 900000,             '2022-09-19',   '',   '', 'Gov Fund - Season 1', 'defillama','']
-            ,[1,'hop-protocol',   1000000,       '2022-09-22',   '',   '', 'Gov Fund - Phase 0', 'defillama','']
-            ,[1,'beethoven-x',    500000,        '2022-09-29',   '',   '', 'Gov Fund - Season 1', 'defillama','']
-            ,[1,'beefy',  650000*0.5,              '2022-10-24',   '',   '', 'Gov Fund - Season 1', 'defillama','']
-            ,[1,'hundred-finance',    300000,    '2022-11-28',   '',   '', 'Gov Fund - Season 1', 'defillama','']
-            ,[1,'dforce',    300000,    '2022-11-30',   '',   '', 'Gov Fund - Season 1', 'defillama','']
-            ,[1,'cbridge',    300000,    '2022-08-13',   '',   'Celer', 'Gov Fund - Phase 0', 'defillama','']
-            ,[1,'clipper',    300000,    '2023-01-23',   '',   '', 'Gov Fund - Phase 0', 'defillama','']
+             [1,'velodrome',  3000000,          '2022-07-13',   '2022-11-17',   'Velodrome #1 ', 'Partner Fund', 'defillama','','']
+            ,[1,'pooltogether',   450000, '2022-07-22',   '', '', 'Partner Fund', 'defillama','','']
+            ,[1,'lyra',   3000000,               '2022-08-02',   '',   '', 'Gov Fund - Phase 0', 'defillama','','']
+            ,[1,'rubicon',    900000,            '2022-07-15',   '',   '', 'Gov Fund - Phase 0', 'defillama','','']
+            ,[1,'perpetual-protocol', 9000000, '2022-07-14',   '',   '', 'Gov Fund - Phase 0', 'defillama','','']
+            ,[1,'thales', 900000,             '2022-07-15',   '',   '', 'Gov Fund - Phase 0', 'defillama','',''] #TVL not relevant
+            ,[1,'aave-v3',    5000000,            '2022-08-04',   '2022-11-04',   'Aave - Liquidity Mining', 'Partner Fund', 'defillama','','']
+            ,[1,'wepiggy',    300000,            '2022-08-03',   '',   '', 'Gov Fund - Phase 0', 'defillama','','']
+            ,[1,'stargate',   1000000,           '2022-08-05',   '',   '', 'Gov Fund - Phase 0', 'defillama','','']
+            ,[1,'pika-protocol',  900000,      '2022-08-29',   '',   '', 'Gov Fund - Phase 0', 'defillama','','']
+            ,[1,'pickle', 200000,             '2022-09-09',   '',   'Pickle Finance', 'Gov Fund - Season 1', 'defillama','','']
+            ,[1,'aelin',  900000,              '2022-09-12',   '2022-09-14',   '', 'Gov Fund - Phase 0', 'defillama','','']
+            ,[1,'polynomial-protocol',    900000, '2022-09-14',   '',   '', 'Gov Fund - Phase 0', 'defillama','','']
+            ,[1,'xtoken', 900000,             '2022-09-19',   '',   '', 'Gov Fund - Season 1', 'defillama','','']
+            ,[1,'hop-protocol',   1000000,       '2022-09-22',   '',   '', 'Gov Fund - Phase 0', 'defillama','','']
+            ,[1,'beethoven-x',    500000,        '2022-09-29',   '',   '', 'Gov Fund - Season 1', 'defillama','','']
+            ,[1,'beefy',  650000*0.5,              '2022-10-24',   '',   '', 'Gov Fund - Season 1', 'defillama','','']
+            ,[1,'hundred-finance',    300000,    '2022-11-28',   '',   '', 'Gov Fund - Season 1', 'defillama','','']
+            ,[1,'dforce',    300000,    '2022-11-30',   '',   '', 'Gov Fund - Season 1', 'defillama','','']
+            ,[1,'cbridge',    300000,    '2022-08-13',   '',   'Celer', 'Gov Fund - Phase 0', 'defillama','','']
+            ,[1,'clipper',    300000,    '2023-01-23',   '',   '', 'Gov Fund - Phase 0', 'defillama','','']
             #Uniswap LM Program - Phase 1
-            ,[0,'uniswap-v3', 150000,         '2022-10-26',   '2022-11-21',   'Uniswap LM - Phase 1', 'Gov Fund - Phase 0', 'defillama','']
-            ,[1,'arrakis-finance',    50000,    '2022-10-26',   '2022-11-21',   'Uniswap LM - Phase 1', 'Gov Fund - Phase 0','defillama','']
-            ,[1,'gamma',    50000,              '2022-10-26',   '2022-11-21',   'Uniswap LM - Phase 1', 'Gov Fund - Phase 0','defillama','']
-            ,[1,'xtoken',    50000,             '2022-10-26',   '2022-11-21',   'Uniswap LM - Phase 1', 'Gov Fund - Phase 0','defillama','']
+            ,[0,'uniswap-v3', 150000,         '2022-10-26',   '2022-11-21',   'Uniswap LM - Phase 1', 'Gov Fund - Phase 0', 'defillama','','']
+            ,[1,'arrakis-finance',    50000,    '2022-10-26',   '2022-11-21',   'Uniswap LM - Phase 1', 'Gov Fund - Phase 0','defillama','','']
+            ,[1,'gamma',    50000,              '2022-10-26',   '2022-11-21',   'Uniswap LM - Phase 1', 'Gov Fund - Phase 0','defillama','','']
+            ,[1,'xtoken',    50000,             '2022-10-26',   '2022-11-21',   'Uniswap LM - Phase 1', 'Gov Fund - Phase 0','defillama','','']
             #Uniswap LM Program - Phase 2 - https://gov.uniswap.org/t/rfc-phase-2-optimism-uniswap-protocol-liquidity-mining-program/19803/12
-            ,[0,'uniswap-v3', 100000,         '2023-01-16',   '2023-02-08',   'Uniswap LM - Phase 2', 'Gov Fund - Phase 0', 'defillama','']
-            ,[1,'arrakis-finance',    100000/4,    '2023-01-16',   '2023-02-08',   'Uniswap LM - Phase 2', 'Gov Fund - Phase 0','defillama','']
-            ,[1,'gamma',    100000/4,              '2023-01-16',   '2023-02-08',   'Uniswap LM - Phase 2', 'Gov Fund - Phase 0','defillama','']
-            ,[1,'xtoken',    100000/4,             '2023-01-16',   '2023-02-08',   'Uniswap LM - Phase 2', 'Gov Fund - Phase 0','defillama','']
-            ,[1,'defiedge',    100000/4,             '2023-01-16',   '2023-02-08',   'Uniswap LM - Phase 2', 'Gov Fund - Phase 0','defillama','']
+            ,[0,'uniswap-v3', 100000,         '2023-01-16',   '2023-02-08',   'Uniswap LM - Phase 2', 'Gov Fund - Phase 0', 'defillama','','']
+            ,[1,'arrakis-finance',    100000/4,    '2023-01-16',   '2023-02-08',   'Uniswap LM - Phase 2', 'Gov Fund - Phase 0','defillama','','']
+            ,[1,'gamma',    100000/4,              '2023-01-16',   '2023-02-08',   'Uniswap LM - Phase 2', 'Gov Fund - Phase 0','defillama','','']
+            ,[1,'xtoken',    100000/4,             '2023-01-16',   '2023-02-08',   'Uniswap LM - Phase 2', 'Gov Fund - Phase 0','defillama','','']
+            ,[1,'defiedge',    100000/4,             '2023-01-16',   '2023-02-08',   'Uniswap LM - Phase 2', 'Gov Fund - Phase 0','defillama','','']
             # Other DEX Programs
-            ,[0,'synthetix',  2*20000* (abs(pd.to_datetime("today")-pd.to_datetime('2022-08-25')).days / 7 ),    '2022-08-25',   '',   'All Synthetix Curve Pools', 'Gov Fund - Phase 0', 'pool-subgraph-curve',['0x7bc5728bc2b59b45a58d9a576e2ffc5f0505b35e','0x061b87122ed14b9526a813209c8a59a633257bab']] # susd/usd + seth/eth Curve incentives started
-            ,[1,'synthetix',  20000* (abs(pd.to_datetime("today")-pd.to_datetime('2022-08-25')).days / 7 ),    '2022-08-25',   '',   'sUSD-3Crv: Curve', 'Gov Fund - Phase 0', 'pool-subgraph-curve',['0x061b87122ed14b9526a813209c8a59a633257bab']] # susd/usd + seth/eth Curve incentives started
-            ,[1,'synthetix',  20000* (abs(pd.to_datetime("today")-pd.to_datetime('2022-08-25')).days / 7 ),    '2022-08-25',   '',   'sETH-ETH: Curve', 'Gov Fund - Phase 0', 'pool-subgraph-curve',['0x7bc5728bc2b59b45a58d9a576e2ffc5f0505b35e']] # susd/usd + seth/eth Curve incentives started
+            ,[1,'rocket-pool',  2_100*(abs(pd.to_datetime("today")-pd.to_datetime('2022-11-09')).days / 7 ),    '2022-11-09',   '', 'WETH/rETH: Velodrome', 'Gov Fund - Season 1',  'pool-subgraph-velodrome',  ['0x69f795e2d9249021798645d784229e5bec2a5a25'],'velodrome']
+            ,[1,'rocket-pool',  5_000*(abs(pd.to_datetime("today")-pd.to_datetime('2022-11-09')).days / 7 ),    '2022-11-09',   '', 'WETH/rETH: Beethoven X', 'Gov Fund - Season 1',  'pool-subgraph-messari',  ['0x4fd63966879300cafafbb35d157dc5229278ed23'],'beethoven-x']
+            ,[0,'synthetix',  2*20000* (abs(pd.to_datetime("today")-pd.to_datetime('2022-08-25')).days / 7 ),    '2022-08-25',   '',   'All Synthetix Curve Pools', 'Gov Fund - Phase 0', 'pool-subgraph-curve',['0x7bc5728bc2b59b45a58d9a576e2ffc5f0505b35e','0x061b87122ed14b9526a813209c8a59a633257bab'],'curve'] # susd/usd + seth/eth Curve incentives started
+            ,[1,'synthetix',  20000* (abs(pd.to_datetime("today")-pd.to_datetime('2022-08-25')).days / 7 ),    '2022-08-25',   '',   'sUSD-3Crv: Curve', 'Gov Fund - Phase 0', 'pool-subgraph-curve',['0x061b87122ed14b9526a813209c8a59a633257bab'],'curve'] # susd/usd + seth/eth Curve incentives started
+            ,[1,'synthetix',  20000* (abs(pd.to_datetime("today")-pd.to_datetime('2022-08-25')).days / 7 ),    '2022-08-25',   '',   'sETH-ETH: Curve', 'Gov Fund - Phase 0', 'pool-subgraph-curve',['0x7bc5728bc2b59b45a58d9a576e2ffc5f0505b35e'],'curve'] # susd/usd + seth/eth Curve incentives started
             
             ,[0,'synthetix',  3*10000* (abs(pd.to_datetime("today")-pd.to_datetime('2022-09-27')).days / 7 ),    '2022-09-27',   '',   'All Synthetix Velo Pools', 'Gov Fund - Phase 0', 'pool-subgraph-velodrome',['0x9056eb7ca982a5dd65a584189994e6a27318067d' \
                                                                                                                                                                                                     ,'0xd16232ad60188b68076a235c65d692090caba155'\
-                                                                                                                                                                                                    ,'0xfd7fddfc0a729ecf45fb6b12fa3b71a575e1966f']] # Velo incentives started
-            ,[1,'synthetix',  10000* (abs(pd.to_datetime("today")-pd.to_datetime('2022-09-27')).days / 7 ),    '2022-09-27',   '',   'USDC/SNX: Velo', 'Gov Fund - Phase 0', 'pool-subgraph-velodrome',['0x9056eb7ca982a5dd65a584189994e6a27318067d']] # Velo incentives started
-            ,[1,'synthetix',  10000* (abs(pd.to_datetime("today")-pd.to_datetime('2022-09-27')).days / 7 ),    '2022-09-27',   '',   'USDC/sUSD: Velo', 'Gov Fund - Phase 0', 'pool-subgraph-velodrome',['0xd16232ad60188b68076a235c65d692090caba155']] # Velo incentives started
-            ,[1,'synthetix',  10000* (abs(pd.to_datetime("today")-pd.to_datetime('2022-09-27')).days / 7 ),    '2022-09-27',   '',   'ETH/sETH: Velo', 'Gov Fund - Phase 0', 'pool-subgraph-velodrome',['0xfd7fddfc0a729ecf45fb6b12fa3b71a575e1966f']] # Velo incentives started
+                                                                                                                                                                                                    ,'0xfd7fddfc0a729ecf45fb6b12fa3b71a575e1966f'],'velodrome'] # Velo incentives started
+            ,[1,'synthetix',  10000* (abs(pd.to_datetime("today")-pd.to_datetime('2022-09-27')).days / 7 ),    '2022-09-27',   '',   'USDC/SNX: Velo', 'Gov Fund - Phase 0', 'pool-subgraph-velodrome',['0x9056eb7ca982a5dd65a584189994e6a27318067d'],'velodrome'] # Velo incentives started
+            ,[1,'synthetix',  10000* (abs(pd.to_datetime("today")-pd.to_datetime('2022-09-27')).days / 7 ),    '2022-09-27',   '',   'USDC/sUSD: Velo', 'Gov Fund - Phase 0', 'pool-subgraph-velodrome',['0xd16232ad60188b68076a235c65d692090caba155'],'velodrome'] # Velo incentives started
+            ,[1,'synthetix',  10000* (abs(pd.to_datetime("today")-pd.to_datetime('2022-09-27')).days / 7 ),    '2022-09-27',   '',   'ETH/sETH: Velo', 'Gov Fund - Phase 0', 'pool-subgraph-velodrome',['0xfd7fddfc0a729ecf45fb6b12fa3b71a575e1966f'],'velodrome'] # Velo incentives started
 
-            ,[1,'synthetix',  18000* (abs(pd.to_datetime("today")-pd.to_datetime('2022-10-25')).days / (7*4) ),    '2022-10-25',   '',   'SNX Bridge: Hop', 'Gov Fund - Phase 0', 'pool-defillama-hop',['SNX']] # Hop incentives started
+            ,[1,'synthetix',  18000* (abs(pd.to_datetime("today")-pd.to_datetime('2022-10-25')).days / (7*4) ),    '2022-10-25',   '',   'SNX Bridge: Hop', 'Gov Fund - Phase 0', 'pool-defillama-hop',['SNX'],'hop'] # Hop incentives started
             
-            ,[1,'layer2dao',  300000,    '2022-07-20',   '2022-08-22',   'L2DAO/OP: Velodrome', 'Gov Fund - Phase 0', 'subgraph-velodrome',['0xfc77e39de40e54f820e313039207dc850e4c9e60']] # l2dao/op incentives - estimating end date based on last distribution to Velo gauge + 7 days
-            ,[1,'beefy',  650000*0.35,    '2022-09-13',   '',   'BIFI/OP: Velodrome', 'Gov Fund - Phase 0', 'subgraph-velodrome',['0x81f638e5d063618fc5f6a976e48e9b803b3240c0']] # bifi/op incentives
+            ,[1,'layer2dao',  300000,    '2022-07-20',   '2022-08-22',   'L2DAO/OP: Velodrome', 'Gov Fund - Phase 0', 'pool-subgraph-velodrome',['0xfc77e39de40e54f820e313039207dc850e4c9e60'],'velodrome'] # l2dao/op incentives - estimating end date based on last distribution to Velo gauge + 7 days
+            ,[1,'beefy',  650000*0.35,    '2022-09-13',   '',   'BIFI/OP: Velodrome', 'Gov Fund - Phase 0', 'pool-subgraph-velodrome',['0x81f638e5d063618fc5f6a976e48e9b803b3240c0'],'velodrome'] # bifi/op incentives
             # Season 2
-            ,[1,'velodrome',  4000000,  '2022-11-24',   '',   'Velodrome #2 (Tour de OP)', 'Gov Fund - Season 2', 'defillama','']
-            ,[1,'revert-compoundor',  240000,  '2022-11-03',   '',   '', 'Gov Fund - Season 2', 'defillama','']
-            ,[1,'dhedge',    350000,    '2022-12-21',   '',   '', 'Gov Fund - Season 2', 'defillama',''] # Announced 12/21, launched 1/17 - https://twitter.com/dHedgeOrg/status/1615573828394184706
+            ,[1,'velodrome',  4000000,  '2022-11-24',   '',   'Velodrome #2 (Tour de OP)', 'Gov Fund - Season 2', 'defillama','','']
+            ,[1,'revert-compoundor',  240000,  '2022-11-03',   '',   '', 'Gov Fund - Season 2', 'defillama','','']
+            ,[1,'dhedge',    350000,    '2022-12-21',   '',   '', 'Gov Fund - Season 2', 'defillama','',''] # Announced 12/21, launched 1/17 - https://twitter.com/dHedgeOrg/status/1615573828394184706
             ]
-        , columns = ['include_in_summary','protocol','num_op','start_date', 'end_date','name', 'op_source', 'data_source','contracts']
+        , columns = ['include_in_summary','protocol','num_op','start_date', 'end_date','name', 'op_source', 'data_source','contracts','source_slug']
     )
 
 protocol_name_mapping = pd.DataFrame(
@@ -142,7 +145,7 @@ pcounts = pcounts.rename(columns={'name':'count'})
 
 protocols = protocols.merge(pcounts, on = 'coalesce')
 
-
+protocols['slug'] = protocols['protocol']
 protocols['program_name'] = np.where( ( (protocols['name'] == '') )#| (protocols['count'] == 1) )
                                     , protocols['id_format']
                                     , protocols['id_format'] + ' - ' + protocols['name']
@@ -150,25 +153,23 @@ protocols['program_name'] = np.where( ( (protocols['name'] == '') )#| (protocols
 
 protocols = protocols.sort_values(by='start_date', ascending=True)
                     
-# display(protocols)
+display(protocols)
 
 
 # In[ ]:
 
-
-api_str = 'https://api.llama.fi/protocol/'
-
-prod = []
-s = r.Session()
 
 dfl_protocols = protocols[protocols['data_source'] == 'defillama'].copy()
 
 dfl_slugs = dfl_protocols[['protocol']].drop_duplicates()
 # display(dfl_slugs)
 dfl_slugs = dfl_slugs.rename(columns={'protocol':'slug'})
-df_dfl = dfl.get_range(dfl_slugs[['slug']],['Optimism'], do_fallback_on_raw_tvl)
+df_dfl = dfl.get_range(dfl_slugs[['slug']],['Optimism'], fallback_on_raw_tvl= do_fallback_on_raw_tvl)
 # display(df_dfl[df_dfl['protocol']=='beefy'])
-df_dfl = df_dfl.merge(dfl_protocols, on ='protocol')
+df_dfl = df_dfl.merge(dfl_protocols, on ='slug')
+
+df_dfl['protocol'] = df_dfl['protocol_y'].combine_first(df_dfl['protocol_x'])
+df_dfl['name'] = df_dfl['name_y'].combine_first(df_dfl['name_x'])
 
 df_dfl = df_dfl[['date', 'token', 'token_value', 'usd_value', 'protocol', 'start_date','end_date','program_name','app_name']]
 
@@ -179,14 +180,8 @@ df_dfl = df_dfl[['date', 'token', 'token_value', 'usd_value', 'protocol', 'start
 subg_protocols = protocols[protocols['data_source'].str.contains('pool-')].copy()
 # subg_protocols['og_app_name'] = subg_protocols['app_name']
 subg_protocols['og_protocol'] = subg_protocols['protocol']
-subg_protocols['protocol'] = subg_protocols['data_source'].str.split('-').str[-1]
+subg_protocols['df_source'] = subg_protocols['data_source'].str.split('-').str[-1]
 # display(subg_protocols)
-
-
-# In[ ]:
-
-
-# display(subg.get_curve_pool_tvl('0x061b87122ed14b9526a813209c8a59a633257bab'))
 
 
 # In[ ]:
@@ -194,13 +189,23 @@ subg_protocols['protocol'] = subg_protocols['data_source'].str.split('-').str[-1
 
 dfs_sub = []
 for index, program in subg_protocols.iterrows():
+        min_tsmp = int( pd.to_datetime(program['start_date']).timestamp() )
+        min_tsmp = min_tsmp - 1000 #add some buffer
+        source_slug = program['source_slug']
+        df_source = program['df_source']
+        print(df_source + ' - ' +source_slug)
         for c in program['contracts']:
-                if program['protocol'] == 'curve':
-                        sdf = subg.get_curve_pool_tvl(c)
-                elif program['protocol'] == 'velodrome':
-                        sdf = subg.get_velodrome_pool_tvl(c)
-                elif program['protocol'] == 'hop':
-                        sdf = subg.get_hop_pool_tvl(c)
+                # messari generalized
+                if df_source == 'messari':
+                        sdf = subg.get_messari_format_pool_tvl(source_slug, c, min_ts = min_tsmp)
+                # subgraph specific
+                elif df_source == 'curve':
+                        sdf = subg.get_curve_pool_tvl(c, min_ts = min_tsmp)
+                elif df_source == 'velodrome':
+                        sdf = subg.get_velodrome_pool_tvl(c, min_ts = min_tsmp)
+                elif df_source == 'hop':
+                        sdf = subg.get_hop_pool_tvl(c, min_ts = min_tsmp)
+                        
                 sdf['start_date'] = program['start_date']
                 sdf['end_date'] = program['end_date']
                 sdf['program_name'] = program['program_name']
@@ -722,9 +727,9 @@ for p in proto_names:
 
 cumul_fig.update_layout(yaxis_tickprefix = '$')
 cumul_fig.update_layout(
-    title="Cumulative Net Dollar Flow since Program Announcement",
+    title="Cumulative Net Flows since Program Announcement<br><sup>For Ended Programs, we show continue to show flows through 30 days after program end.</sup>",
     xaxis_title="Day",
-    yaxis_title="Cumulative Net Dollar Flow (N$F)",
+    yaxis_title="Cumulative Net Flows (USD)",
     legend_title="App Name",
 #     color_discrete_map=px.colors.qualitative.G10
 )
@@ -744,9 +749,9 @@ for p in proto_names:
 
 fig_last.update_layout(yaxis_tickprefix = '$')
 fig_last.update_layout(
-    title="Cumulative Net Dollar Flow since Program Announcement (At Most Recent Token Price)",
+    title="Cumulative Net Flows since Program Announcement (At Most Recent Token Price)<br><sup>For Ended Programs, we show continue to show flows through 30 days after program end.</sup>",
     xaxis_title="Day",
-    yaxis_title="Cumulative Net Dollar Flow (N$F) - At Most Recent Price",
+    yaxis_title="Cumulative Net Flows (USD) - At Most Recent Price",
     legend_title="App Name",
 #     color_discrete_map=px.colors.qualitative.G10
 )
@@ -791,9 +796,9 @@ for val in value_list:
 
       cumul_fig_app.update_layout(yaxis_tickprefix = '$')
       cumul_fig_app.update_layout(
-          title=p + "<br><sup>Cumulative Net Dollar Flow since Program Announcement, Until Program End + 30 Days" + postpend + "</sup>",
+          title=p + "<br><sup>Cumulative Net Flows since Program Announcement, Until Program End + 30 Days" + postpend + "</sup>",
           xaxis_title="Day",
-          yaxis_title="Cumulative Net Dollar Flow (N$F)",
+          yaxis_title="Cumulative Net Flows (USD)",
           legend_title="Period",
       #     color_discrete_map=px.colors.qualitative.G10
       )
@@ -818,13 +823,12 @@ for val in value_list:
 # In[ ]:
 
 
-# fig.show()
-cumul_fig.show()
+fig_last.show()
 print("yay")
 
 
-# In[ ]:
+# In[30]:
 
 
-# ! jupyter nbconvert --to python optimism_app_net_flows.ipynb
+get_ipython().system(' jupyter nbconvert --to python optimism_app_net_flows.ipynb')
 
