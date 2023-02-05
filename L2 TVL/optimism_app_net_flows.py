@@ -84,6 +84,9 @@ protocols = pd.DataFrame(
             ,[1,'xtoken',    100000/4,             '2023-01-16',   '2023-02-08',   'Uniswap LM - Phase 2', 'Gov Fund - Phase 0','defillama','','']
             ,[1,'defiedge',    100000/4,             '2023-01-16',   '2023-02-08',   'Uniswap LM - Phase 2', 'Gov Fund - Phase 0','defillama','','']
             # Other DEX Programs
+            
+            ,[1,'qidao',  7_000*(abs(pd.to_datetime("today")-pd.to_datetime('2022-08-26')).days / 7 ),    '2022-08-26',   '', 'USDC/MAI: Velodrome', 'Gov Fund - Season 1',  'pool-subgraph-velodrome',  ['0xd62c9d8a3d4fd98b27caaefe3571782a3af0a737'],'velodrome']
+            ,[1,'dhedge',  1_900*(abs(pd.to_datetime("today")-pd.to_datetime('2023-02-03')).days / 7 ),    '2023-02-03',   '', 'DHT/OP: Velodrome', 'Gov Fund - Season 1',  'pool-subgraph-velodrome',  ['0x827ecd158b76f63010e8f129b19fe64a85e97e95'],'velodrome']
             ,[1,'rocket-pool',  2_100*(abs(pd.to_datetime("today")-pd.to_datetime('2022-11-09')).days / 7 ),    '2022-11-09',   '', 'WETH/rETH: Velodrome', 'Gov Fund - Season 1',  'pool-subgraph-velodrome',  ['0x69f795e2d9249021798645d784229e5bec2a5a25'],'velodrome']
             ,[1,'rocket-pool',  5_000*(abs(pd.to_datetime("today")-pd.to_datetime('2022-11-09')).days / 7 ),    '2022-11-09',   '', 'WETH/rETH: Beethoven X', 'Gov Fund - Season 1',  'pool-subgraph-messari',  ['0x4fd63966879300cafafbb35d157dc5229278ed23'],'beethoven-x']
             ,[0,'synthetix',  2*20000* (abs(pd.to_datetime("today")-pd.to_datetime('2022-08-25')).days / 7 ),    '2022-08-25',   '',   'All Synthetix Curve Pools', 'Gov Fund - Phase 0', 'pool-subgraph-curve',['0x7bc5728bc2b59b45a58d9a576e2ffc5f0505b35e','0x061b87122ed14b9526a813209c8a59a633257bab'],'curve'] # susd/usd + seth/eth Curve incentives started
@@ -827,8 +830,8 @@ fig_last.show()
 print("yay")
 
 
-# In[30]:
+# In[ ]:
 
 
-get_ipython().system(' jupyter nbconvert --to python optimism_app_net_flows.ipynb')
+# ! jupyter nbconvert --to python optimism_app_net_flows.ipynb
 
