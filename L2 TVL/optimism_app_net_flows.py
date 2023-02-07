@@ -138,15 +138,15 @@ for d in date_cols:
     
 
 # protocols['program_name'] = np.where( protocols['name'] == '', protocols['id_format'], protocols['name'])
-protocols['coalesce'] = np.where( protocols['name'] == ''
+protocols['top_level_name'] = np.where( protocols['name'] == ''
                                     , protocols['id_format']
                                     , protocols['name']
                                     )
 # Get count by coalesced name
-pcounts = pd.DataFrame( protocols.groupby(['coalesce'])['name'].count() )
+pcounts = pd.DataFrame( protocols.groupby(['top_level_name'])['name'].count() )
 pcounts = pcounts.rename(columns={'name':'count'})
 
-protocols = protocols.merge(pcounts, on = 'coalesce')
+protocols = protocols.merge(pcounts, on = 'top_level_name')
 
 protocols['slug'] = protocols['protocol']
 protocols['program_name'] = np.where( ( (protocols['name'] == '') )#| (protocols['count'] == 1) )
@@ -174,7 +174,7 @@ df_dfl = df_dfl.merge(dfl_protocols, on ='slug')
 df_dfl['protocol'] = df_dfl['protocol_y'].combine_first(df_dfl['protocol_x'])
 df_dfl['name'] = df_dfl['name_y'].combine_first(df_dfl['name_x'])
 
-df_dfl = df_dfl[['date', 'token', 'token_value', 'usd_value', 'protocol', 'start_date','end_date','program_name','app_name']]
+df_dfl = df_dfl[['date', 'token', 'token_value', 'usd_value', 'protocol', 'start_date','end_date','program_name','app_name','top_level_name']]
 
 
 # In[ ]:
@@ -214,6 +214,7 @@ for index, program in subg_protocols.iterrows():
                 sdf['program_name'] = program['program_name']
                 sdf['protocol'] = program['og_protocol']
                 sdf['app_name'] = program['app_name']
+                sdf['top_level_name'] = program['top_level_name']
 
                 sdf['token_value'] = sdf['token_value'].fillna(0)
                 sdf['usd_value'] = sdf['usd_value'].fillna(0)
@@ -260,7 +261,7 @@ df_df['start_date'] = df_df['start_date'].fillna( pd.to_datetime("today").floor(
 #Generate End Date Column
 df_df['end_date_30'] = df_df['end_date'].fillna(pd.to_datetime("today")).dt.floor('d') + timedelta(days = 30)
 
-df_df = df_df.groupby(['date','token','protocol','start_date','end_date_30','program_name','app_name']).sum(numeric_only=True).reset_index()
+df_df = df_df.groupby(['date','token','protocol','start_date','end_date_30','program_name','app_name','top_level_name']).sum(numeric_only=True).reset_index()
 
 # display(
 #         df_df[(df_df['protocol']=='revert-compoundor') & (df_df['date'] == '2022-11-09')] 
@@ -343,9 +344,9 @@ data_df.to_csv(prepend + 'csv_outputs/' + 'tvl_flows_by_token.csv')
 # In[ ]:
 
 
-netdf_df = data_df[['date','protocol','program_name','net_dollar_flow','net_price_stock_change','last_price_net_dollar_flow','usd_value','app_name']]
+netdf_df = data_df[['date','protocol','program_name','net_dollar_flow','net_price_stock_change','last_price_net_dollar_flow','usd_value','app_name','top_level_name']]
 
-netdf_df = netdf_df.groupby(['date','protocol','program_name','app_name']).sum(['net_dollar_flow','net_price_stock_change','last_price_net_dollar_flow','usd_value'])
+netdf_df = netdf_df.groupby(['date','protocol','program_name','app_name','top_level_name']).sum(['net_dollar_flow','net_price_stock_change','last_price_net_dollar_flow','usd_value'])
 
 # reset & get program data
 netdf_df.reset_index(inplace=True)
@@ -359,12 +360,12 @@ for c in cumul_cols:
         # netdf_df['cumul_last_price_net_dollar_flow'] = netdf_df.groupby(['protocol', 'program_name'])['last_price_net_dollar_flow'].cumsum()
         # netdf_df['cumul_net_price_stock_change'] = netdf_df.groupby(['protocol', 'program_name'])['net_price_stock_change'].cumsum()
 
-# display(netdf_df)
+
 # print(protocols.columns)
 # print(netdf_df.columns)
 
 # Bring Program info Back In
-netdf_df = netdf_df.merge(protocols[['include_in_summary','program_name','app_name','protocol','op_source','start_date','end_date','num_op']], on=['program_name','protocol','app_name'])
+netdf_df = netdf_df.merge(protocols[['include_in_summary','program_name','app_name','top_level_name','protocol','op_source','start_date','end_date','num_op']], on=['program_name','protocol','app_name','top_level_name'])
 
 #For Summary
 if_ended_cols = ['net_dollar_flow','last_price_net_dollar_flow']
@@ -381,6 +382,7 @@ for d in date_cols:
 
 # check info at program end
 # display(program_end_df)
+display(netdf_df[netdf_df['protocol'] == 'dhedge'])
 
 
 # In[ ]:
@@ -439,7 +441,9 @@ if not os.path.exists(prepend + "csv_outputs"):
 netdf_df.to_csv(prepend + 'csv_outputs/op_summer_daily_stats.csv', index=False)
 
 #SORT FOR CHARTS
-netdf_df = netdf_df.sort_values(by=['program_name','app_name'], ascending=[True,True])
+netdf_df = netdf_df.sort_values(by=['top_level_name','program_name','app_name'], ascending=[True,True,True])
+display(netdf_df.head())
+print(netdf_df.columns)
 
 
 # In[ ]:
