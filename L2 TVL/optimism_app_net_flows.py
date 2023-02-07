@@ -382,7 +382,7 @@ for d in date_cols:
 
 # check info at program end
 # display(program_end_df)
-display(netdf_df[netdf_df['protocol'] == 'dhedge'])
+# display(netdf_df[netdf_df['protocol'] == 'dhedge'])
 
 
 # In[ ]:
@@ -442,8 +442,8 @@ netdf_df.to_csv(prepend + 'csv_outputs/op_summer_daily_stats.csv', index=False)
 
 #SORT FOR CHARTS
 netdf_df = netdf_df.sort_values(by=['top_level_name','program_name','app_name'], ascending=[True,True,True])
-display(netdf_df.head())
-print(netdf_df.columns)
+# display(netdf_df.head())
+# print(netdf_df.columns)
 
 
 # In[ ]:
