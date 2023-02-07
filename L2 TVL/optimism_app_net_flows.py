@@ -438,6 +438,9 @@ if not os.path.exists(prepend + "csv_outputs"):
         os.mkdir(prepend + "csv_outputs")
 netdf_df.to_csv(prepend + 'csv_outputs/op_summer_daily_stats.csv', index=False)
 
+#SORT FOR CHARTS
+netdf_df = netdf_df.sort_values(by=['program_name','app_name'], ascending=[True,True])
+
 
 # In[ ]:
 
