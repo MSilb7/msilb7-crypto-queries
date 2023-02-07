@@ -156,7 +156,7 @@ protocols['program_name'] = np.where( ( (protocols['name'] == '') )#| (protocols
 
 protocols = protocols.sort_values(by='start_date', ascending=True)
                     
-display(protocols)
+# display(protocols)
 
 
 # In[ ]:
