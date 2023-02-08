@@ -202,8 +202,8 @@ for index, program in subg_protocols.iterrows():
         min_tsmp = min_tsmp - 1000 #add some buffer
         source_slug = program['source_slug']
         df_source = program['df_source']
-        print(df_source + ' - ' +source_slug)
         for c in program['contracts']:
+                # print(df_source + ' - ' +source_slug + ' - ' + c)
                 # messari generalized
                 if df_source == 'messari':
                         sdf = subg.get_messari_format_pool_tvl(source_slug, c, min_ts = min_tsmp)

@@ -1,13 +1,13 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[ ]:
+# In[1]:
 
 
 # ! jupyter nbconvert --to python optimism_subgraph_tvls.ipynb
 
 
-# In[ ]:
+# In[2]:
 
 
 from subgrounds.subgrounds import Subgrounds
@@ -29,7 +29,7 @@ sg = Subgrounds()
 # display(sgs)
 
 
-# In[ ]:
+# In[3]:
 
 
 def create_sg(tg_api):
@@ -37,7 +37,7 @@ def create_sg(tg_api):
         return csg
 
 
-# In[ ]:
+# In[4]:
 
 
 def get_velodrome_pool_tvl(pid, min_ts = 0, max_ts = 99999999999999):
@@ -106,7 +106,7 @@ def get_velodrome_pool_tvl(pid, min_ts = 0, max_ts = 99999999999999):
         return velo_tvl
 
 
-# In[ ]:
+# In[5]:
 
 
 def get_curve_pool_tvl(pid, min_ts = 0, max_ts = 99999999999999):
@@ -179,8 +179,58 @@ def get_curve_pool_tvl(pid, min_ts = 0, max_ts = 99999999999999):
 
         return curve_tvl
 
+def get_curve_pool_tvl_and_volume(chain, min_tvl = 10000, min_ts = 0, max_ts = 99999999999999):
+        curve = create_sg('https://api.thegraph.com/subgraphs/name/convex-community/volume-' + str.lower(chain))
+        q1 = curve.Query.dailyPoolSnapshots(
+        orderBy=curve.Query.dailyPoolSnapshot.tvl,
+        orderDirection='desc',
+        first=max_ts*max_ts, #arbitrarily large number so we pull everything
+                where=[
+                curve.Query.dailyPoolSnapshot.timestamp > min_ts,
+                curve.Query.dailyPoolSnapshot.timestamp <= max_ts,
+                curve.Query.dailyPoolSnapshot.tvl >= min_tvl,
+                ]
+        )
+        curve_tvl = sg.query_df([
+                q1.id,
+                q1.timestamp,
+                q1.pool,
+                # q1.pool.name,
+                # q1.pool.symbol,
+                # q1.pool.coins,
+                # q1.pool.coins,
+                q1.pool.coinNames,
+                q1.tvl,
+                q1.totalDailyFeesUSD,
+                q1.fee
+                ]
+                , pagination_strategy=ShallowStrategy)
+        curve_tvl.columns = curve_tvl.columns.str.replace('dailyPoolSnapshots_', '')
+        print(curve_tvl.columns)
+        curve_tvl['id_rank'] = curve_tvl.groupby(['id']).cumcount()+1
+        
 
-# In[ ]:
+        grp = curve_tvl.groupby(['timestamp','pool_address','pool_name','pool_symbol','pool_lpToken','pool_isV2',\
+                                 'pool_assetType','pool_poolType','tvl','totalDailyFeesUSD','fee']).\
+                                agg({'pool_coinNames':lambda x: list(x.unique())}
+                                     )
+        grp.reset_index(inplace=True)
+
+        # Assume Fees / fee rate = original volume
+        grp['daily_trade_voume_usd'] = grp['totalDailyFeesUSD'] / grp['fee'] 
+
+        #Map asset type
+        mappings = {0: "USD", 1: "ETH", 2: "BTC", 3: "Other", 4: "Crypto"}
+        grp['pool_assetType_mapped'] = grp['pool_assetType'].map(mappings)
+        grp['dt'] = pd.to_datetime(grp['timestamp'], unit = 's')
+        
+        grp = grp.sort_values(by=['timestamp','daily_trade_voume_usd'],ascending=[False,False])
+
+
+        return grp
+
+
+# In[6]:
 
 
 def get_messari_format_pool_tvl(slug, pool_id, chain = 'optimism', min_ts = 0, max_ts = 99999999999999):
@@ -272,7 +322,7 @@ def get_messari_format_pool_tvl(slug, pool_id, chain = 'optimism', min_ts = 0, m
         return data_df
 
 
-# In[ ]:
+# In[7]:
 
 
 def get_hop_pool_tvl(pid, min_ts = 0, max_ts = 99999999999999):
@@ -286,7 +336,7 @@ def get_hop_pool_tvl(pid, min_ts = 0, max_ts = 99999999999999):
     return hop
 
 
-# In[ ]:
+# In[8]:
 
 
 # Note, this is not in TVL tracking format - maybe we split this to a new file ~eventually
@@ -302,10 +352,11 @@ def get_messari_sg_pool_snapshots(slug, chains = ['optimism'], min_ts = 0, max_t
                         q1 = curve.Query.liquidityPoolDailySnapshots(
                         orderBy=curve.Query.liquidityPoolDailySnapshot.timestamp,
                         orderDirection='desc',
-                        first=10000,#max_ts*max_ts, #arbitrarily large number so we pull everything
+                        first=100000,#max_ts*max_ts, #arbitrarily large number so we pull everything
                                 where=[
                                 curve.Query.liquidityPoolDailySnapshot.timestamp > min_ts,
                                 curve.Query.liquidityPoolDailySnapshot.timestamp <= max_ts,
+                                curve.Query.liquidityPoolDailySnapshot.pool == '0xfb6fe7802ba9290ef8b00ca16af4bc26eb663a28'
                                 ]
                         )
                         # Pull Fields
@@ -341,6 +392,7 @@ def get_messari_sg_pool_snapshots(slug, chains = ['optimism'], min_ts = 0, max_t
         msr_daily.columns = msr_daily.columns.str.replace('liquidityPoolDailySnapshots_', '')
         
         col_list = msr_daily.columns.to_list()
+        print(col_list)
         col_list.remove('pool_inputTokens_id') # we want to group by everything else 
         
         msr_daily = msr_daily.fillna(0)
@@ -356,7 +408,7 @@ def get_messari_sg_pool_snapshots(slug, chains = ['optimism'], min_ts = 0, max_t
         return pd.DataFrame(msr_daily)
 
 
-# In[ ]:
+# In[9]:
 
 
 # pdf = get_curve_pool_tvl('0x061b87122ed14b9526a813209c8a59a633257bab')
@@ -365,23 +417,30 @@ def get_messari_sg_pool_snapshots(slug, chains = ['optimism'], min_ts = 0, max_t
 # display(vdf)
 
 
-# In[ ]:
+# In[10]:
 
 
 # pd.
-
+# df = get_curve_pool_tvl_and_volume('optimism')
+# print(df.columns)
+# display(df.head())
 # msr = get_messari_sg_pool_snapshots('curve-finance',['polygon'])
 # display(msr)
+
+# print(msr['dailyVolumeUSD'].mean())
 # 
 
 
-# In[ ]:
+# In[14]:
 
 
-# get_messari_format_pool_tvl('beethoven-x', '0x4fd63966879300cafafbb35d157dc5229278ed23')
+# df = get_messari_format_pool_tvl('beethoven-x', '0xb1c9ac57594e9b1ec0f3787d9f6744ef4cb0a024')
+# df = get_messari_format_pool_tvl('beethoven-x', '0x4fd63966879300cafafbb35d157dc5229278ed23')
+# messari - beethoven-x - 0xb1c9ac57594e9b1ec0f3787d9f6744ef4cb0a024
+# display(df)/
 
 
-# In[ ]:
+# In[12]:
 
 
 # ! jupyter nbconvert --to python optimism_pool_tvls.ipynb

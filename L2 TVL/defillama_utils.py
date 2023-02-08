@@ -321,26 +321,29 @@ def get_historical_defillama_prices(token_list_api, chain = 'optimism', min_ts =
         llama_api = 'https://coins.llama.fi/chart/' + token_list_api \
                         + '?start=' + str(min_ts) \
                         + '&span=600&period=1d&searchWidth=300'
-        print(llama_api)
+        # print(llama_api)
+        try:
+                # prices = pd.DataFrame(r.get(llama_api,headers=header).json()['coins']).T.reset_index()
+                prices = r.get(llama_api,headers=header).json()
+                prices = pd.DataFrame(prices['coins']).T
+                prices.reset_index(inplace=True)
+                prices = prices.rename(columns={'index':'token_address'})
+                prices = prices.loc[:, ['token_address', 'symbol', 'decimals', 'prices']]
+                
+                result = pd.DataFrame()
+                for i, prices_ in enumerate(prices['prices']):
+                        data = [{'timestamp': x['timestamp'], 'price': x['price']} for x in prices_]
+                        new_df = pd.concat([prices.iloc[i, :].drop(columns=['prices']).to_frame().T.assign(**price) for price in data], axis=0, ignore_index=True)
+                        result = pd.concat([result, new_df], axis=0, ignore_index=True)
 
-        # prices = pd.DataFrame(r.get(llama_api,headers=header).json()['coins']).T.reset_index()
-        prices = r.get(llama_api,headers=header).json()
-        prices = pd.DataFrame(prices['coins']).T
-        prices.reset_index(inplace=True)
-        prices = prices.rename(columns={'index':'token_address'})
+                result.drop(columns=['prices'], inplace=True)
 
-        prices = prices.loc[:, ['token_address', 'symbol', 'decimals', 'prices']]
+                result['dt'] = pd.to_datetime(result['timestamp'], unit='s').dt.date
 
-        result = pd.DataFrame()
-        for i, prices_ in enumerate(prices['prices']):
-                data = [{'timestamp': x['timestamp'], 'price': x['price']} for x in prices_]
-                new_df = pd.concat([prices.iloc[i, :].drop(columns=['prices']).to_frame().T.assign(**price) for price in data], axis=0, ignore_index=True)
-                result = pd.concat([result, new_df], axis=0, ignore_index=True)
+                result[['chain', 'token_address']] = result['token_address'].str.split(':', expand=True)
 
-        result.drop(columns=['prices'], inplace=True)
-
-        result['dt'] = pd.to_datetime(result['timestamp'], unit='s').dt.date
-
-        result[['chain', 'token_address']] = result['token_address'].str.split(':', expand=True)
+        except:
+                result = pd.DataFrame(columns=['token_address', 'symbol', 'decimals','timestamp',\
+                                                'price','dt','chain'])
 
         return result
