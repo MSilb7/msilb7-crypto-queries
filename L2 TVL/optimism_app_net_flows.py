@@ -115,7 +115,7 @@ protocols = pd.DataFrame(
             ,[1,'revert-compoundor',  240000,  '2022-11-03',   '',   '', 'Gov Fund - Season 2', 'defillama','','']
             ,[1,'dhedge',    350000,    '2022-12-21',   '',   '', 'Gov Fund - Season 2', 'defillama','',''] # Announced 12/21, launched 1/17 - https://twitter.com/dHedgeOrg/status/1615573828394184706
             ]
-        , columns = ['include_in_summary','protocol','num_op','start_date', 'end_date','name', 'op_source', 'data_source','contracts','source_slug']
+        , columns = ['include_in_summary','slug','num_op','start_date', 'end_date','name', 'op_source', 'data_source','contracts','source_slug']
     )
 
 protocol_name_mapping = pd.DataFrame(
@@ -127,38 +127,27 @@ protocol_name_mapping = pd.DataFrame(
         ['pickle','pickle finance'],
         ['stargate','stargate finance']
     ]
-    ,columns=['protocol','app_name']
+    ,columns=['slug','app_name']
 )
-
-protocols = protocols.merge(protocol_name_mapping,on='protocol', how = 'left')
-protocols['app_name'] = protocols['app_name'].combine_first(protocols['protocol'])
-
-# print(protocols[0])
-protocols['id_format'] = protocols['protocol'].str.replace('-',' ').str.title()
-
-protocols['app_name'] = protocols['app_name'].str.replace('-',' ').str.title()
 
 date_cols = ['start_date', 'end_date']
 for d in date_cols:
     protocols[d] = pd.to_datetime( protocols[d] )
-    
 
-# protocols['program_name'] = np.where( protocols['name'] == '', protocols['id_format'], protocols['name'])
+protocols = protocols.merge(protocol_name_mapping,on='slug', how = 'left')
+
+# For subgraphs
+protocols['app_name'] = protocols['app_name'].str.replace('-',' ').str.title()
+protocols['id_format'] = protocols['slug'].str.replace('-',' ').str.title()
+protocols['program_name'] = np.where( ( (protocols['name'] == '') )
+                                    , protocols['id_format']
+                                    , protocols['id_format'] + ' - ' + protocols['name']
+                                    )
 protocols['top_level_name'] = np.where( protocols['name'] == ''
                                     , protocols['id_format']
                                     , protocols['name']
                                     )
-# Get count by coalesced name
-pcounts = pd.DataFrame( protocols.groupby(['top_level_name'])['name'].count() )
-pcounts = pcounts.rename(columns={'name':'count'})
-
-protocols = protocols.merge(pcounts, on = 'top_level_name')
-
-protocols['slug'] = protocols['protocol']
-protocols['program_name'] = np.where( ( (protocols['name'] == '') )#| (protocols['count'] == 1) )
-                                    , protocols['id_format']
-                                    , protocols['id_format'] + ' - ' + protocols['name']
-                                    )
+# protocols['program_name'] = np.where( protocols['name'] == '', protocols['id_format'], protocols['name'])
 
 protocols = protocols.sort_values(by='start_date', ascending=True)
                     
@@ -168,17 +157,39 @@ protocols = protocols.sort_values(by='start_date', ascending=True)
 # In[ ]:
 
 
+# Pull Data
 dfl_protocols = protocols[protocols['data_source'] == 'defillama'].copy()
 
-dfl_slugs = dfl_protocols[['protocol']].drop_duplicates()
+dfl_slugs = dfl_protocols[['slug']].drop_duplicates()
 # display(dfl_slugs)
-dfl_slugs = dfl_slugs.rename(columns={'protocol':'slug'})
 df_dfl = dfl.get_range(dfl_slugs[['slug']],['Optimism'], fallback_on_raw_tvl= do_fallback_on_raw_tvl)
-# display(df_dfl[df_dfl['protocol']=='beefy'])
-df_dfl = df_dfl.merge(dfl_protocols, on ='slug')
 
-df_dfl['protocol'] = df_dfl['protocol_y'].combine_first(df_dfl['protocol_x'])
-df_dfl['name'] = df_dfl['name_y'].combine_first(df_dfl['name_x'])
+df_dfl['is_raw_tvl'] = np.where(df_dfl['slug'].str.endswith('*'), 1, 0)
+
+
+# In[ ]:
+
+
+# Format COlumns
+# df_dfl['app_name'] = df_dfl['app_name'].combine_first(df_dfl['protocol'])
+
+# df_dfl['id_format'] = df_dfl['slug'].str.replace('-',' ').str.title()
+
+# df_dfl['app_name'] = df_dfl['app_name'].str.replace('-',' ').str.title()
+
+
+df_dfl = df_dfl.merge(dfl_protocols, on ='slug')
+# display(df_dfl)
+
+# df_dfl['protocol'] = df_dfl['slug']#.combine_first(df_dfl['slug_y'])
+# display(df_dfl)
+df_dfl['name'] = df_dfl['name_y'].combine_first(df_dfl['name_x']) + \
+                        np.where(df_dfl['protocol'].str.endswith('*'), '*','') #IF Raw TVL, pull this in
+# display(df_dfl)
+df_dfl['top_level_name'] = df_dfl['top_level_name'] + np.where(df_dfl['protocol'].str.endswith('*'), '*','') #IF Raw TVL, pull this in
+
+
+df_dfl['program_name'] = df_dfl['program_name'] + np.where(df_dfl['protocol'].str.endswith('*'), '*','') #IF Raw TVL, pull this in
 
 df_dfl = df_dfl[['date', 'token', 'token_value', 'usd_value', 'protocol', 'start_date','end_date','program_name','app_name','top_level_name']]
 
@@ -188,7 +199,7 @@ df_dfl = df_dfl[['date', 'token', 'token_value', 'usd_value', 'protocol', 'start
 
 subg_protocols = protocols[protocols['data_source'].str.contains('pool-')].copy()
 # subg_protocols['og_app_name'] = subg_protocols['app_name']
-subg_protocols['og_protocol'] = subg_protocols['protocol']
+subg_protocols['og_protocol'] = subg_protocols['slug']
 subg_protocols['df_source'] = subg_protocols['data_source'].str.split('-').str[-1]
 # display(subg_protocols)
 
