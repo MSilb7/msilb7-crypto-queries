@@ -93,6 +93,11 @@ protocols = pd.DataFrame(
             ,[0,'synthetix',  2*20000* (abs(pd.to_datetime("today")-pd.to_datetime('2022-08-25')).days / 7 ),    '2022-08-25',   '',   'All Synthetix Curve Pools', 'Gov Fund - Phase 0', 'pool-subgraph-curve',['0x7bc5728bc2b59b45a58d9a576e2ffc5f0505b35e','0x061b87122ed14b9526a813209c8a59a633257bab'],'curve'] # susd/usd + seth/eth Curve incentives started
             ,[1,'synthetix',  20000* (abs(pd.to_datetime("today")-pd.to_datetime('2022-08-25')).days / 7 ),    '2022-08-25',   '',   'sUSD-3Crv: Curve', 'Gov Fund - Phase 0', 'pool-subgraph-curve',['0x061b87122ed14b9526a813209c8a59a633257bab'],'curve'] # susd/usd + seth/eth Curve incentives started
             ,[1,'synthetix',  20000* (abs(pd.to_datetime("today")-pd.to_datetime('2022-08-25')).days / 7 ),    '2022-08-25',   '',   'sETH-ETH: Curve', 'Gov Fund - Phase 0', 'pool-subgraph-curve',['0x7bc5728bc2b59b45a58d9a576e2ffc5f0505b35e'],'curve'] # susd/usd + seth/eth Curve incentives started
+            #More DEXs
+    
+            ,[1,'overnight',  3_000*(abs(pd.to_datetime("today")-pd.to_datetime('2023-01-10')).days / 7 ),    '2023-01-10',   '', 'USD+/USDC: Velodrome', 'Gov Fund - Season 1',  'pool-subgraph-velodrome',  ['0x67124355cce2ad7a8ea283e990612ebe12730175'],'velodrome']
+            ,[1,'overnight',  2_500,    '2023-01-10',   '', 'BPT-USD+: Beethoven X', 'Gov Fund - Season 1',  'pool-subgraph-messari',  ['0xb1c9ac57594e9b1ec0f3787d9f6744ef4cb0a024'],'beethoven-x']
+            ,[1,'overnight',  1_000*(abs(pd.to_datetime("today")-pd.to_datetime('2023-01-30')).days / 7 ),    '2023-01-30',   '', 'USD+/DOLA: Velodrome', 'Gov Fund - Season 1',  'pool-subgraph-velodrome',  ['0xa99817d2d286c894f8f3888096a5616d06f20d46'],'velodrome']
             
             ,[0,'synthetix',  3*10000* (abs(pd.to_datetime("today")-pd.to_datetime('2022-09-27')).days / 7 ),    '2022-09-27',   '',   'All Synthetix Velo Pools', 'Gov Fund - Phase 0', 'pool-subgraph-velodrome',['0x9056eb7ca982a5dd65a584189994e6a27318067d' \
                                                                                                                                                                                                     ,'0xd16232ad60188b68076a235c65d692090caba155'\
