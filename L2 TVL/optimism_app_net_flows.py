@@ -137,7 +137,8 @@ for d in date_cols:
 protocols = protocols.merge(protocol_name_mapping,on='slug', how = 'left')
 
 # For subgraphs
-protocols['app_name'] = protocols['app_name'].str.replace('-',' ').str.title()
+protocols['protocol'] = protocols['slug']
+protocols['app_name'] = protocols['app_name'].combine_first(protocols['slug'])
 protocols['id_format'] = protocols['slug'].str.replace('-',' ').str.title()
 protocols['program_name'] = np.where( ( (protocols['name'] == '') )
                                     , protocols['id_format']
@@ -159,6 +160,9 @@ protocols = protocols.sort_values(by='start_date', ascending=True)
 
 # Pull Data
 dfl_protocols = protocols[protocols['data_source'] == 'defillama'].copy()
+
+#drop og protocol column to avoid collisions
+dfl_protocols = dfl_protocols.drop('protocol', axis=1)
 
 dfl_slugs = dfl_protocols[['slug']].drop_duplicates()
 # display(dfl_slugs)
@@ -188,18 +192,20 @@ df_dfl['name'] = df_dfl['name_y'].combine_first(df_dfl['name_x']) + \
 # display(df_dfl)
 df_dfl['top_level_name'] = df_dfl['top_level_name'] + np.where(df_dfl['protocol'].str.endswith('*'), '*','') #IF Raw TVL, pull this in
 
-
 df_dfl['program_name'] = df_dfl['program_name'] + np.where(df_dfl['protocol'].str.endswith('*'), '*','') #IF Raw TVL, pull this in
 
 df_dfl = df_dfl[['date', 'token', 'token_value', 'usd_value', 'protocol', 'start_date','end_date','program_name','app_name','top_level_name']]
+
+# display(df_dfl)
 
 
 # In[ ]:
 
 
 subg_protocols = protocols[protocols['data_source'].str.contains('pool-')].copy()
-# subg_protocols['og_app_name'] = subg_protocols['app_name']
+subg_protocols['og_app_name'] = subg_protocols['app_name']
 subg_protocols['og_protocol'] = subg_protocols['slug']
+subg_protocols['og_top_level_name'] = subg_protocols['top_level_name']
 subg_protocols['df_source'] = subg_protocols['data_source'].str.split('-').str[-1]
 # display(subg_protocols)
 
@@ -230,8 +236,8 @@ for index, program in subg_protocols.iterrows():
                 sdf['end_date'] = program['end_date']
                 sdf['program_name'] = program['program_name']
                 sdf['protocol'] = program['og_protocol']
-                sdf['app_name'] = program['app_name']
-                sdf['top_level_name'] = program['top_level_name']
+                sdf['app_name'] = program['og_app_name']
+                sdf['top_level_name'] = program['og_top_level_name']
 
                 sdf['token_value'] = sdf['token_value'].fillna(0)
                 sdf['usd_value'] = sdf['usd_value'].fillna(0)
@@ -251,6 +257,13 @@ df_df_sub = pd.concat(dfs_sub)
 
 
 df_df_comb = pd.concat([df_dfl, df_df_sub])
+#remove * from protocol
+df_df_comb['protocol'] = df_df_comb['protocol'].str[:-1].where(df_df_comb['protocol'].str[-1] == '*', df_df_comb['protocol'])
+# display(
+#         df_dfl[(df_dfl['protocol']=='pooltogether')]
+#         )
+
+
 # display(df_df_comb)
 df_df_comb['start_date'] = pd.to_datetime(df_df_comb['start_date'])
 df_df_comb['end_date'] = pd.to_datetime(df_df_comb['end_date'])
@@ -268,20 +281,26 @@ df_df_shift = df_df_comb.copy()
 df_df_shift['date'] = df_df_shift['date'] + timedelta(days=1)
 df_df_shift['token_value'] = 0
 df_df_shift['usd_value'] = 0
-
 #merge back in
 df_df = pd.concat([df_df_comb,df_df_shift])
 df_df = df_df[df_df['date'] <= pd.to_datetime("today") ]
+
+
 
 # Group - Exclude End Date since this is often null and overwritting could be weird, especially if we actually know an end date
 df_df['start_date'] = df_df['start_date'].fillna( pd.to_datetime("today").floor('d') )
 #Generate End Date Column
 df_df['end_date_30'] = df_df['end_date'].fillna(pd.to_datetime("today")).dt.floor('d') + timedelta(days = 30)
 
-df_df = df_df.groupby(['date','token','protocol','start_date','end_date_30','program_name','app_name','top_level_name']).sum(numeric_only=True).reset_index()
-
 # display(
-#         df_df[(df_df['protocol']=='revert-compoundor') & (df_df['date'] == '2022-11-09')] 
+#         df_df[(df_df['protocol']=='velodrome')] 
+#         )
+
+df_df = df_df.groupby(['date','token','protocol','start_date','end_date_30','program_name','app_name','top_level_name']).sum().reset_index()
+
+# display(df_df)
+# display(
+#         df_df[(df_df['protocol']=='pooltogether')] 
 #         )
 
 
@@ -382,7 +401,19 @@ for c in cumul_cols:
 # print(netdf_df.columns)
 
 # Bring Program info Back In
-netdf_df = netdf_df.merge(protocols[['include_in_summary','program_name','app_name','top_level_name','protocol','op_source','start_date','end_date','num_op']], on=['program_name','protocol','app_name','top_level_name'])
+join_cols = ['program_name','protocol','app_name','top_level_name']
+join_cols_join = [col + '_join' for col in join_cols]
+for c in join_cols:
+        netdf_df[c+'_join'] = netdf_df[c].str[:-1].where(netdf_df[c].str[-1] == '*', netdf_df[c])
+        protocols[c+'_join'] = protocols[c]
+
+protocol_cols = ['include_in_summary','op_source','start_date','end_date','num_op'] + join_cols_join
+
+netdf_df = netdf_df.merge(protocols[protocol_cols], on=join_cols_join)
+
+# for c in join_cols_join:
+#         old_col = c.replace("_join", "")
+#         netdf_df[old_col] = netdf_df[c]
 
 #For Summary
 if_ended_cols = ['net_dollar_flow','last_price_net_dollar_flow']
@@ -399,7 +430,7 @@ for d in date_cols:
 
 # check info at program end
 # display(program_end_df)
-# display(netdf_df[netdf_df['protocol'] == 'dhedge'])
+# display(netdf_df[netdf_df['protocol'] == 'velodrome'])
 
 
 # In[ ]:
@@ -754,7 +785,7 @@ for p in proto_names:
 
 cumul_fig.update_layout(yaxis_tickprefix = '$')
 cumul_fig.update_layout(
-    title="Cumulative Net Flows since Program Announcement<br><sup>For Ended Programs, we show continue to show flows through 30 days after program end.</sup>",
+    title="Cumulative Net Flows since Program Announcement<br><sup>For Ended Programs, we show continue to show flows through 30 days after program end. | * Shows raw TVL change, rather than flows</sup>",
     xaxis_title="Day",
     yaxis_title="Cumulative Net Flows (USD)",
     legend_title="App Name",
@@ -776,7 +807,7 @@ for p in proto_names:
 
 fig_last.update_layout(yaxis_tickprefix = '$')
 fig_last.update_layout(
-    title="Cumulative Net Flows since Program Announcement (At Most Recent Token Price)<br><sup>For Ended Programs, we show continue to show flows through 30 days after program end.</sup>",
+    title="Cumulative Net Flows since Program Announcement (At Most Recent Token Price)<br><sup>For Ended Programs, we show continue to show flows through 30 days after program end. | * Shows raw TVL change, rather than flows</sup>",
     xaxis_title="Day",
     yaxis_title="Cumulative Net Flows (USD) - At Most Recent Price",
     legend_title="App Name",
