@@ -180,6 +180,7 @@ def get_curve_pool_tvl(pid, min_ts = 0, max_ts = 99999999999999):
         return curve_tvl
 
 def get_curve_pool_tvl_and_volume(chain, min_tvl = 10000, min_ts = 0, max_ts = 99999999999999):
+        # Playground: https://thegraph.com/hosted-service/subgraph/convex-community/volume-optimism
         curve = create_sg('https://api.thegraph.com/subgraphs/name/convex-community/volume-' + str.lower(chain))
         q1 = curve.Query.dailyPoolSnapshots(
         orderBy=curve.Query.dailyPoolSnapshot.tvl,
@@ -201,17 +202,22 @@ def get_curve_pool_tvl_and_volume(chain, min_tvl = 10000, min_ts = 0, max_ts = 9
                 # q1.pool.coins,
                 q1.pool.coinNames,
                 q1.tvl,
+                q1.lpFeesUSD,
+                q1.adminFeesUSD,
                 q1.totalDailyFeesUSD,
                 q1.fee
                 ]
                 , pagination_strategy=ShallowStrategy)
         curve_tvl.columns = curve_tvl.columns.str.replace('dailyPoolSnapshots_', '')
-        print(curve_tvl.columns)
+        # print(curve_tvl.columns)
         curve_tvl['id_rank'] = curve_tvl.groupby(['id']).cumcount()+1
         
 
         grp = curve_tvl.groupby(['timestamp','pool_address','pool_name','pool_symbol','pool_lpToken','pool_isV2',\
-                                 'pool_assetType','pool_poolType','tvl','totalDailyFeesUSD','fee']).\
+                                 'pool_assetType','pool_poolType','tvl'\
+                                 ,'lpFeesUSD', 'adminFeesUSD'\
+                                        ,'totalDailyFeesUSD','fee'
+                                        ]).\
                                 agg({'pool_coinNames':lambda x: list(x.unique())}
                                      )
         grp.reset_index(inplace=True)
@@ -223,8 +229,19 @@ def get_curve_pool_tvl_and_volume(chain, min_tvl = 10000, min_ts = 0, max_ts = 9
         mappings = {0: "USD", 1: "ETH", 2: "BTC", 3: "Other", 4: "Crypto"}
         grp['pool_assetType_mapped'] = grp['pool_assetType'].map(mappings)
         grp['dt'] = pd.to_datetime(grp['timestamp'], unit = 's')
-        
-        grp = grp.sort_values(by=['timestamp','daily_trade_voume_usd'],ascending=[False,False])
+        grp['chain'] = chain
+
+        # convert the arrays to strings, sort the strings, and convert back to arrays
+        grp['pool_coinNames'] = grp['pool_coinNames'].apply(lambda x: sorted(x))
+        grp['pool_coinNames'] = grp['pool_coinNames'].apply(lambda x: [i if i != '0xeeee' else 'ETH' for i in x])
+        grp['pool_coinNames'] = grp['pool_coinNames'].apply(lambda x: ','.join(map(str, x)))
+
+        #cols to include
+        cols = ['dt','chain','pool_address','pool_lpToken','pool_name','pool_symbol','pool_coinNames','pool_assetType_mapped','pool_poolType'\
+                        ,'tvl','daily_trade_voume_usd','totalDailyFeesUSD','fee']
+        grp = grp[cols]
+
+        grp = grp.sort_values(by=['dt','daily_trade_voume_usd'],ascending=[False,False])
 
 
         return grp
@@ -431,11 +448,13 @@ def get_messari_sg_pool_snapshots(slug, chains = ['optimism'], min_ts = 0, max_t
 # 
 
 
-# In[14]:
+# In[11]:
 
 
 # df = get_messari_format_pool_tvl('beethoven-x', '0xb1c9ac57594e9b1ec0f3787d9f6744ef4cb0a024')
 # df = get_messari_format_pool_tvl('beethoven-x', '0x4fd63966879300cafafbb35d157dc5229278ed23')
+# df = get_curve_pool_tvl_and_volume('optimism')
+# display(df)
 # messari - beethoven-x - 0xb1c9ac57594e9b1ec0f3787d9f6744ef4cb0a024
 # display(df)/
 
