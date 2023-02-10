@@ -270,7 +270,7 @@ data_df = data_df[~data_df['net_dollar_flow'].isna()]
 data_df['net_dollar_flow_latest_price'] = np.where(
     data_df['net_dollar_flow'] == 0, 0, data_df['net_dollar_flow_latest_price']
 )
-data_df.to_csv('csv_outputs/latest_tvl_app_trends_by_token.csv')  
+# data_df.to_csv('csv_outputs/latest_tvl_app_trends_by_token.csv')  #csv too large, only run this manually
 # data_df[(data_df['protocol'] == 'magpie') & (data_df['date'] >= '2023-01-27') ]
 # data_df[data_df['protocol'] == 'velodrome']
 
