@@ -1,0 +1,1 @@
+`address`,`a_op_delelgated_airdrop`,`b_gas_rebate_airdrop`,`attr1_currently_delegating_points`,`attr2_op_delelgated_points`,`attr3_mo_active_points`,`attr4_gas_rebate_points`,`num_bonus_categories`,`op_multiplier_bonus`,`total_op_eligible_to_claim`

@@ -4,6 +4,7 @@
 #dec_cols = columns we should treat as decimals
 import pandas as pd
 import os
+import numpy as np
 
 def to_dune_sql_format(df, prepend = '', int_cols = [], dec_cols = []):
         #for file export
@@ -12,14 +13,17 @@ def to_dune_sql_format(df, prepend = '', int_cols = [], dec_cols = []):
 
         for col in df.columns:
                 if col in int_cols:
-                        df[col] = df[col].fillna(-1)
-                        df[col] = df[col].astype('int64')
-                        df[col] = ',' + df[col].astype(str)
+                        pass #do nothing
+                        # df[col] = df[col].fillna(-1)
+                        # df[col] = pd.to_numeric(df[col], downcast='signed')
+                        # df[col] = ',' + df[col].astype(str)
                 elif col in dec_cols:
                         pass #do nothing
                 else:
                         df[col] = df[col].fillna('')
                         df[col] = ',\'' + df[col].astype(str) + '\''
+                
+                df[col] = ',' + df[col].astype(str)
 
         # Add parenthases for SQL
         df.iloc[:, 0] = '(' + df.iloc[:, 0].str.replace(',','') #replace leading comma
