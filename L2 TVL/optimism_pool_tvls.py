@@ -1,13 +1,13 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[1]:
+# In[ ]:
 
 
 # ! jupyter nbconvert --to python optimism_subgraph_tvls.ipynb
 
 
-# In[2]:
+# In[ ]:
 
 
 from subgrounds.subgrounds import Subgrounds
@@ -29,7 +29,7 @@ sg = Subgrounds()
 # display(sgs)
 
 
-# In[3]:
+# In[ ]:
 
 
 def create_sg(tg_api):
@@ -37,7 +37,7 @@ def create_sg(tg_api):
         return csg
 
 
-# In[4]:
+# In[ ]:
 
 
 def get_velodrome_pool_tvl(pid, min_ts = 0, max_ts = 99999999999999):
@@ -106,7 +106,7 @@ def get_velodrome_pool_tvl(pid, min_ts = 0, max_ts = 99999999999999):
         return velo_tvl
 
 
-# In[5]:
+# In[ ]:
 
 
 def get_curve_pool_tvl(pid, min_ts = 0, max_ts = 99999999999999):
@@ -247,7 +247,7 @@ def get_curve_pool_tvl_and_volume(chain, min_tvl = 10000, min_ts = 0, max_ts = 9
         return grp
 
 
-# In[6]:
+# In[ ]:
 
 
 def get_messari_format_pool_tvl(slug, pool_id, chain = 'optimism', min_ts = 0, max_ts = 99999999999999):
@@ -339,13 +339,12 @@ def get_messari_format_pool_tvl(slug, pool_id, chain = 'optimism', min_ts = 0, m
         return data_df
 
 
-# In[7]:
+# In[ ]:
 
 
 def get_hop_pool_tvl(pid, min_ts = 0, max_ts = 99999999999999):
-    api_base_str = 'https://api.llama.fi/protocol/'
     prot_str = 'hop-protocol'
-    hop = dfl.get_single_tvl(api_base_str, prot_str, ['Optimism'])
+    hop = dfl.get_single_tvl(prot_str, ['Optimism'])
     hop = hop[(hop['token'] == pid) & (~hop['token_value'].isna())]
     hop = hop[['date','token','token_value','usd_value','protocol']]
     hop['protocol'] = 'Hop' #rename to match func
@@ -353,7 +352,7 @@ def get_hop_pool_tvl(pid, min_ts = 0, max_ts = 99999999999999):
     return hop
 
 
-# In[8]:
+# In[ ]:
 
 
 # Note, this is not in TVL tracking format - maybe we split this to a new file ~eventually
@@ -425,7 +424,7 @@ def get_messari_sg_pool_snapshots(slug, chains = ['optimism'], min_ts = 0, max_t
         return pd.DataFrame(msr_daily)
 
 
-# In[9]:
+# In[ ]:
 
 
 # pdf = get_curve_pool_tvl('0x061b87122ed14b9526a813209c8a59a633257bab')
@@ -434,7 +433,7 @@ def get_messari_sg_pool_snapshots(slug, chains = ['optimism'], min_ts = 0, max_t
 # display(vdf)
 
 
-# In[10]:
+# In[ ]:
 
 
 # pd.
@@ -448,7 +447,7 @@ def get_messari_sg_pool_snapshots(slug, chains = ['optimism'], min_ts = 0, max_t
 # 
 
 
-# In[11]:
+# In[ ]:
 
 
 # df = get_messari_format_pool_tvl('beethoven-x', '0xb1c9ac57594e9b1ec0f3787d9f6744ef4cb0a024')
@@ -459,7 +458,7 @@ def get_messari_sg_pool_snapshots(slug, chains = ['optimism'], min_ts = 0, max_t
 # display(df)/
 
 
-# In[12]:
+# In[ ]:
 
 
 # ! jupyter nbconvert --to python optimism_pool_tvls.ipynb

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[9]:
+# In[ ]:
 
 
 # ! pip install pandas
@@ -12,7 +12,7 @@
 # ! pip freeze = requirements.txt
 
 
-# In[10]:
+# In[ ]:
 
 
 import pandas as pd
@@ -28,7 +28,7 @@ import defillama_utils as dfl
 import pandas_utils as pu
 
 
-# In[11]:
+# In[ ]:
 
 
 pwd = os.getcwd()
@@ -42,7 +42,7 @@ do_fallback_on_raw_tvl = True
 str_fallback_indicator = '' #Dont append any indicator yet, since it screws up joins
 
 
-# In[12]:
+# In[ ]:
 
 
 # Protocol Incentive Start Dates
@@ -155,7 +155,7 @@ protocols = protocols.sort_values(by='start_date', ascending=True)
 # display(protocols)
 
 
-# In[13]:
+# In[ ]:
 
 
 # Pull Data
@@ -171,7 +171,7 @@ df_dfl = dfl.get_range(dfl_slugs[['slug']],['Optimism'], fallback_on_raw_tvl= do
 df_dfl['is_raw_tvl'] = np.where(df_dfl['slug'].str.endswith('*'), 1, 0)
 
 
-# In[14]:
+# In[ ]:
 
 
 # Format COlumns
@@ -199,7 +199,7 @@ df_dfl = df_dfl[['date', 'token', 'token_value', 'usd_value', 'protocol', 'start
 # display(df_dfl)
 
 
-# In[15]:
+# In[ ]:
 
 
 subg_protocols = protocols[protocols['data_source'].str.contains('pool-')].copy()
@@ -210,7 +210,7 @@ subg_protocols['df_source'] = subg_protocols['data_source'].str.split('-').str[-
 # display(subg_protocols)
 
 
-# In[16]:
+# In[ ]:
 
 
 dfs_sub = []
