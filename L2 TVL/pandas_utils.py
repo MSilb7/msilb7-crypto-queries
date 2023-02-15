@@ -1,5 +1,7 @@
 # https://www.thepythoncode.com/article/convert-pandas-dataframe-to-html-table-python
 import pandas as pd
+import datetime
+
 def generate_html(dataframe: pd.DataFrame):
     # get the table HTML from the dataframe
     table_html = dataframe.to_html(table_id="table")
@@ -87,4 +89,16 @@ def format_pct(x):
     else:
         x = float(x) #just cast for safety
         return '{:.1%}'.format(x)
-    
+
+#ChatPT wrote this lol
+def get_unix_timestamp(trailing_days):
+    # get the current date at the start of the day
+    today_start = datetime.datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
+
+    # calculate the date for the trailing_days ago
+    trailing_date = today_start - datetime.timedelta(days=trailing_days)
+
+    # calculate the Unix timestamp for the trailing date
+    unix_timestamp = int(trailing_date.timestamp())
+
+    return unix_timestamp

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[ ]:
+# In[9]:
 
 
 # ! pip install pandas
@@ -12,7 +12,7 @@
 # ! pip freeze = requirements.txt
 
 
-# In[ ]:
+# In[10]:
 
 
 import pandas as pd
@@ -28,7 +28,7 @@ import defillama_utils as dfl
 import pandas_utils as pu
 
 
-# In[ ]:
+# In[11]:
 
 
 pwd = os.getcwd()
@@ -42,7 +42,7 @@ do_fallback_on_raw_tvl = True
 str_fallback_indicator = '' #Dont append any indicator yet, since it screws up joins
 
 
-# In[ ]:
+# In[12]:
 
 
 # Protocol Incentive Start Dates
@@ -73,10 +73,10 @@ protocols = pd.DataFrame(
             ,[1,'cbridge',    300000,    '2022-08-13',   '',   'Celer', 'Gov Fund - Phase 0', 'defillama','','']
             ,[1,'clipper',    300000,    '2023-01-23',   '',   '', 'Gov Fund - Phase 0', 'defillama','','']
             #Uniswap LM Program - Phase 1
-            ,[0,'uniswap-v3', 150000,         '2022-10-26',   '2022-11-21',   'Uniswap LM - Phase 1', 'Gov Fund - Phase 0', 'defillama','','']
-            ,[1,'arrakis-finance',    50000,    '2022-10-26',   '2022-11-21',   'Uniswap LM - Phase 1', 'Gov Fund - Phase 0','defillama','','']
-            ,[1,'gamma',    50000,              '2022-10-26',   '2022-11-21',   'Uniswap LM - Phase 1', 'Gov Fund - Phase 0','defillama','','']
-            ,[1,'xtoken',    50000,             '2022-10-26',   '2022-11-21',   'Uniswap LM - Phase 1', 'Gov Fund - Phase 0','defillama','','']
+            ,[0,'uniswap-v3', 50000,         '2022-10-26',   '2022-11-21',   'Uniswap LM - Phase 1', 'Gov Fund - Phase 0', 'defillama','','']
+            ,[1,'arrakis-finance',    50000/3,    '2022-10-26',   '2022-11-21',   'Uniswap LM - Phase 1', 'Gov Fund - Phase 0','defillama','','']
+            ,[1,'gamma',    50000/3,              '2022-10-26',   '2022-11-21',   'Uniswap LM - Phase 1', 'Gov Fund - Phase 0','defillama','','']
+            ,[1,'xtoken',    50000/3,             '2022-10-26',   '2022-11-21',   'Uniswap LM - Phase 1', 'Gov Fund - Phase 0','defillama','','']
             #Uniswap LM Program - Phase 2 - https://gov.uniswap.org/t/rfc-phase-2-optimism-uniswap-protocol-liquidity-mining-program/19803/12
             ,[0,'uniswap-v3', 100000,         '2023-01-16',   '2023-02-08',   'Uniswap LM - Phase 2', 'Gov Fund - Phase 0', 'defillama','','']
             ,[1,'arrakis-finance',    100000/4,    '2023-01-16',   '2023-02-08',   'Uniswap LM - Phase 2', 'Gov Fund - Phase 0','defillama','','']
@@ -155,7 +155,7 @@ protocols = protocols.sort_values(by='start_date', ascending=True)
 # display(protocols)
 
 
-# In[ ]:
+# In[13]:
 
 
 # Pull Data
@@ -171,7 +171,7 @@ df_dfl = dfl.get_range(dfl_slugs[['slug']],['Optimism'], fallback_on_raw_tvl= do
 df_dfl['is_raw_tvl'] = np.where(df_dfl['slug'].str.endswith('*'), 1, 0)
 
 
-# In[ ]:
+# In[14]:
 
 
 # Format COlumns
@@ -199,7 +199,7 @@ df_dfl = df_dfl[['date', 'token', 'token_value', 'usd_value', 'protocol', 'start
 # display(df_dfl)
 
 
-# In[ ]:
+# In[15]:
 
 
 subg_protocols = protocols[protocols['data_source'].str.contains('pool-')].copy()
@@ -210,7 +210,7 @@ subg_protocols['df_source'] = subg_protocols['data_source'].str.split('-').str[-
 # display(subg_protocols)
 
 
-# In[ ]:
+# In[16]:
 
 
 dfs_sub = []

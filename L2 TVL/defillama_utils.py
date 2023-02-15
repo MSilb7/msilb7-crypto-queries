@@ -173,10 +173,10 @@ def get_chain_tvls(chain_list):
         return chains
 
 # Eventually figure out how to integrate this with get_tvls so that it's not duplicative
-def get_single_tvl(api_base, prot, chains, header = header, statuses = statuses, fallback_on_raw_tvl = False):
+def get_single_tvl(prot, chains, header = header, statuses = statuses, fallback_on_raw_tvl = False):
         prod = []
         # retry_client = RetryClient()
-        apistring = api_base + prot
+        apistring = 'https://api.llama.fi/protocol/' + prot
 
         # response = retry_client.get(apistring, retry_options=ExponentialRetry(attempts=10), raise_for_status=statuses)
         try:
