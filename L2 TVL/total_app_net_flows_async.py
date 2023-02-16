@@ -356,6 +356,9 @@ if mark_at_latest_price == 1:
 else:
         titleval_append = ''
 
+# Cast 'net_dollar_flow' to float64 data type
+summary_df['net_dollar_flow'] = summary_df['net_dollar_flow'].astype('float64')
+
 # summary_df = summary_df[(summary_df['chain'] == 'Solana') & (summary_df['protocol'] == 'uxd')]
 for i in drange:
         if i == 0:
