@@ -118,8 +118,8 @@ protocols = pd.DataFrame(
             ,[1,'dhedge',    350000,    '2022-12-21',   '',   '', 'Gov Fund - Season 2', 'defillama','',''] # Announced 12/21, launched 1/17 - https://twitter.com/dHedgeOrg/status/1615573828394184706
             ,[1,'alchemix',  1_000*(abs(pd.to_datetime("today")-pd.to_datetime('2023-01-08')).days / 7 ),    '2023-01-08',   '', 'alETH/WETH: Velodrome', 'Gov Fund - Season 1',  'pool-subgraph-velodrome',  ['0x6fd5bee1ddb4dbbb0b7368b080ab99b8ba765902'],'velodrome']
             ,[1,'angle',  1_200*(abs(pd.to_datetime("today")-pd.to_datetime('2023-02-20')).days / 7 ),    '2023-02-20',   '', 'agEUR/MAI: Velodrome', 'Gov Fund - Season 1',  'pool-subgraph-velodrome',  ['0x389d9aea762fd5f9fbd4434d8e11295f15097b67'],'velodrome']
-            ,[1,'angle',  1_200*(abs(pd.to_datetime("today")-pd.to_datetime('2023-02-20')).days / 7 ),    '2023-02-20',   '', 'OP/agEUR: Velodrome', 'Gov Fund - Season 1',  'pool-subgraph-velodrome',  ['0xBda45a58BAC8B327d02798a9184A850CEEd9a477'],'velodrome']
-            # ,[1,'angle',  2_400*(abs(pd.to_datetime("today")-pd.to_datetime('2023-02-20')).days / 7 ),    '2023-02-20',   '', 'USDC/agEUR: Uniswap', 'Gov Fund - Season 1',  'pool-subgraph-uniswap',  ['0xBda45a58BAC8B327d02798a9184A850CEEd9a477'],'uniswap']
+            ,[1,'angle',  1_200*(abs(pd.to_datetime("today")-pd.to_datetime('2023-02-20')).days / 7 ),    '2023-02-20',   '', 'OP/agEUR: Velodrome', 'Gov Fund - Season 1',  'pool-subgraph-velodrome',  ['0xbda45a58bac8b327d02798a9184a850ceed9a477'],'velodrome']
+            ,[1,'angle',  2_400*(abs(pd.to_datetime("today")-pd.to_datetime('2023-02-20')).days / 7 ),    '2023-02-20',   '', 'USDC/agEUR: Uniswap', 'Gov Fund - Season 1',  'pool-subgraph-messari',  ['0xf44acaa38be5e965c5ddf374e7a2ba270e580684'],'uniswap-v3']
             ]
         , columns = ['include_in_summary','slug','num_op','start_date', 'end_date','name', 'op_source', 'data_source','contracts','source_slug']
     )
@@ -229,12 +229,12 @@ for index, program in subg_protocols.iterrows():
                 # print(df_source + ' - ' +source_slug + ' - ' + c)
                 # messari generalized
                 if df_source == 'messari':
-                        sdf = subg.get_messari_format_pool_tvl(source_slug, c, min_ts = min_tsmp)
+                        sdf = subg.get_messari_format_pool_tvl(source_slug, c.lower(), min_ts = min_tsmp)
                 # subgraph specific
                 elif df_source == 'curve':
-                        sdf = subg.get_curve_pool_tvl(c, min_ts = min_tsmp)
+                        sdf = subg.get_curve_pool_tvl(c.lower(), min_ts = min_tsmp)
                 elif df_source == 'velodrome':
-                        sdf = subg.get_velodrome_pool_tvl(c, min_ts = min_tsmp)
+                        sdf = subg.get_velodrome_pool_tvl(c.lower(), min_ts = min_tsmp)
                 elif df_source == 'hop':
                         sdf = subg.get_hop_pool_tvl(c, min_ts = min_tsmp)
                         
