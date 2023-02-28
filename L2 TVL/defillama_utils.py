@@ -177,13 +177,13 @@ def get_single_tvl(prot, chains, header = header, statuses = statuses, fallback_
         prod = []
         # retry_client = RetryClient()
         apistring = 'https://api.llama.fi/protocol/' + prot
-
         # response = retry_client.get(apistring, retry_options=ExponentialRetry(attempts=10), raise_for_status=statuses)
         try:
                 prot_req = r.get(apistring).json()
                 cats = prot_req['category']
                 prot_req = prot_req['chainTvls']
                 for ch in chains:
+                        ch = ch.capitalize() # defillama uses initcap
                         ad = pd.json_normalize( prot_req[ch]['tokens'] )
                         ad_usd = pd.json_normalize( prot_req[ch]['tokensInUsd'] )
                         if (ad.empty) & (fallback_on_raw_tvl == False):
@@ -338,12 +338,12 @@ def get_historical_defillama_prices(token_list_api, chain = 'optimism', min_ts =
 
                 result.drop(columns=['prices'], inplace=True)
 
-                result['dt'] = pd.to_datetime(result['timestamp'], unit='s').dt.date
+                result['date'] = pd.to_datetime(result['timestamp'], unit='s').dt.date
 
                 result[['chain', 'token_address']] = result['token_address'].str.split(':', expand=True)
 
         except:
                 result = pd.DataFrame(columns=['token_address', 'symbol', 'decimals','timestamp',\
-                                                'price','dt','chain'])
+                                                'price','date','chain'])
 
         return result

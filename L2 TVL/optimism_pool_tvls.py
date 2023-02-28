@@ -310,7 +310,7 @@ def get_messari_format_pool_tvl(slug, pool_id, chain = 'optimism', min_ts = 0, m
         token_list = pool_lst['inputTokens_id'].drop_duplicates().to_list()
 
         prices = dfl.get_historical_defillama_prices(token_list, chain, min_ts)
-        prices = prices.rename(columns={'token_address':'inputTokens_id'})
+        prices = prices.rename(columns={'token_address':'inputTokens_id','date':'dt'})
 
         pool_lst = pool_lst[['pool_id','inputTokens_id','inputTokens_lastPriceUSD','inputTokens_symbol','inputTokens_decimals']]
 
