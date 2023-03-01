@@ -394,8 +394,9 @@ final_summary_df = summary_df[(summary_df['rank_desc'] == 1) & (summary_df['date
 final_summary_df = final_summary_df[final_summary_df['cumul_net_dollar_flow']< 1e20] #weird error handling
 
 
-os.makedirs('csv_outputs', exist_ok=True)  
-final_summary_df.to_csv('csv_outputs/latest_tvl_app_trends.csv')  
+os.makedirs('csv_outputs', exist_ok=True)
+
+final_summary_df.to_csv('csv_outputs/latest_tvl_app_trends.csv', mode='w', index=False)
 
 # display(summary_df)
 for i in drange:
