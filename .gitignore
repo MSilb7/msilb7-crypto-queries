@@ -19,3 +19,4 @@ dune_exports/dune.env
 dune_exports/
 op_attestation_data/*.csv
 L2 TVL/csv_outputs/latest_tvl_app_trends_by_token.csv
+.env
