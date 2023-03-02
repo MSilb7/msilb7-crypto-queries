@@ -11,7 +11,7 @@ on:
 #     branches: [ "main" ]
   # Run on a schedule
   schedule:
-      - cron: '0 */6 * * *'
+      - cron: '0 */4 * * *'
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
@@ -34,7 +34,7 @@ jobs:
       
       - uses: actions/setup-python@v4
         with:
-          python-version: '3.10.8'
+          python-version: '3.10.9'
           cache: 'pip' # caching pip dependencies
       - run: pip install -r requirements.txt
       
@@ -51,6 +51,7 @@ jobs:
           pip install -U aiohttp
           pip install -U nest_asyncio
           pip install -U subgrounds
+          pip install -U pandas
 
       # Runs a single command using the runners shell
       # - name: Run a one-line script
