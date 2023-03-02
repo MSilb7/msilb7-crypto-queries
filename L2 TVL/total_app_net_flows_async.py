@@ -396,7 +396,7 @@ final_summary_df = final_summary_df[final_summary_df['cumul_net_dollar_flow']< 1
 
 os.makedirs('csv_outputs', exist_ok=True)
 
-final_summary_df.to_csv('csv_outputs/latest_tvl_app_trends.csv', mode='w', index=False, encoding='utf-8')
+final_summary_df.to_csv(prepend + 'csv_outputs/latest_tvl_app_trends.csv', mode='w', index=False, encoding='utf-8')
 
 
 # In[ ]:
