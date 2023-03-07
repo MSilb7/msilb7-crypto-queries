@@ -72,7 +72,7 @@ protocols = pd.DataFrame(
             ,[1,'dforce',    300000,    '2022-11-30',   '',   '', 'Gov Fund - Season 1', 'defillama','','']
             ,[1,'cbridge',    300000,    '2022-08-13',   '',   'Celer', 'Gov Fund - Phase 0', 'defillama','','']
             ,[1,'clipper',    300000,    '2023-01-23',   '',   '', 'Gov Fund - Phase 0', 'defillama','','']
-            ,[1,'sushi',    100000/4,             '2023-01-16',   '2023-02-08',   'Uniswap LM - Phase 2', 'Gov Fund - Phase 0','defillama','','']
+            ,[1,'sushi',    504000,             '2023-03-03',   '2023-03-03',   '', 'Gov Fund - Season 1','defillama','','']
             #Uniswap LM Program - Phase 1
             ,[0,'uniswap-v3', 50000,         '2022-10-26',   '2022-11-21',   'Uniswap LM - Phase 1', 'Gov Fund - Phase 0', 'defillama','','']
             ,[1,'arrakis-finance',    50000/3,    '2022-10-26',   '2022-11-21',   'Uniswap LM - Phase 1', 'Gov Fund - Phase 0','defillama','','']
@@ -84,9 +84,11 @@ protocols = pd.DataFrame(
             ,[1,'gamma',    100000/4,              '2023-01-16',   '2023-02-08',   'Uniswap LM - Phase 2', 'Gov Fund - Phase 0','defillama','','']
             ,[1,'xtoken',    100000/4,             '2023-01-16',   '2023-02-08',   'Uniswap LM - Phase 2', 'Gov Fund - Phase 0','defillama','','']
             ,[1,'defiedge',    100000/4,             '2023-01-16',   '2023-02-08',   'Uniswap LM - Phase 2', 'Gov Fund - Phase 0','defillama','','']
+
             # Other DEX Programs
             
-            ,[1,'qidao',  7_000*(abs(pd.to_datetime("today")-pd.to_datetime('2022-08-26')).days / 7 ),    '2022-08-26',   '', 'USDC/MAI: Velodrome', 'Gov Fund - Season 1',  'pool-subgraph-velodrome',  ['0xd62c9d8a3d4fd98b27caaefe3571782a3af0a737'],'velodrome']
+            ,[1,'qidao',  7_000*(abs(pd.to_datetime("today")-pd.to_datetime('2022-08-26')).days / 7 ),    '2022-08-26',   '', 'sUSDC/MAI: Velodrome', 'Gov Fund - Season 1',  'pool-subgraph-velodrome',  ['0xd62c9d8a3d4fd98b27caaefe3571782a3af0a737'],'velodrome']
+            ,[1,'qidao',  7_000*(abs(pd.to_datetime("today")-pd.to_datetime('2022-08-26')).days / 7 ),    '2022-08-26',   '', 'vUSDC/MAI: Velodrome', 'Gov Fund - Season 1',  'pool-subgraph-velodrome',  ['0x0B5581d5db524Eaf0006A0BafD1e8D206c70Cc0d'],'velodrome']
             ,[1,'dhedge',  1_900*(abs(pd.to_datetime("today")-pd.to_datetime('2023-02-03')).days / 7 ),    '2023-02-03',   '', 'DHT/OP: Velodrome', 'Gov Fund - Season 1',  'pool-subgraph-velodrome',  ['0x827ecd158b76f63010e8f129b19fe64a85e97e95'],'velodrome']
             ,[1,'rocket-pool',  2_100*(abs(pd.to_datetime('2023-02-08')-pd.to_datetime('2022-11-09')).days / 7 ),    '2022-11-09',   '2023-02-08', 'sWETH/rETH: Velodrome', 'Gov Fund - Season 1',  'pool-subgraph-velodrome',  ['0x69f795e2d9249021798645d784229e5bec2a5a25'],'velodrome']
             ,[1,'rocket-pool',  4_300*(abs(pd.to_datetime("today")-pd.to_datetime('2023-02-08')).days / 7 ),    '2023-02-08',   '', 'vWETH/rETH: Velodrome', 'Gov Fund - Season 1',  'pool-subgraph-velodrome',  ['0x985612ff2c9409174fedcff23d4f4761af124f88'],'velodrome']
