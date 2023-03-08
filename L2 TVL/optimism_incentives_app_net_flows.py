@@ -72,7 +72,7 @@ protocols = pd.DataFrame(
             ,[1,'dforce',    300000,    '2022-11-30',   '',   '', 'Gov Fund - Season 1', 'defillama','','']
             ,[1,'cbridge',    300000,    '2022-08-13',   '',   'Celer', 'Gov Fund - Phase 0', 'defillama','','']
             ,[1,'clipper',    300000,    '2023-01-23',   '',   '', 'Gov Fund - Phase 0', 'defillama','','']
-            ,[1,'sushi-trident',    504000,             '2023-03-03',   '2023-03-03',   '', 'Gov Fund - Season 1','defillama','','']
+            ,[1,'sushi-trident',    504000,             '2023-03-03',   '',   '', 'Gov Fund - Season 1','defillama','','']
             #Uniswap LM Program - Phase 1
             ,[0,'uniswap-v3', 50000,         '2022-10-26',   '2022-11-21',   'Uniswap LM - Phase 1', 'Gov Fund - Phase 0', 'defillama','','']
             ,[1,'arrakis-finance',    50000/3,    '2022-10-26',   '2022-11-21',   'Uniswap LM - Phase 1', 'Gov Fund - Phase 0','defillama','','']
@@ -144,6 +144,9 @@ for d in date_cols:
     protocols[d] = pd.to_datetime( protocols[d] )
 
 protocols = protocols.merge(protocol_name_mapping,on='slug', how = 'left')
+
+protocols.to_csv(prepend + 'csv_outputs/' + 'protocols_export.csv')
+
 
 # For subgraphs
 protocols['protocol'] = protocols['slug']
