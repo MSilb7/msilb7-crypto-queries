@@ -76,7 +76,7 @@ df_df = dfl.get_all_protocol_tvls_by_chain_and_token(min_tvl, is_fallback_on_raw
 # In[ ]:
 
 
-display(df_df)
+# display(df_df)
 df_df_all = df_df.copy()
 df_df_all.head()
 # df_df_all[(df_df_all['protocol'] == 'magpie') & (df_df_all['date'] == '2023-01-27')]
