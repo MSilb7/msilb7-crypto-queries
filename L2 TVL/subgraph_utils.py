@@ -79,6 +79,7 @@ def get_velodrome_pool_tvl(pid, min_ts = 0, max_ts = 99999999999999):
         df_array = [velo_tvl, velo_wts, velo_reserves]
 
         for df in df_array:
+                print(df)
                 df.columns = df.columns.str.replace('liquidityPoolDailySnapshots_', '')
                 df['id_rank'] = df.groupby(['id']).cumcount()+1
 

@@ -1,6 +1,7 @@
 # https://www.thepythoncode.com/article/convert-pandas-dataframe-to-html-table-python
 import pandas as pd
 import datetime
+import ast
 
 def generate_html(dataframe: pd.DataFrame):
     # get the table HTML from the dataframe
@@ -90,7 +91,7 @@ def format_pct(x):
         x = float(x) #just cast for safety
         return '{:.1%}'.format(x)
 
-#ChatPT wrote this lol
+#ChatGPT wrote this lol
 def get_unix_timestamp(trailing_days):
     # get the current date at the start of the day
     today_start = datetime.datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
@@ -102,3 +103,11 @@ def get_unix_timestamp(trailing_days):
     unix_timestamp = int(trailing_date.timestamp())
 
     return unix_timestamp
+
+#chatgpt again
+# define a function to convert strings to lists
+def str_to_list(s):
+    if pd.isna(s):
+        return None
+    else:
+        return ast.literal_eval(s)
