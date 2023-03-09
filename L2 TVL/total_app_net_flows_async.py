@@ -76,7 +76,7 @@ df_df = dfl.get_all_protocol_tvls_by_chain_and_token(min_tvl, is_fallback_on_raw
 # In[ ]:
 
 
-# display(df_df)
+display(df_df)
 df_df_all = df_df.copy()
 df_df_all.head()
 # df_df_all[(df_df_all['protocol'] == 'magpie') & (df_df_all['date'] == '2023-01-27')]
@@ -86,11 +86,11 @@ df_df_all.head()
 
 
 # display(df_df_all)
-df_df_all2 = df_df_all.copy()
-# df_df_all2['token_value'] = df_df_all2['token_value'].fillna(0)
-df_df_all2['token_value'] = df_df_all2['token_value'].astype('float64')
-df_df_all2['usd_value'] = df_df_all2['usd_value'].astype('float64')
-# display(df_df_all2)
+# df_df_all_u = df_df_all.copy()
+# df_df_all_u['token_value'] = df_df_all_u['token_value'].fillna(0)
+df_df['token_value'] = df_df['token_value'].astype('float64')
+df_df['usd_value'] = df_df['usd_value'].astype('float64')
+# display(df_df_all_u)
 
 
 # In[ ]:
@@ -98,28 +98,28 @@ df_df_all2['usd_value'] = df_df_all2['usd_value'].astype('float64')
 
 #create an extra day to handle for tokens dropping to 0
 
-print(df_df_all2.dtypes)
+print(df_df.dtypes)
 
-df_df_all_u = df_df_all2.fillna(0)
-df_df_shift = df_df_all_u.copy()
+df_df = df_df.fillna(0)
+df_df_shift = df_df.copy()
 df_df_shift['date'] = df_df_shift['date'] + timedelta(days=1)
 df_df_shift['token_value'] = 0.0
 df_df_shift['usd_value'] = 0.0
 
 #merge back in
-df_df_all = pd.concat([df_df_all_u,df_df_shift])
+df_df = pd.concat([df_df,df_df_shift])
 
 print(df_df_all.dtypes)
 
 # display(df_df_all)
-df_df_all = df_df_all[df_df_all['date'] <= pd.to_datetime("today") ]
+df_df = df_df[df_df['date'] <= pd.to_datetime("today") ]
 
-df_df_all['token_value'] = df_df_all['token_value'].fillna(0)
-df_df_all = df_df_all.groupby(['date','token','chain','protocol','name','category','parent_protocol']).sum(['usd_value','token_value'])
+df_df['token_value'] = df_df['token_value'].fillna(0)
+df_df = df_df.groupby(['date','token','chain','protocol','name','category','parent_protocol']).sum(['usd_value','token_value'])
 
 # display(df_df_all)
-df_df_all = df_df_all.reset_index()
-df_df_shift = []
+df_df = df_df.reset_index()
+df_df_shift = [] #free up memory
 # display(df_df_all)
 
 
@@ -137,7 +137,7 @@ print("done api")
 
 
 #filter down a bit so we can do trailing comp w/o doing every row
-df_df = df_df_all[df_df_all['date'].dt.date >= start_date-timedelta(days=1) ]
+df_df = df_df[df_df['date'].dt.date >= start_date-timedelta(days=1) ]
 
 #trailing comp
 df_df['last_token_value'] = df_df.groupby(['token','protocol','chain'])['token_value'].shift(1)
