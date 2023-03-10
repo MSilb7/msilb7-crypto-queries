@@ -21,6 +21,7 @@ sgs = pd.DataFrame(
         [
                  ['l2dao-velodrome','https://api.thegraph.com/subgraphs/name/messari/velodrome-optimism','']
                 ,['synthetix-curve','https://api.thegraph.com/subgraphs/name/convex-community/volume-optimism','']
+                ,['uniswap','https://api.thegraph.com/subgraphs/name/ianlapham/optimism-post-regenesis', '']
         ]
         ,columns = ['dfl_id','subgraph_url','query']
 )
@@ -79,7 +80,6 @@ def get_velodrome_pool_tvl(pid, min_ts = 0, max_ts = 99999999999999):
         df_array = [velo_tvl, velo_wts, velo_reserves]
 
         for df in df_array:
-                print(df)
                 df.columns = df.columns.str.replace('liquidityPoolDailySnapshots_', '')
                 df['id_rank'] = df.groupby(['id']).cumcount()+1
 
@@ -105,6 +105,14 @@ def get_velodrome_pool_tvl(pid, min_ts = 0, max_ts = 99999999999999):
         })
 
         return velo_tvl
+
+
+# In[ ]:
+
+
+# def get_uniswap_pool_tvl(pid, min_ts = 0, max_ts = 99999999999999):
+#     uni = create_sg('https://api.thegraph.com/subgraphs/name/ianlapham/optimism-post-regenesis')
+
 
 
 # In[ ]:
@@ -311,7 +319,7 @@ def get_messari_format_pool_tvl(slug, pool_id, chain = 'optimism', min_ts = 0, m
         token_list = pool_lst['inputTokens_id'].drop_duplicates().to_list()
 
         prices = dfl.get_historical_defillama_prices(token_list, chain, min_ts)
-        prices = prices.rename(columns={'token_address':'inputTokens_id','date':'dt'})
+        prices = prices.rename(columns={'token_address':'inputTokens_id'})
 
         pool_lst = pool_lst[['pool_id','inputTokens_id','inputTokens_lastPriceUSD','inputTokens_symbol','inputTokens_decimals']]
 
@@ -319,17 +327,16 @@ def get_messari_format_pool_tvl(slug, pool_id, chain = 'optimism', min_ts = 0, m
         snap_lst['token_order'] = snap_lst.groupby('pool_date_id')['pool_date_id'].cumcount() + 1
         pool_lst['token_order'] = pool_lst.groupby('pool_id')['pool_id'].cumcount() + 1
 
-        snap_lst['dt'] = pd.to_datetime(snap_lst['timestamp'], unit='s').dt.date
+        snap_lst['date'] = pd.to_datetime(snap_lst['timestamp'], unit='s').dt.date
 
         data_df = snap_lst.merge(pool_lst,on='token_order',how='left')
-        data_df = data_df.merge(prices,on=['inputTokens_id','dt'],how='left')
+        data_df = data_df.merge(prices,on=['inputTokens_id','date'],how='left')
         data_df['token_price'] = data_df['price'].combine_first(data_df['inputTokens_lastPriceUSD']) #prefer defillama's 'price'
 
         data_df['token_balance'] = data_df['inputTokenBalances'] / 10**data_df['inputTokens_decimals']
         data_df['usd_balance'] = data_df['token_balance'] * data_df['token_price']
 
         data_df = data_df.rename(columns={
-                'dt':'date',
                 'symbol':'token',
                 'token_balance':'token_value',
                 'usd_balance':'usd_value'
@@ -462,5 +469,5 @@ def get_messari_sg_pool_snapshots(slug, chains = ['optimism'], min_ts = 0, max_t
 # In[ ]:
 
 
-# ! jupyter nbconvert --to python optimism_pool_tvls.ipynb
+# ! jupyter nbconvert --to python subgraph_utils.ipynb
 
