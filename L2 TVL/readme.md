@@ -1,3 +1,6 @@
+# DEPRECATED
+This data no longer updates automatically, it has been relocated to [op-analytics](https://github.com/ethereum-optimism/op-analytics/tree/main/op_rewards_tracking)
+
 # OP Summer TVL Change Tracking
 
 **[Cumulative Flows at Last Price - Interactive Chart](https://msilb7.github.io/msilb7-crypto-queries/L2%20TVL/img_outputs/cumul_ndf_last_price.html)**
