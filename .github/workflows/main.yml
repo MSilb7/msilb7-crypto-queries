@@ -10,8 +10,8 @@ on:
 #   pull_request:
 #     branches: [ "main" ]
   # Run on a schedule
-  schedule:
-      - cron: '0 */6 * * *'
+  # schedule:
+      # - cron: '0 */6 * * *'
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
