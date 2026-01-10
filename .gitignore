@@ -1,12 +1,28 @@
+# OS files
 .DS_Store
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
 .ipynb_checkpoints/
+
+# Editor
+.vscode/
+
+# Environment & Config
+*.env
+.env
+config.py
+config.ini
+*.ini
+
+# Project-specific ignores (legacy)
 arbitrum-oracle-txs/
 arbitrum-txs/
 optimism-oracle-txs/
 optimism-txs/
-config.py
-config.ini
-*.ini
 labels/etherscan-export.xlsx
 folder_ignore/
 Covalent API Testing.ipynb
@@ -15,8 +31,6 @@ L2 TVL/velo_app_net_flows.ipynb
 L2 TVL/ignore/
 L2 TVL/Curve/csv_outputs/*.csv
 dune_exports/dune.env
-*.env
 dune_exports/
 op_attestation_data/*.csv
 L2 TVL/csv_outputs/latest_tvl_app_trends_by_token.csv
-.env
